@@ -1,5 +1,8 @@
 package com.training.project;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 import com.training.project.dao.Imp.*;
 import com.training.project.model.*;
@@ -45,8 +48,8 @@ public class App {
 //        	List<String> profileDetails = userService.GetUserProfileDetails(5);
 //        	profileDetails.forEach(System.out::println);
         	
-//        	AppointmentService appointmentService = new AppointmentService(sessionFactory);
-//            List<Appointment> appointments = appointmentService.getAppointmentsForDoctor(2);
+//        	DoctorService doctorService = new DoctorService(sessionFactory);
+//            List<Appointment> appointments = doctorService.getUpcomingAppointmentsForDoctor(2,LocalDate.now());
 //            appointments.forEach(System.out::println);
 //        	boolean isStatusUpdated = appointmentService.updateAppointmentStatus(2,1,2);
 //            System.out.println("isStatusUpdated "+isStatusUpdated);

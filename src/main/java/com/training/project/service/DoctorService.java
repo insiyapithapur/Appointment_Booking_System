@@ -18,6 +18,7 @@ import com.training.project.model.Doctor;
 import com.training.project.model.Patient;
 import com.training.project.model.Schedule;
 import com.training.project.model.User;
+import com.training.project.util.HibernateUtil;
 
 public class DoctorService {
 	private SessionFactory sessionFactory;
@@ -27,12 +28,29 @@ public class DoctorService {
     private ScheduleDaoImp scheduleDao;
 	private AppointmentDaoImp appointmentDao;
 	
+	public DoctorService() {
+	    try {
+	        this.sessionFactory = HibernateUtil.getSessionFactory();
+	        if (this.sessionFactory == null) {
+	            System.err.println("Failed to initialize SessionFactory in DoctorService constructor");
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Error initializing SessionFactory: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
+	public DoctorService(SessionFactory sessionFactory) {
+		super();
+		this.sessionFactory = sessionFactory;
+	}
+
 	/*
 	 * Get all appointments of patient for present day
 	 */
 	public List<Appointment> getUpcomingAppointmentsForDoctor(int userId, LocalDate fromDate) {
 	    Session session = sessionFactory.openSession();
 	    appointmentDao = new AppointmentDaoImp(session);
+	    
 	    try {
 	        return appointmentDao.findUpcomingAppointmentsForUser(userId, fromDate);
 	    } finally {
@@ -69,7 +87,7 @@ public class DoctorService {
 	                "JOIN Patient p ON p.user.id = u.id",
 	                Object[].class
 	            );
-	        } else if (roleId == 2) { // Doctor: Fetch only patients who visited this doctor
+	        } else if (roleId == 3) { // Doctor: Fetch only patients who visited this doctor
 	            query = session.createQuery(
 	                "SELECT DISTINCT ud.firstName, ud.lastName, ud.phoneNumber " +
 	                "FROM UserDetail ud " +

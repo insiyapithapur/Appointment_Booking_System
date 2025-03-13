@@ -3,6 +3,7 @@ package com.training.project.dao.Imp;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import com.training.project.dao.GenericDao;
 import com.training.project.model.*;
@@ -76,5 +77,19 @@ public class UserDetailDaoImp implements GenericDao<UserDetail, Integer> {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
+	public UserDetail findByUserId(Integer userId) {
+		try {
+			String hql = "FROM UserDetail ud WHERE ud.user.userId = :userId";
+			Query<UserDetail> query = session.createQuery(hql, UserDetail.class);
+			query.setParameter("userId", userId);
+			
+			// Get a single result or null if not found
+			return query.uniqueResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 }

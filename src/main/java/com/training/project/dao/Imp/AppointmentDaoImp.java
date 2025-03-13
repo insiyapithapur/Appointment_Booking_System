@@ -152,7 +152,7 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	            // Query for doctor: Fetch appointments only for the specific date
 	            hql = "SELECT a FROM Appointment a JOIN a.schedule s "
 	                + "WHERE s.doctor.user.userId = :userId "
-	                + "AND a.appointmentDate = :fromDate ORDER BY a.appointmentDate ASC";
+	                + "AND a.appointmentDate >= :fromDate ORDER BY a.appointmentDate ASC";
 	        } else {
 	            throw new IllegalArgumentException("User role " + roleName + " is not supported for appointment retrieval");
 	        }

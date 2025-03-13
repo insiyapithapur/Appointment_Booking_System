@@ -7,6 +7,7 @@ import org.hibernate.*;
 import org.hibernate.query.Query;
 import com.training.project.dao.Imp.*;
 import com.training.project.model.*;
+import com.training.project.util.HibernateUtil;
 
 public class PatientService {
 	private SessionFactory sessionFactory;
@@ -16,6 +17,18 @@ public class PatientService {
 	private DoctorDaoImp doctorDao;
 	private UserDaoImp userDao;
 	
+	public PatientService() {
+	    try {
+	        this.sessionFactory = HibernateUtil.getSessionFactory();
+	        if (this.sessionFactory == null) {
+	            System.err.println("Failed to initialize SessionFactory in DoctorService constructor");
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Error initializing SessionFactory: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	}
+
 	public PatientService(SessionFactory sessionFactory) {
 		super();
 		this.sessionFactory = sessionFactory;
