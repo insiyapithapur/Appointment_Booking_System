@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import com.training.project.dao.Imp.*;
 import com.training.project.model.*;
+import com.training.project.util.HibernateUtil;
 
 public class UserService {
 	private SessionFactory sessionFactory;
@@ -15,11 +16,17 @@ public class UserService {
 	private DoctorDaoImp doctorDao;
 	private PatientDaoImp patientDao;
 	
-	public UserService(SessionFactory sessionFactory) {
-		super();
-		this.sessionFactory = sessionFactory;
+	public UserService() {
+	    try {
+	        this.sessionFactory = HibernateUtil.getSessionFactory();
+	        if (this.sessionFactory == null) {
+	            System.err.println("Failed to initialize SessionFactory in DoctorService constructor");
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Error initializing SessionFactory: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 	}
-	
 //	/*
 //	 * Registration of doctor
 //	 */
@@ -164,7 +171,7 @@ public class UserService {
     	
 	    try {
 	        // 1. Check if the username already exists
-	        User existingUser = userDao.findByUsername(patientUser.getUsername());
+	        User existingUser = userDao.checkUsername(patientUser.getUsername());
 	        if (existingUser != null) {
 	            System.out.println("Username '" + patientUser.getUsername() + "' already exists");
 	            return false;
@@ -261,7 +268,7 @@ public class UserService {
 	        profileDetails.add("Name: " + userDetails.getFirstName()+" "+userDetails.getLastName());
 	        profileDetails.add("Email: " + userDetails.getEmail());
 	        profileDetails.add("DOB: " + userDetails.getDateOfBirth());
-	        profileDetails.add("Email: " + userDetails.getGender());
+	        profileDetails.add("Gender: " + userDetails.getGender());
 	        profileDetails.add("Phone: " + userDetails.getPhoneNumber());
 	    }
 	    
@@ -281,7 +288,7 @@ public class UserService {
 	            profileDetails.add("Specialization: " + doctor.getSpecialization());
 	            profileDetails.add("License Number: " + doctor.getLicenseNumber());
 	            profileDetails.add("Degree: " + doctor.getDegree());
-	            profileDetails.add("Degree: " + doctor.getIsActive());
+//	            profileDetails.add("Degree: " + doctor.getIsActive());
 	        }
 	    }
 	    session.close();
@@ -291,44 +298,21 @@ public class UserService {
 	/*
 	 * Login for all Users
 	 */
-	public List<Integer> Login(String username,String password) {
+	public boolean checkUser(String username) {
 		Session session = sessionFactory.openSession();
-	    userDao = new UserDaoImp(session);
-	    List<Integer> result = new ArrayList<>();
-	    
-	    User user = userDao.findByUsername(username);
-	    
-	    // Check if user exists
-	    if(user == null) {
-	    	System.out.println("Username not found");
-	        return null; // Username not found
-	    }
-	    
-	    if(!user.getPasswordHash().equals(password)) {
-	    	System.out.println("Password doesn't match");
-	        return null; // Password doesn't match
-	    }
-	    
-	    try {
-	        user.setIsLogin(true);
-	        user.setLastLogin(LocalDateTime.now());
-	        
-	        boolean updateSuccess = userDao.update(user);
-	        
-	        if(!updateSuccess) {
-	        	System.out.println("update failer");
-	        	return null; //no updation performed
-	        }
-	        result.add(user.getUserId());
-	        result.add(user.getRole().getRoleId());
-	        
-	        return result;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return null;
-	    } finally {
-	        session.close();
-	    }
+		userDao = new UserDaoImp(session);
+		User user =  userDao.checkUsername(username);
+		return user != null;
+	}
+	public List<Object> checkPassword(String username,String password) {
+		Session session = sessionFactory.openSession();
+		userDao = new UserDaoImp(session);
+		
+		List<Object> sessionContent =  userDao.findIdsByUsername(username);
+		if(sessionContent == null) {
+			return null;
+		}
+		return sessionContent;
 	}
 	
 	/*
@@ -339,7 +323,7 @@ public class UserService {
 	    boolean result = false;
 	    userDao = new UserDaoImp(session);
 	    
-	    User user = userDao.findByUsername(username);
+	    User user = userDao.checkUsername(username);
 
 	    if(user != null&&user.getUsername().equals(username)) {
 	    	if(oldPassword.equals(user.getPasswordHash())) {

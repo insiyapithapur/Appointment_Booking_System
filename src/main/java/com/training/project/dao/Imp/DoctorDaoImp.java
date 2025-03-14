@@ -126,28 +126,33 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
         }
         return doctorDetails;
     }
+	
+	public User getUserByDoctorId(int doctorId) {
+        Query<User> query = session.createQuery(
+            "SELECT d.user FROM Doctor d WHERE d.doctorId = :doctorId", 
+            User.class);
+        query.setParameter("doctorId", doctorId);
+        return query.uniqueResult();
+    }
+	
+	//find by id 
 
-
-
-
-							//find by id 
-
-public Doctor getDoctorById(Integer doctorId) {
-	Transaction transaction = session.beginTransaction();
-	Doctor doctor = session.get(Doctor.class, doctorId);
-	transaction.commit();
-	session.close();
-	return doctor;
-}
+	public Doctor getDoctorById(Integer doctorId) {
+		Transaction transaction = session.beginTransaction();
+		Doctor doctor = session.get(Doctor.class, doctorId);
+		transaction.commit();
+		session.close();
+		return doctor;
+	}
 
 						//Update
 
-public void updateDoctor(Doctor doctor) {
-	Transaction transaction = session.beginTransaction();
-	session.update(doctor);
-	transaction.commit();
-	session.close();
-}
+	public void updateDoctor(Doctor doctor) {
+		Transaction transaction = session.beginTransaction();
+		session.update(doctor);
+		transaction.commit();
+		session.close();
+	}
 
 						//delete
 
@@ -196,5 +201,5 @@ public void updateDoctor(Doctor doctor) {
             return null;
         }
 
- }
+     }
 }

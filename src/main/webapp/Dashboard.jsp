@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +10,8 @@
     <title>Medical Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
             --sidebar-bg: #4f5e95;
@@ -142,6 +145,7 @@
             padding: 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            margin-bottom: 30px;
         }
         
         .appointments-header {
@@ -190,21 +194,37 @@
             align-items: center;
         }
         
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .status-confirmed {
+        /* Custom badge styles with CSS variables */
+        .badge-confirmed {
             background-color: var(--confirmed-color);
             color: #2e7d32;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
         }
         
-        .status-pending {
+        .badge-pending {
+            background-color: #fff8e1;
+            color: #f57f17;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        
+        .badge-cancelled {
+            background-color: #ffebee;
+            color: #c62828;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        
+        .badge-completed {
             background-color: var(--pending-color);
             color: #1565c0;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
         }
         
         .toggle-sidebar {
@@ -238,7 +258,50 @@
             z-index: 999;
         }
         
+        .reason-cell {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .reason-tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .reason-tooltip .reason-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: normal;
+        }
+        
+        .reason-tooltip:hover .reason-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
         /* Responsive styles */
+        @media (max-width: 1250px) {
+            .appointments-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
         @media (max-width: 991px) {
             .sidebar {
                 width: 220px;
@@ -287,85 +350,74 @@
         <div class="doctor-name mb-3">Dr. ${doctorName}</div>
         
         <div class="nav-item active" onclick="navigateTo('Dashboard')">Dashboard</div>
-        <div class="nav-item" onclick="navigateTo('patients')">Patients</div>
-        <div class="nav-item" onclick="navigateTo('appointments')">Appointments</div>
-        <div class="nav-item" onclick="navigateTo('profile')">Profile</div>
-        <div class="nav-item" onclick="navigateTo('settings')">Settings</div>
+        <div class="nav-item" onclick="navigateTo('Patient')">Patients</div>
+        <div class="nav-item" onclick="navigateTo('Appointment')">Appointments</div>
+        <div class="nav-item" onclick="navigateTo('Profile')">Profile</div>
     </div>
     
     <div class="content">
         <h2>Dashboard</h2>
         <p class="text-muted" id="current-datetime"></p>
         
-        <!-- Stats Cards -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-title">Today's Appointments</div>
-                <div class="stat-value">${todayAppointments}</div>
-                <div class="trend-indicator trend-up">↑</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-title">Pending Confirmations</div>
-                <div class="stat-value">${pendingConfirmations}</div>
-                <div class="trend-indicator trend-down">↓</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-title">New Patients</div>
-                <div class="stat-value">${newPatients}</div>
-                <div class="trend-indicator trend-up">↑</div>
-            </div>
-        </div>
-        
         <!-- Appointments Table -->
         <div class="appointments-container">
             <div class="appointments-header">Today's Appointments</div>
             <table class="appointments-table">
-                <!-- Add "Action" to your table header -->
-				<thead>
-				    <tr>
-				        <th>Patient Name</th>
-				        <th>Time</th>
-				        <th>Token No</th>
-				        <th>Status</th>
-				        <th>Action</th>
-				    </tr>
-				</thead>
-				<tbody>
-				    <c:forEach items="${appointments}" var="appointment">
-				        <tr>
-				            <td>
-				                <div class="patient-info">
-				                    <div class="patient-avatar" style="background-color: ${appointment.avatarColor}">${appointment.initials}</div>
-				                    ${appointment.patientName}
-				                </div>
-				            </td>
-				            <td>${appointment.formattedDate}</td>
-				            <td>${appointment.appointmentToken}</td>
-				            <td>
-				                <span class="status-badge ${appointment.status == 'CONFIRMED' ? 'status-confirmed' : 'status-pending'}">
-				                    ${appointment.status}
-				                </span>
-				            </td>
-				            <td>
-				                <c:choose>
-				                    <c:when test="${appointment.status == 'COMPLETED'}">
-				                        <!-- If completed: View enabled, Complete disabled -->
-				                        <button class="btn btn-sm btn-primary" onclick="viewAppointment(${appointment.appointmentId})">View</button>
-				                        <button class="btn btn-sm btn-secondary" disabled>Complete</button>
-				                    </c:when>
-				                    <c:otherwise>
-				                        <!-- If pending: View disabled, Complete enabled -->
-				                        <button class="btn btn-sm btn-secondary" disabled>View</button>
-				                        <button class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;" 
-				                                onclick="markCompleted(${appointment.appointmentId})">Complete</button>
-				                    </c:otherwise>
-				                </c:choose>
-				            </td>
-				        </tr>
-				    </c:forEach>
-				</tbody>
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Date</th>
+                        <th>Token No</th>
+                        <th>Reason</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach items="${appointments}" var="appointment">
+                        <tr>
+                            <td>
+                                <div class="patient-info">
+                                    <div class="patient-avatar" style="background-color: ${appointment.avatarColor}">${appointment.initials}</div>
+                                    ${appointment.patientName}
+                                </div>
+                            </td>
+                            <td>${appointment.formattedDate}</td>
+                            <td>${appointment.appointmentToken}</td>
+                            <td class="reason-cell">
+                                <div class="reason-tooltip">
+                                    ${appointment.reason.length() > 25 ? appointment.reason.substring(0, 25) + '...' : appointment.reason}
+                                    <span class="reason-text">${appointment.reason}</span>
+                                </div>
+                            </td>
+                            <td>${appointment.contactNumber}</td>
+                            <td>
+                                <span class="badge-${fn:toLowerCase(appointment.status)}">
+                                    ${appointment.status}
+                                </span>
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${appointment.status == 'Completed'}">
+                                        <!-- If completed: View enabled, Complete disabled -->
+                                        <button class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;"
+                                            onclick="viewAppointment(${appointment.appointmentId})">
+                                            View
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- If pending: View disabled, Complete enabled -->
+                                        <button class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;" 
+                                                onclick="markCompleted(${appointment.appointmentId})">
+                                                Complete
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
             </table>
         </div>
     </div>
@@ -402,7 +454,39 @@
         }
         
         function navigateTo(page) {
-            window.location.href = ''page;
+            console.log("Navigation requested to: " + page);
+            window.location.href = page;
+        }
+        
+        function viewAppointment(id) {
+            console.log("Viewing appointment: " + id);
+            // You can implement navigation to appointment details
+            // window.location.href = "appointment-details.jsp?id=" + id;
+        }
+        
+        function markCompleted(id) {
+            if(confirm("Are you sure you want to mark this appointment as completed?")) {
+                console.log("Marking appointment as completed: " + id);
+                
+                // AJAX call to update the status
+                $.ajax({
+                    url: "UpdateAppointmentStatus",
+                    type: "POST",
+                    data: {
+                        appointmentId: id,
+                        status: "COMPLETED"
+                    },
+                    success: function(response) {
+                        alert("Appointment marked as completed");
+                        // Reload the page to reflect changes
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Error updating appointment status");
+                        console.error(error);
+                    }
+                });
+            }
         }
         
         // Handle responsive behavior

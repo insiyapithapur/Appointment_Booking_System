@@ -131,7 +131,7 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	    }
 	}
 	
-	public List<Appointment> findUpcomingAppointmentsForUser(int userId, LocalDate fromDate) {
+	/*public List<Appointment> findUpcomingAppointmentsForUser(int dooctorId, LocalDate fromDate) {
 	    try {
 	        // Fetch role of the user
 	        String roleQuery = "SELECT u.role.roleName FROM User u WHERE u.userId = :userId";
@@ -166,5 +166,138 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	        e.printStackTrace();
 	        return List.of();
 	    }
+	}*/
+	
+	public List<String> findUpcomingAppointmentsForUser(int doctorId, LocalDate fromDate) {
+	    List<String> appointmentDetails = new ArrayList<>();
+	    try {
+	        // First check if the user is a doctor
+	        Query<String> roleQuery = session.createQuery(
+	            "SELECT u.role.roleName FROM User u " +
+	            "JOIN Doctor d ON d.user.id = u.id " +
+	            "WHERE d.doctorId = :doctorId", String.class);
+	        roleQuery.setParameter("doctorId", doctorId);
+	        String role = roleQuery.uniqueResult();
+
+	        if (role == null || !role.equals("Doctor")) {
+	            return appointmentDetails; // Return empty list if not a doctor
+	        }
+
+	        // HQL query to get upcoming appointments for the doctor with required details
+	        // Modified to use a different join path to get user details
+	        Query<Object[]> query = session.createQuery(
+	            "SELECT CONCAT(ud.firstName, ' ', ud.lastName), " + // Patient Name
+	            "a.appointmentDate, " +                        // Appointment Date
+	            "a.tokenNo, " +                                // Token Number
+	            "a.reason, " +                                 // Reason
+	            "aps.statusName, " +                           // Status
+	            "ud.phoneNumber " +                            // Contact No
+	            "FROM Appointment a " +
+	            "JOIN a.schedule s " +
+	            "JOIN s.doctor d " +
+	            "JOIN a.patient p " +
+	            "JOIN p.user pu " +
+	            "JOIN UserDetail ud ON ud.user.id = pu.id " +  // Changed this join
+	            "JOIN a.status aps " +
+	            "WHERE d.doctorId = :doctorId " +
+	            "AND a.appointmentDate >= :fromDate " +
+	            "ORDER BY a.appointmentDate ASC, a.tokenNo ASC", 
+	            Object[].class);
+	        
+	        query.setParameter("doctorId", doctorId);
+	        query.setParameter("fromDate", fromDate);
+	        
+	        List<Object[]> results = query.getResultList();
+	        System.out.println("results "+results);
+	        
+	        // Format the results
+	        for (Object[] row : results) {
+	            String patientName = (String) row[0];
+	            LocalDate appointmentDate = (LocalDate) row[1];
+	            Integer tokenNo = (Integer) row[2];
+	            String reason = (String) row[3];
+	            String status = (String) row[4];
+	            String contactNo = (String) row[5];
+	            
+	            String formattedAppointment = String.format(
+	                "Patient: %s | Date: %s | Token: %d | Reason: %s | Status: %s | Contact: %s",
+	                patientName,
+	                appointmentDate,
+	                tokenNo,
+	                reason != null ? reason : "N/A",
+	                status,
+	                contactNo
+	            );
+	            
+	            appointmentDetails.add(formattedAppointment);
+	        }
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        session.close();
+	    }
+	    
+	    System.out.println("appointmentDetails "+appointmentDetails);
+	    return appointmentDetails;
 	}
+	
+    public List<Object[]> findPatientsByDoctorId(int doctorId) {
+        // First check if the user is a doctor
+        Query<String> roleQuery = session.createQuery(
+            "SELECT u.role.roleName FROM User u " +
+            "JOIN Doctor d ON d.user.id = u.id " +
+            "WHERE d.doctorId = :doctorId", String.class);
+        roleQuery.setParameter("doctorId", doctorId);
+        String role = roleQuery.uniqueResult();
+        
+        if (role == null || !role.equals("Doctor")) {
+            return new ArrayList<>(); // Return empty list if not a doctor
+        }
+        
+        // HQL query to get all patients that the doctor has handled
+        Query<Object[]> query = session.createQuery(
+            "SELECT DISTINCT " + 
+            "   CONCAT(ud.firstName, ' ', ud.lastName), " +  // Patient Name
+            "   ud.phoneNumber, " +                          // Contact Number
+            "   ud.email, " +                                // Email
+            "   p.bloodGrp, " +                              // Blood Group
+            "   ud.dateOfBirth " +                           // Date of Birth
+            "FROM Appointment a " +
+            "JOIN a.schedule s " +
+            "JOIN s.doctor d " +
+            "JOIN a.patient p " +
+            "JOIN p.user pu " +
+            "JOIN UserDetail ud ON ud.user.id = pu.id " +
+            "WHERE d.doctorId = :doctorId ",
+            Object[].class);
+        
+        query.setParameter("doctorId", doctorId);
+        return query.getResultList();
+    }
+    
+    public List<Object[]> findAppointmentsByDoctorId(int doctorId) {
+        Query<Object[]> query = session.createQuery(
+            "SELECT " + 
+            "   a.appointmentId, " +                      // Appointment ID
+            "   CONCAT(ud.firstName, ' ', ud.lastName), " + // Patient Name
+            "   ud.phoneNumber, " +                       // Contact Number
+            "   a.appointmentDate, " +                    // Appointment Date
+            "   a.tokenNo, " +                            // Token Number
+            "   a.reason, " +                             // Reason
+            "   aps.statusName " +                        // Appointment Status
+            "FROM Appointment a " +
+            "JOIN a.schedule s " +
+            "JOIN s.doctor d " +
+            "JOIN a.patient p " +
+            "JOIN p.user pu " +
+            "JOIN UserDetail ud ON ud.user.id = pu.id " +
+            "JOIN a.status aps " +
+            "WHERE d.doctorId = :doctorId " +
+            "ORDER BY a.appointmentDate DESC, a.tokenNo ASC",
+            Object[].class);
+        
+        query.setParameter("doctorId", doctorId);
+        return query.getResultList();
+    }
 }

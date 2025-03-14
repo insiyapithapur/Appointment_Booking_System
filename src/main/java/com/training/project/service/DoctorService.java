@@ -1,6 +1,7 @@
 package com.training.project.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,12 +48,12 @@ public class DoctorService {
 	/*
 	 * Get all appointments of patient for present day
 	 */
-	public List<Appointment> getUpcomingAppointmentsForDoctor(int userId, LocalDate fromDate) {
+	public List<String> getUpcomingAppointmentsForDoctor(int doctorId, LocalDate fromDate) {
 	    Session session = sessionFactory.openSession();
 	    appointmentDao = new AppointmentDaoImp(session);
 	    
 	    try {
-	        return appointmentDao.findUpcomingAppointmentsForUser(userId, fromDate);
+	        return appointmentDao.findUpcomingAppointmentsForUser(doctorId, fromDate);
 	    } finally {
 	        session.close();
 	    }
@@ -61,76 +62,53 @@ public class DoctorService {
 	/*
 	 * Get ALl Handled Patient by doctor
 	 */
-	public List<String> getAllPatients(int userId) {
-	    List<String> patientDetails = new ArrayList<>();
-	    Session session = sessionFactory.openSession();
-	    
-	    try {
-	        // Fetch the user role first
-	        Query<Integer> roleQuery = session.createQuery(
-	            "SELECT u.role.id FROM User u WHERE u.id = :userId", Integer.class);
-	        roleQuery.setParameter("userId", userId);
-	        Integer roleId = roleQuery.uniqueResult();
-
-	        if (roleId == null) {
-	            System.out.println("User not found.");
-	            return patientDetails;
+	 public List<String> getAllPatients(int doctorId) {
+	        List<String> patientDetails = new ArrayList<>();
+	        Session session = sessionFactory.openSession();
+	        
+	        try {
+	        	appointmentDao = new AppointmentDaoImp(session);
+	            List<Object[]> results = appointmentDao.findPatientsByDoctorId(doctorId);
+	            
+	            // Format the results into readable strings
+	            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+	            
+	            for (Object[] row : results) {
+	                String patientName = (String) row[0];
+	                String contactNumber = (String) row[1];
+	                String email = (String) row[2];
+	                String bloodGroup = (String) row[3];
+	                LocalDate dob = (LocalDate) row[4];
+	                
+	                String formattedDob = dob != null ? dob.format(dateFormatter) : "N/A";
+	                String bloodGroupValue = bloodGroup != null ? bloodGroup : "Unknown";
+	                
+	                String patientInfo = String.format(
+	                    "Patient: %s | Contact: %s | Email: %s | Blood Group: %s | DOB: %s",
+	                    patientName,
+	                    contactNumber,
+	                    email,
+	                    bloodGroupValue,
+	                    formattedDob
+	                );
+	                
+	                patientDetails.add(patientInfo);
+	            }
+	            
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.close();
 	        }
-
-	        Query<Object[]> query;
-
-	        if (roleId == 1) { // Admin: Fetch all patients
-	            query = session.createQuery(
-	                "SELECT DISTINCT ud.firstName, ud.lastName, ud.phoneNumber " +
-	                "FROM UserDetail ud " +
-	                "JOIN ud.user u " +
-	                "JOIN Patient p ON p.user.id = u.id",
-	                Object[].class
-	            );
-	        } else if (roleId == 3) { // Doctor: Fetch only patients who visited this doctor
-	            query = session.createQuery(
-	                "SELECT DISTINCT ud.firstName, ud.lastName, ud.phoneNumber " +
-	                "FROM UserDetail ud " +
-	                "JOIN ud.user u " +
-	                "JOIN Patient p ON p.user.id = u.id " +
-	                "JOIN Appointment a ON a.patient.id = p.id " + // FIXED JOIN
-	                "JOIN a.schedule s " +
-	                "JOIN s.doctor d " +
-	                "WHERE d.user.id = :userId",
-	                Object[].class
-	            );
-	            query.setParameter("userId", userId);
-	        } else {
-	            System.out.println("Access Denied! Only Admins or Doctors can view patients.");
-	            return patientDetails;
-	        }
-
-	        List<Object[]> results = query.getResultList();
-
-	        if (results.isEmpty()) {
-	            System.out.println("No patients found for this doctor.");
-	            return patientDetails;
-	        }
-
-	        for (Object[] row : results) {
-	            String patientInfo = row[0] + " " + row[1] + " - " + row[2];
-	            patientDetails.add(patientInfo);
-	        }
-
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        session.close();
+	        System.out.println("patient details "+patientDetails);
+	        return patientDetails;
 	    }
-
-	    return patientDetails;
-	}
 	
 	/*
 	 * Get All Appointments for a user, regardless of whether they are a doctor or patient
 	 * integrate medical records are left
 	 */
-	public List<Appointment> getAppointmentsForUser(int userId) {
+	/*public List<Appointment> getAppointmentsForUser(int userId) {
 	    Session session = sessionFactory.openSession();
 	    userDao = new UserDaoImp(session);
 	    doctorDao = new DoctorDaoImp(session);
@@ -183,6 +161,69 @@ public class DoctorService {
 	    } finally {
 	        session.close();
 	    }
-	}
-
+	}*/
+	 
+	 
+	 /*
+	  * Get All Appointments for doctor
+	  * integrate medical records are left
+	*/
+	 public List<String> getAppointmentsForDoctor(int doctorId) {
+	        List<String> appointmentDetails = new ArrayList<>();
+	        Session session = sessionFactory.openSession();
+	        
+	        try {
+	            // First check if the user is a doctor
+	        	doctorDao = new DoctorDaoImp(session);
+	            User doctor = doctorDao.getUserByDoctorId(doctorId);
+	            
+	            if (doctor == null || !doctor.getRole().getRoleName().equals("Doctor")) {
+	                return appointmentDetails; // Return empty list if not a doctor
+	            }
+	            
+	            // Get appointments for the doctor
+	            appointmentDao = new AppointmentDaoImp(session);
+	            List<Object[]> results = appointmentDao.findAppointmentsByDoctorId(doctorId);
+	            
+	            // Format the results into readable strings
+	            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+	            
+	            for (Object[] row : results) {
+	                try {
+	                    Integer appointmentId = (Integer) row[0];
+	                    String patientName = (String) row[1];
+	                    String contactNumber = (String) row[2];
+	                    LocalDate appointmentDate = (LocalDate) row[3];
+	                    Integer tokenNo = (Integer) row[4];
+	                    String reason = (String) row[5];
+	                    String status = (String) row[6];
+	                    
+	                    String formattedDate = appointmentDate != null ? appointmentDate.format(dateFormatter) : "N/A";
+	                    String reasonText = reason != null ? reason : "N/A";
+	                    
+	                    String appointmentInfo = String.format(
+	                        "ID: %d | Patient: %s | Contact: %s | Date: %s | Token: %d | Reason: %s | Status: %s",
+	                        appointmentId,
+	                        patientName,
+	                        contactNumber,
+	                        formattedDate,
+	                        tokenNo,
+	                        reasonText,
+	                        status
+	                    );
+	                    
+	                    appointmentDetails.add(appointmentInfo);
+	                } catch (Exception e) {
+	                    System.err.println("Error processing appointment: " + e.getMessage());
+	                }
+	            }
+	            
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            session.close();
+	        }
+	        System.out.println("appointmentDetails"+appointmentDetails);
+	        return appointmentDetails;
+	    }
 }

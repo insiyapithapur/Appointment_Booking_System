@@ -48,9 +48,9 @@ public class App {
 //        	List<String> profileDetails = userService.GetUserProfileDetails(5);
 //        	profileDetails.forEach(System.out::println);
         	
-//        	DoctorService doctorService = new DoctorService(sessionFactory);
-//            List<Appointment> appointments = doctorService.getUpcomingAppointmentsForDoctor(2,LocalDate.now());
-//            appointments.forEach(System.out::println);
+        	DoctorService doctorService = new DoctorService(sessionFactory);
+            List<String> patientDetails = doctorService.getAppointmentsForDoctor(1);
+            patientDetails.forEach(System.out::println);
 //        	boolean isStatusUpdated = appointmentService.updateAppointmentStatus(2,1,2);
 //            System.out.println("isStatusUpdated "+isStatusUpdated);
         } catch (Exception e) {

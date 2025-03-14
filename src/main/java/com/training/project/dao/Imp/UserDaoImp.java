@@ -103,7 +103,7 @@ public class UserDaoImp implements GenericDao<User, Integer> {
 		return false;
 	}
 	
-	public User findByUsername(String username) {
+	public User checkUsername(String username) {
         try {
             return session.createQuery("FROM User WHERE username = :username", User.class)
                     .setParameter("username", username)
@@ -113,6 +113,59 @@ public class UserDaoImp implements GenericDao<User, Integer> {
             return null;
         }
     }
+	
+	@SuppressWarnings("unchecked")
+	public List<Object> findIdsByUsername(String username) {
+	    try {
+	        String role = null;
+	        List<Object[]> results = null;
+
+	        // First, get the user's role
+	        User user = session.createQuery("FROM User WHERE username = :username", User.class)
+	                .setParameter("username", username)
+	                .uniqueResult();
+
+	        if (user == null) {
+	            return null;
+	        }
+
+	        role = user.getRole().getRoleName();
+
+	        // Now get both IDs in a single query based on role
+	        if ("DOCTOR".equalsIgnoreCase(role)) {
+	            results = session.createQuery(
+	                    "SELECT u.userId, d.doctorId FROM User u JOIN Doctor d ON u = d.user WHERE u.username = :username")
+	                    .setParameter("username", username)
+	                    .list();
+	        } else if ("PATIENT".equalsIgnoreCase(role)) {
+	            results = session.createQuery(
+	                    "SELECT u.userId, p.patientId FROM User u JOIN Patient p ON u = p.user WHERE u.username = :username")
+	                    .setParameter("username", username)
+	                    .list();
+	        } else if ("ADMIN".equalsIgnoreCase(role)) {
+	            results = session.createQuery(
+	                    "SELECT u.userId FROM User u WHERE u.username = :username")
+	                    .setParameter("username", username)
+	                    .list();
+	        }
+
+	        if (results != null && !results.isEmpty()) {
+	            Object[] ids = results.get(0);
+	            List<Object> detailsList = new ArrayList<>();
+	            detailsList.add(ids[0]); // userId
+	            detailsList.add(ids[1]); // role-specific id
+	            detailsList.add(role);   // role name
+	            detailsList.add(username); //username
+	            return detailsList;
+	        }
+
+	        return null;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
+	
 	
 	// it will add the user with the role as doctor if just want to create user as doctor
 

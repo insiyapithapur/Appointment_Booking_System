@@ -93,7 +93,7 @@ public class PatientService {
 	/*
 	 * Get all appointments of patient from present day
 	 */
-	public List<Appointment> getUpcomingAppointmentsForPatient(int userId, LocalDate fromDate) {
+	public List<String> getUpcomingAppointmentsForPatient(int userId, LocalDate fromDate) {
 	    Session session = sessionFactory.openSession();
 	    appointmentDao = new AppointmentDaoImp(session);
 	    try {

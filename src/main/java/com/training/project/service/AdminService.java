@@ -103,7 +103,7 @@ public class AdminService {
 	        }
 	        
 	        // 3. Check if the username already exists
-	        User existingUser = userDao.findByUsername(doctorUser.getUsername());
+	        User existingUser = userDao.checkUsername(doctorUser.getUsername());
 	        if (existingUser != null) {
 	            System.out.println("Username '" + doctorUser.getUsername() + "' already exists");
 	            return false;
