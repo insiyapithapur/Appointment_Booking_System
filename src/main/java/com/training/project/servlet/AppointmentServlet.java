@@ -23,7 +23,7 @@ import com.training.project.service.UserService;
 /**
  * Servlet to handle appointments display
  */
-@WebServlet("/Appointment")
+@WebServlet("/Doctor/Appointment")
 public class AppointmentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -48,9 +48,6 @@ public class AppointmentServlet extends HttpServlet {
 	  */
 	 protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	     System.out.println("===== AppointmentServlet doGet method called =====");
-	     System.out.println("Request URI: " + request.getRequestURI());
-	     System.out.println("Context Path: " + request.getContextPath());
-	     System.out.println("Servlet Path: " + request.getServletPath());
 	     
 	     HttpSession session = request.getSession();
 	     
@@ -85,7 +82,7 @@ public class AppointmentServlet extends HttpServlet {
 	     }
 	     
 	     // Forward to the JSP
-	     request.getRequestDispatcher("Appointment.jsp").forward(request, response);
+	     request.getRequestDispatcher("/Appointment.jsp").forward(request, response);
 	 }
 
 	 /**

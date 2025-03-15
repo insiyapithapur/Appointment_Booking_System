@@ -21,7 +21,7 @@ import com.training.project.service.UserService;
 /**
  * Servlet to handle patient list and appointment display
  */
-@WebServlet("/Patient")
+@WebServlet("/Doctor/Patient")
 public class PatientServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -40,7 +40,7 @@ public class PatientServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        
+        System.out.println("patient servlet doGet");
         // Check if user is logged in
         // if (session == null || session.getAttribute("userId") == null) {
         //     response.sendRedirect("login.jsp");

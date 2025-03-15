@@ -221,7 +221,7 @@ body {
 				<p class="text-muted" id="current-datetime"></p>
 			</div>
 			<button class="btn btn-outline-primary"
-				onclick="navigateTo('doctors')">
+				onclick="navigateTo('Admin/Doctors')">
 				<i class="bi bi-arrow-left me-2"></i> Back to Doctor List
 			</button>
 		</div>
@@ -350,6 +350,71 @@ body {
 						</div>
 					</div>
 				</div>
+				<!-- Add schedule  -->
+				
+				<!-- Schedule Information -->
+<div class="form-card">
+    <div class="form-section-title">Schedule Information</div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <h6>Weekly Schedule</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="addScheduleBtn">
+                    <i class="bi bi-plus-circle"></i> Add Schedule
+                </button>
+            </div>
+            <hr>
+        </div>
+    </div>
+    
+    <div id="scheduleContainer">
+        <div class="schedule-item card p-3 mb-3">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="dayOfWeek0" class="form-label required">Day of Week</label>
+                    <select class="form-select" id="dayOfWeek0" name="dayOfWeek[]" required>
+                        <option value="">Select Day</option>
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                        <option value="7">Sunday</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a day</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="startTime0" class="form-label required">Start Time</label>
+                    <input type="time" class="form-control" id="startTime0" name="startTime[]" required>
+                    <div class="invalid-feedback">Please select start time</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="endTime0" class="form-label required">End Time</label>
+                    <input type="time" class="form-control" id="endTime0" name="endTime[]" required>
+                    <div class="invalid-feedback">Please select end time</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="maxTokens0" class="form-label required">Max Tokens</label>
+                    <input type="number" class="form-control" id="maxTokens0" name="maxTokens[]" min="1" required>
+                    <div class="invalid-feedback">Please enter max tokens</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="isAvailable0" class="form-label">Availability</label>
+                    <select class="form-select" id="isAvailable0" name="isAvailable[]">
+                        <option value="true" selected>Available</option>
+                        <option value="false">Not Available</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-schedule" style="display: none;">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 				<!-- Form Actions -->
@@ -402,16 +467,9 @@ body {
 		}
 
 		function navigateTo(page) {
-			// Check if page includes file extension
-			if (!page.includes('.jsp') && !page.includes('.html')
-					&& !page.includes('.php') && !page.includes('?')) {
-				// For controller endpoints
-				window.location.href = page;
-			} else {
-				// For direct page navigation
-				window.location.href = page;
-			}
-		}
+        	const contextPath = '${pageContext.request.contextPath}';
+            window.location.href = contextPath + '/' + page;
+        }
 
 		// Handle responsive behavior
 		window.addEventListener('resize', function() {
@@ -499,6 +557,126 @@ body {
 				function() {
 					this.value = this.value.replace(/[^a-zA-Z0-9_]/g, '');
 				});
+		
+		
+		
+		
+		
+		// Schedule management
+		let scheduleCounter = 1;
+
+		document.getElementById('addScheduleBtn').addEventListener('click', function() {
+		    const container = document.getElementById('scheduleContainer');
+		    const newSchedule = document.createElement('div');
+		    newSchedule.className = 'schedule-item card p-3 mb-3';
+		    
+		    newSchedule.innerHTML = `
+		        <div class="row g-3">
+		            <div class="col-md-4">
+		                <label for="dayOfWeek${scheduleCounter}" class="form-label required">Day of Week</label>
+		                <select class="form-select" id="dayOfWeek${scheduleCounter}" name="dayOfWeek[]" required>
+		                    <option value="">Select Day</option>
+		                    <option value="1">Monday</option>
+		                    <option value="2">Tuesday</option>
+		                    <option value="3">Wednesday</option>
+		                    <option value="4">Thursday</option>
+		                    <option value="5">Friday</option>
+		                    <option value="6">Saturday</option>
+		                    <option value="7">Sunday</option>
+		                </select>
+		                <div class="invalid-feedback">Please select a day</div>
+		            </div>
+		            <div class="col-md-4">
+		                <label for="startTime${scheduleCounter}" class="form-label required">Start Time</label>
+		                <input type="time" class="form-control" id="startTime${scheduleCounter}" name="startTime[]" required>
+		                <div class="invalid-feedback">Please select start time</div>
+		            </div>
+		            <div class="col-md-4">
+		                <label for="endTime${scheduleCounter}" class="form-label required">End Time</label>
+		                <input type="time" class="form-control" id="endTime${scheduleCounter}" name="endTime[]" required>
+		                <div class="invalid-feedback">Please select end time</div>
+		            </div>
+		            <div class="col-md-6">
+		                <label for="maxTokens${scheduleCounter}" class="form-label required">Max Tokens</label>
+		                <input type="number" class="form-control" id="maxTokens${scheduleCounter}" name="maxTokens[]" min="1" required>
+		                <div class="invalid-feedback">Please enter max tokens</div>
+		            </div>
+		            <div class="col-md-6">
+		                <label for="isAvailable${scheduleCounter}" class="form-label">Availability</label>
+		                <select class="form-select" id="isAvailable${scheduleCounter}" name="isAvailable[]">
+		                    <option value="true" selected>Available</option>
+		                    <option value="false">Not Available</option>
+		                </select>
+		            </div>
+		            <div class="col-12">
+		                <button type="button" class="btn btn-sm btn-outline-danger remove-schedule">
+		                    <i class="bi bi-trash"></i> Remove
+		                </button>
+		            </div>
+		        </div>
+		    `;
+		    
+		    container.appendChild(newSchedule);
+		    
+		    // Show the remove button for the first schedule once there are multiple schedules
+		    if (container.querySelectorAll('.schedule-item').length > 1) {
+		        document.querySelector('.schedule-item .remove-schedule').style.display = 'inline-block';
+		    }
+		    
+		    // Add event listener to the new remove button
+		    newSchedule.querySelector('.remove-schedule').addEventListener('click', function() {
+		        container.removeChild(newSchedule);
+		        // Hide the remove button for the first schedule if only one remains
+		        if (container.querySelectorAll('.schedule-item').length === 1) {
+		            document.querySelector('.schedule-item .remove-schedule').style.display = 'none';
+		        }
+		    });
+		    
+		    scheduleCounter++;
+		});
+
+		// Add event listener to the initial remove button
+		document.querySelector('.remove-schedule').addEventListener('click', function() {
+		    const container = document.getElementById('scheduleContainer');
+		    if (container.querySelectorAll('.schedule-item').length > 1) {
+		        this.closest('.schedule-item').remove();
+		    }
+		});
+
+		// Token calculation based on start and end time
+		function calculateMaxTokens(startTime, endTime) {
+		    if (startTime && endTime) {
+		        const start = new Date(`2023-01-01T${startTime}`);
+		        const end = new Date(`2023-01-01T${endTime}`);
+		        
+		        // Calculate difference in minutes
+		        const diffInMinutes = (end - start) / (1000 * 60);
+		        
+		        // Calculate tokens (1 token per 6 minutes = 10 tokens per hour)
+		        return Math.floor(diffInMinutes / 6);
+		    }
+		    return 0;
+		}
+
+		// Set up event listeners for time inputs to calculate tokens automatically
+		document.addEventListener('change', function(e) {
+		    if (e.target.name === 'startTime[]' || e.target.name === 'endTime[]') {
+		        const scheduleItem = e.target.closest('.schedule-item');
+		        const startTimeInput = scheduleItem.querySelector('[name="startTime[]"]');
+		        const endTimeInput = scheduleItem.querySelector('[name="endTime[]"]');
+		        const maxTokensInput = scheduleItem.querySelector('[name="maxTokens[]"]');
+		        
+		        if (startTimeInput.value && endTimeInput.value) {
+		            const tokens = calculateMaxTokens(startTimeInput.value, endTimeInput.value);
+		            if (tokens > 0) {
+		                maxTokensInput.value = tokens;
+		            } else {
+		                maxTokensInput.value = '';
+		                alert('End time must be after start time');
+		            }
+		        }
+		    }
+		});
 	</script>
 </body>
 </html>

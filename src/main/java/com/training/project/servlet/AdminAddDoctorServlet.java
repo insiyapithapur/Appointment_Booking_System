@@ -2,6 +2,8 @@ package com.training.project.servlet;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
 import javax.servlet.ServletException;
@@ -46,6 +48,14 @@ public class AdminAddDoctorServlet extends HttpServlet {
         String specialization = request.getParameter("specialization");
         String designation = request.getParameter("designation");
         String qualifications = request.getParameter("qualifications");
+        
+        //Get schedule parameters
+        String[] daysOfWeek = request.getParameterValues("dayOfWeek[]");
+        String[] startTimes = request.getParameterValues("startTime[]");
+        String[] endTimes = request.getParameterValues("endTime[]");
+        String[] maxTokens = request.getParameterValues("maxTokens[]");
+        String[] isAvailable = request.getParameterValues("isAvailable[]");
+
         
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -117,6 +127,34 @@ public class AdminAddDoctorServlet extends HttpServlet {
             Doctor doctor = new Doctor(specialization, licenseNumber, experience, qualifications, true, doctorUser);
             session.save(doctor);
             
+         // Create and save schedules
+            if (daysOfWeek != null && daysOfWeek.length > 0) {
+                for (int i = 0; i < daysOfWeek.length; i++) {
+                    if (daysOfWeek[i] != null && !daysOfWeek[i].isEmpty()) {
+                        Integer dayOfWeek = Integer.parseInt(daysOfWeek[i]);
+                        
+                        // Parse start time and end time
+                        LocalTime startTime = LocalTime.parse(startTimes[i]);
+                        LocalTime endTime = LocalTime.parse(endTimes[i]);
+                        
+                        // Create LocalDateTime objects (using a reference date for storing the time)
+                        LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now(), startTime);
+                        LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now(), endTime);
+                        
+                        // Parse max tokens
+                        Integer tokens = Integer.parseInt(maxTokens[i]);
+                        
+                        // Parse availability
+                        Boolean available = Boolean.parseBoolean(isAvailable[i]);
+                        
+                        System.out.println("GUDYGDUYAGVD");
+                        // Create and save schedule
+                        Schedule schedule = new Schedule(dayOfWeek, startDateTime, endDateTime, tokens, available, doctor);
+                        session.save(schedule);
+                    }
+                }
+            }
+
             // Commit the transaction
             transaction.commit();
             

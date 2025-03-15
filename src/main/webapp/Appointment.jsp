@@ -380,10 +380,10 @@
         <div class="avatar" onclick="navigateTo('profile.jsp')">MD+</div>
         <div class="doctor-name mb-4">Dr. ${doctorName}</div>
         
-        <div class="nav-item" onclick="navigateTo('Dashboard')">Dashboard</div>
-        <div class="nav-item" onclick="navigateTo('Patient')">Patients</div>
-        <div class="nav-item active" onclick="navigateTo('Appointment')">Appointments</div>
-        <div class="nav-item" onclick="navigateTo('Profile')">Profile</div>
+        <div class="nav-item" onclick="navigateTo('Doctor/Dashboard')">Dashboard</div>
+        <div class="nav-item" onclick="navigateTo('Doctor/Patient')">Patients</div>
+        <div class="nav-item active" onclick="navigateTo('Doctor/Appointment')">Appointments</div>
+        <div class="nav-item" onclick="navigateTo('Doctor/Profile')">Profile</div>
     </div>
 
     <div class="content">
@@ -613,8 +613,8 @@
         }
         
         function navigateTo(page) {
-            console.log("Navigation requested to: " + page);
-            window.location.href = page;
+            const contextPath = '${pageContext.request.contextPath}';
+            window.location.href = contextPath + '/' + page;
         }
         
         function viewAppointmentDetails(appointmentData) {

@@ -18,7 +18,7 @@ import com.training.project.service.UserService;
 /**
  * Servlet to handle profile display
  */
-@WebServlet("/Profile")
+@WebServlet("/Doctor/Profile")
 public class ProfileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -64,7 +64,7 @@ public class ProfileServlet extends HttpServlet {
         }
         
         // Forward to the JSP
-        request.getRequestDispatcher("Profile.jsp").forward(request, response);
+        request.getRequestDispatcher("/Profile.jsp").forward(request, response);
     }
 
     /**

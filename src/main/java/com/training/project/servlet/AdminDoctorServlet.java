@@ -19,7 +19,7 @@ public class AdminDoctorServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        System.out.println("Admin Patient servlet initialized");
+        System.out.println("Admin  DOCTOR  servlet initialized");
         adminService = new AdminService();
     }
 
