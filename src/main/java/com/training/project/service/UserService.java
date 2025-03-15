@@ -1,7 +1,5 @@
 package com.training.project.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

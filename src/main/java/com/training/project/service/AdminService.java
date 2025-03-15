@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.hibernate.*;
+import org.hibernate.query.Query;
 import com.training.project.dao.Imp.*;
 import com.training.project.model.*;
+import com.training.project.util.HibernateUtil;
 
 public class AdminService {
 	private SessionFactory sessionFactory;
@@ -15,9 +17,16 @@ public class AdminService {
 	private UserDaoImp userDao;
 	private UserDetailDaoImp userDetailDao;
 	
-	public AdminService(SessionFactory sessionFactory) {
-		super();
-		this.sessionFactory = sessionFactory;
+	public AdminService() {
+	    try {
+	        this.sessionFactory = HibernateUtil.getSessionFactory();
+	        if (this.sessionFactory == null) {
+	            System.err.println("Failed to initialize SessionFactory in DoctorService constructor");
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Error initializing SessionFactory: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 	}
 	
 	public List<Patient> fetchAllPatients() {
@@ -225,6 +234,139 @@ public class AdminService {
 	    boolean isScheduleCreated = scheduleDao.create(schedule);
 	    session.close();
 	    return isScheduleCreated;
+	}
+	
+	/*
+	 * Get total count of patients
+	 */
+	public long getTotalPatientCount() {
+	    Session session = sessionFactory.openSession();
+	    patientDao = new PatientDaoImp(session);
+	    try {
+	        Query<Long> query = session.createQuery(
+	            "SELECT COUNT(p) FROM Patient p", Long.class);
+	        return query.uniqueResult();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
+	/**
+     * Get total count of doctors
+     */
+    public long getDoctorCount() {
+        Session session = sessionFactory.openSession();
+        try {
+            Query<Long> query = session.createQuery(
+                "SELECT COUNT(d) FROM Doctor d", Long.class);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            session.close();
+        }
+    }
+    
+    /*
+	 * Get count of active doctors
+	 */
+	public long getActiveDoctorCount() {
+	    Session session = sessionFactory.openSession();
+	    try {
+	        Query<Long> query = session.createQuery(
+	            "SELECT COUNT(d) FROM Doctor d WHERE d.isActive = true", Long.class);
+	        return query.uniqueResult();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
+	public List<Appointment> fetchAppointments() {
+        AppointmentDaoImp appointmentDao = new AppointmentDaoImp();
+        return appointmentDao.getAllAppointments();
+    }
+	
+	/*
+	 * Get list of active doctors with details
+	 */
+	public List<Object[]> getActiveDoctorDetails() {
+	    Session session = sessionFactory.openSession();
+	    doctorDao = new DoctorDaoImp(session);
+	    try {
+	        Query<Object[]> query = session.createQuery(
+	            "SELECT d.doctorId, u.username, ud.firstName, ud.lastName, " +
+	            "d.specialization, d.experience, d.degree " +
+	            "FROM Doctor d " +
+	            "JOIN d.user u " +
+	            "JOIN UserDetail ud ON u.userId = ud.user.userId " +
+	            "WHERE d.isActive = true", Object[].class);
+	        return query.getResultList();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
+	/*
+	 * Get count of today's appointments
+	 */
+	public long getTodayAppointmentCount() {
+	    Session session = sessionFactory.openSession();
+	    try {
+	        LocalDate today = LocalDate.now();
+	        Query<Long> query = session.createQuery(
+	            "SELECT COUNT(a) FROM Appointment a WHERE a.appointmentDate = :today", Long.class);
+	        query.setParameter("today", today);
+	        return query.uniqueResult();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
+	/*
+	 * Get total count of users
+	 */
+	public long getTotalUserCount() {
+	    Session session = sessionFactory.openSession();
+	    try {
+	        Query<Long> query = session.createQuery(
+	            "SELECT COUNT(u) FROM User u", Long.class);
+	        return query.uniqueResult();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
+	/*
+	 * Get total count of appointments
+	 */
+	public long getTotalAppointmentCount() {
+	    Session session = sessionFactory.openSession();
+	    try {
+	        Query<Long> query = session.createQuery("SELECT COUNT(*) FROM Appointment", Long.class);
+	        Long result = query.uniqueResult();
+	        return result != null ? result : 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0;
+	    } finally {
+	        session.close();
+	    }
 	}
         
         private boolean isAdminRole(Role role) {

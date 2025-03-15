@@ -64,21 +64,22 @@ public class LoginServlet extends HttpServlet {
 						    request.getSession().setAttribute("roleName", roleName);
 						    request.getSession().setAttribute("username", storedUsername);
 						    
-						    /*String destination = "";
+						    String destination = "";
 			                if ("ADMIN".equalsIgnoreCase(roleName)) {
-			                    destination = "/admin/dashboard.jsp";
+			                    destination = "/Admin/Dashboard";
 			                } else if ("DOCTOR".equalsIgnoreCase(roleName)) {
-			                    destination = "/doctor/dashboard.jsp";
+			                	System.out.println("destination "+destination);
+			                    destination = "/Doctor/Dashboard";
 			                } else if ("PATIENT".equalsIgnoreCase(roleName)) {
-			                    destination = "/patient/dashboard.jsp";
+			                    destination = "/Patient/Dashboard";
 			                }
 			                
 			                // Use RequestDispatcher to forward the request
 			                request.getRequestDispatcher(destination).forward(request, response);
-			                return; // Important to prevent further execution*/
+			                return; // Important to prevent further execution
 						    
-						    request.getRequestDispatcher("/Dashboard").forward(request, response);
-			                return;
+//						    request.getRequestDispatcher("/Dashboard").forward(request, response);
+//			                return;
 						}
 						else {
 							System.out.println("login servlet pass");

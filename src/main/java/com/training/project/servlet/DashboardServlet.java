@@ -17,7 +17,7 @@ import com.training.project.model.Appointment;
 import com.training.project.service.DoctorService;
 import com.training.project.service.PatientService;
 
-@WebServlet("/Dashboard")
+@WebServlet("/Doctor/Dashboard")
 public class DashboardServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -139,16 +139,6 @@ public class DashboardServlet extends HttpServlet {
         }
         
         return displayData;
-    }
-    
-    private int countPendingAppointments(List<AppointmentDisplayData> appointments) {
-        int count = 0;
-        for (AppointmentDisplayData appointment : appointments) {
-            if ("PENDING".equalsIgnoreCase(appointment.getStatus())) {
-                count++;
-            }
-        }
-        return count;
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

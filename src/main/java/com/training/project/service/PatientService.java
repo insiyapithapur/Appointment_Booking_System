@@ -2,6 +2,7 @@ package com.training.project.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import org.hibernate.*;
 import org.hibernate.query.Query;
@@ -93,33 +94,131 @@ public class PatientService {
 	/*
 	 * Get all appointments of patient from present day
 	 */
-	public List<String> getUpcomingAppointmentsForPatient(int userId, LocalDate fromDate) {
+	public List<String> getUpcomingAppointmentsForPatient(int patientId, LocalDate fromDate) {
+	    List<String> appointmentDetails = new ArrayList<>();
 	    Session session = sessionFactory.openSession();
-	    appointmentDao = new AppointmentDaoImp(session);
+	    
 	    try {
-	        return appointmentDao.findUpcomingAppointmentsForUser(userId, fromDate);
+	        appointmentDao = new AppointmentDaoImp(session);
+	        List<Object[]> results = appointmentDao.findUpcomingAppointmentsForPatient(patientId, fromDate);
+	        
+	        // Format the results into readable strings
+	        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+	        
+	        for (Object[] row : results) {
+	            String doctorName = (String) row[0];
+	            LocalDate appointmentDate = (LocalDate) row[1];
+	            Integer tokenNo = (Integer) row[2];
+	            String reason = (String) row[3];
+	            String status = (String) row[4];
+	            
+	            String formattedDate = appointmentDate != null ? appointmentDate.format(dateFormatter) : "N/A";
+	            
+	            String appointmentInfo = String.format(
+	                "Doctor: %s | Date: %s | Token: %s | Reason: %s | Status: %s",
+	                doctorName,
+	                formattedDate,
+	                tokenNo,
+	                reason,
+	                status
+	            );
+	            
+	            appointmentDetails.add(appointmentInfo);
+	        }
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
 	    } finally {
 	        session.close();
 	    }
+	    
+	    System.out.println("Appointment details: " + appointmentDetails);
+	    return appointmentDetails;
 	}
 	
 	/*
 	 * View All Appointments for patient
 	 * pending, cancelled and completed
 	 */
-	public List<Appointment> viewPastAppointments(int patientId) {
-		Session session = sessionFactory.openSession();
-        try {
-            Query<Appointment> query = session.createQuery(
-                "FROM Appointment WHERE patient.id = :patientId AND appointmentDate <= :today", Appointment.class);
-            query.setParameter("patientId", patientId);
-            query.setParameter("today", LocalDate.now());
-            return query.list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-    }
+	public List<String> getPatientAppointmentHistory(int patientId) {
+	    List<String> appointmentHistory = new ArrayList<>();
+	    Session session = sessionFactory.openSession();
+	    
+	    try {
+	        appointmentDao = new AppointmentDaoImp(session);
+	        List<Object[]> results = appointmentDao.findAppointmentsByPatientId(patientId);
+	        
+	        // Format the results into readable strings
+	        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+	        
+	        for (Object[] row : results) {
+	            Integer appointmentId = (Integer) row[0];
+	            String firstName = (String) row[1];
+	            String lastName = (String) row[2];
+	            LocalDate appointmentDate = (LocalDate) row[3];
+	            Integer tokenNo = (Integer) row[4];
+	            String reason = (String) row[5];
+	            String status = (String) row[6];
+	            String notes = (String) row[7];
+	            String diagnosis = (String) row[8];
+	            String treatment = (String) row[9];
+	            String filePath = (String) row[10];
+	            
+	            String doctorName = "Dr. " + firstName + " " + lastName;
+	            String formattedDate = appointmentDate != null ? appointmentDate.format(dateFormatter) : "N/A";
+	            
+	            // Build main appointment info
+	            StringBuilder appointmentInfo = new StringBuilder();
+	            appointmentInfo.append(String.format(
+	                "ID: %d | Doctor: %s | Date: %s | Token: %d | Reason: %s | Status: %s",
+	                appointmentId,
+	                doctorName,
+	                formattedDate,
+	                tokenNo,
+	                reason,
+	                status
+	            ));
+	            
+	            // Add medical record info if available
+	            if (diagnosis != null || notes != null || treatment != null) {
+	                appointmentInfo.append(" | Medical Record: ");
+	                
+	                if (diagnosis != null && !diagnosis.isEmpty()) {
+	                    appointmentInfo.append("Diagnosis: ").append(diagnosis);
+	                }
+	                
+	                if (treatment != null && !treatment.isEmpty()) {
+	                    if (diagnosis != null && !diagnosis.isEmpty()) {
+	                        appointmentInfo.append(", ");
+	                    }
+	                    appointmentInfo.append("Treatment: ").append(treatment);
+	                }
+	                
+	                if (notes != null && !notes.isEmpty()) {
+	                    if ((diagnosis != null && !diagnosis.isEmpty()) || 
+	                        (treatment != null && !treatment.isEmpty())) {
+	                        appointmentInfo.append(", ");
+	                    }
+	                    appointmentInfo.append("Notes: ").append(notes);
+	                }
+	                
+	                if (filePath != null && !filePath.isEmpty()) {
+	                    appointmentInfo.append(" | File: ").append(filePath);
+	                }
+	            }
+	            
+	            appointmentHistory.add(appointmentInfo.toString());
+	        }
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        session.close();
+	    }
+	    
+	    System.out.println("Appointment history: " + appointmentHistory);
+	    return appointmentHistory;
+	}
 	
 	/*
 	 * Book Appointment ( patients )
@@ -250,5 +349,53 @@ public class PatientService {
 	    } finally {
 	        session.close();
 	    }
+	}
+	
+	/**
+     * Get doctor details
+     */
+	public List<String> getDoctorDetails() {
+	    List<String> doctorDetailsList = new ArrayList<>();
+	    Session session = sessionFactory.openSession();
+
+	    try {
+	        doctorDao = new DoctorDaoImp(session);
+	        List<Object[]> results = doctorDao.getDoctorDetails();
+
+	        for (Object[] row : results) {
+	            Integer doctorId = (Integer) row[0];
+	            String specialization = (String) row[1];
+	            String licenseNumber = (String) row[2];
+	            Float experience = (Float) row[3];
+	            String degree = (String) row[4];
+	            String firstName = (String) row[5];
+	            String lastName = (String) row[6];
+	            String email = (String) row[8];
+	            String phoneNumber = (String) row[10];
+	            Boolean isActive = (Boolean) row[11];
+	            
+	            String doctorInfo = String.format(
+	            		"ID: %d | Dr. %s %s | %s | Exp: %.1f years | %s | Contact: %s | Email: %s | License: %s | isActive %s",
+	                doctorId,
+	                firstName,
+	                lastName,
+	                specialization,
+	                experience,
+	                degree,
+	                phoneNumber,
+	                email,
+	                licenseNumber,
+	                isActive
+	            );
+
+	            doctorDetailsList.add(doctorInfo);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        session.close();
+	    }
+
+	    return doctorDetailsList;
 	}
 }

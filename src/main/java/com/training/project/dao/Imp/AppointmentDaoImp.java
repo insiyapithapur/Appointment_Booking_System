@@ -131,6 +131,29 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	    }
 	}
 	
+	public List<Appointment> getAllAppointments() {
+        Transaction transaction = null;
+        List<Appointment> appointments = null;
+        try{
+            transaction = session.beginTransaction();
+            
+            // Fetching required fields using HQL
+            appointments = session.createQuery(
+                "SELECT a FROM Appointment a " +
+                "JOIN FETCH a.patient p " +
+                "JOIN FETCH a.schedule s " +
+                "JOIN FETCH a.status",
+                Appointment.class
+            ).getResultList();
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
+        return appointments;
+    }
+	
 	/*public List<Appointment> findUpcomingAppointmentsForUser(int dooctorId, LocalDate fromDate) {
 	    try {
 	        // Fetch role of the user
@@ -242,6 +265,29 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	    return appointmentDetails;
 	}
 	
+	public List<Object[]> findUpcomingAppointmentsForPatient(int patientId, LocalDate fromDate) {
+	    String hql = "SELECT new list(d.user.name as doctorName, " +
+	                 "a.appointmentDate, " +
+	                 "a.tokenNo, " +
+	                 "a.reason, " +
+	                 "st.statusName) " +  // Using st for status
+	                 "FROM Appointment a " +
+	                 "JOIN a.patient p " +
+	                 "JOIN a.schedule s " +
+	                 "JOIN s.doctor d " +
+	                 "JOIN d.user u " +
+	                 "JOIN a.status st " +  // Using st for status
+	                 "WHERE p.id = :patientId " +
+	                 "AND a.appointmentDate >= :fromDate " +
+	                 "ORDER BY a.appointmentDate ASC";
+	    
+	    Query query = session.createQuery(hql);
+	    query.setParameter("patientId", patientId);
+	    query.setParameter("fromDate", fromDate);
+	    
+	    return query.list();
+	}
+	
     public List<Object[]> findPatientsByDoctorId(int doctorId) {
         // First check if the user is a doctor
         Query<String> roleQuery = session.createQuery(
@@ -299,5 +345,31 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
         
         query.setParameter("doctorId", doctorId);
         return query.getResultList();
+    }
+    
+    public List<Object[]> findAppointmentsByPatientId(int patientId) {
+        List<Object[]> appointments = null;
+        try {
+            String hql = "SELECT a.appointmentId, ud.firstName, ud.lastName, a.appointmentDate, a.tokenNo, a.reason, " +
+                        "s.statusName, " +
+                        "mr.notes, mr.diagnosis, mr.treatment, mr.filePath " +
+                        "FROM Appointment a " +
+                        "JOIN a.patient p " +
+                        "JOIN a.schedule sch " +
+                        "JOIN sch.doctor d " +
+                        "JOIN d.user u " +
+                        "JOIN UserDetail ud ON u.userId = ud.user.userId " +
+                        "JOIN a.status s " +
+                        "LEFT JOIN a.medicalRecord mr " +
+                        "WHERE p.id = :patientId " +
+                        "ORDER BY a.appointmentDate DESC";
+
+            Query<Object[]> query = session.createQuery(hql, Object[].class);
+            query.setParameter("patientId", patientId);
+            appointments = query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return appointments;
     }
 }

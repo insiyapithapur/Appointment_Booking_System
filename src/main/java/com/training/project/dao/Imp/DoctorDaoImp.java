@@ -102,30 +102,31 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
 
 	    return doctor;
 	}
+	
 	public List<Object[]> getDoctorDetails() {
-        Transaction transaction = null;
-        List<Object[]> doctorDetails = null;
-        try {
-            transaction = session.beginTransaction();
+	    Transaction transaction = null;
+	    List<Object[]> doctorDetails = null;
+	    try {
+	        transaction = session.beginTransaction();
 
-            String hql = "SELECT d.specialization, d.licenseNumber, d.experience, d.degree, " +
-                         "ud.firstName, ud.lastName, u.username, ud.email, ud.gender, ud.phoneNumber " +
-                         "FROM Doctor d " +
-                         "JOIN d.user u " +
-                         "JOIN UserDetail ud ON u.userId = ud.user.userId";
+	        String hql = "SELECT d.doctorId, d.specialization, d.licenseNumber, d.experience, d.degree, " +
+	                     "ud.firstName, ud.lastName, u.username, ud.email, ud.gender, ud.phoneNumber, d.isActive " +
+	                     "FROM Doctor d " +
+	                     "JOIN d.user u " +
+	                     "JOIN UserDetail ud ON u.userId = ud.user.userId";
 
-            Query<Object[]> query = session.createQuery(hql, Object[].class);
-            doctorDetails = query.getResultList();
+	        Query<Object[]> query = session.createQuery(hql, Object[].class);
+	        doctorDetails = query.getResultList();
 
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-        return doctorDetails;
-    }
+	        transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	    }
+	    return doctorDetails;
+	}
 	
 	public User getUserByDoctorId(int doctorId) {
         Query<User> query = session.createQuery(
