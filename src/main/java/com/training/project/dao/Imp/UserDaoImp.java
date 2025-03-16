@@ -49,19 +49,42 @@ public class UserDaoImp implements GenericDao<User, Integer> {
 	    System.out.print(users.isEmpty());
 	    return users;	}
 
-	@Override
-	public boolean create(User user) {
+	public Integer createUser(User user) {
 		Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.save(user);
+            Integer userId = (Integer) session.save(user);
+            System.out.println("userId "+userId);
             tx.commit();
-            return true;
+            return userId;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
-            return false;
+            return 1;
         }
+	}
+	
+	public User findToAuthenticate(String name) {
+		String hql = "FROM User WHERE username = :name";
+		 User user =  session.createQuery(hql, User.class)
+                 .setParameter("name", name)
+                 .uniqueResult();
+		try {
+	    
+	   
+		    User returnUser = new User();
+		    if(user != null) {
+		    returnUser.setUserId(user.getUserId());
+		    returnUser.setUsername(user.getUsername());
+		    returnUser.setPasswordHash(user.getPasswordHash());
+		    returnUser.setRole(user.getRole());
+		    return returnUser;
+		    }
+	    }
+	    catch(Exception e) {
+	    	user = null;
+	    }
+	    return user;
 	}
 
 	@Override
@@ -175,6 +198,34 @@ public class UserDaoImp implements GenericDao<User, Integer> {
 	    }
 	}
 	
+	//For register service
+	public User findByUserName(String name) {
+	    String hql = "FROM User WHERE username = :name";
+	    User user =  session.createQuery(hql, User.class)
+                .setParameter("name", name)
+                .uniqueResult();
+	    try {
+	    
+	   
+	    
+		    User returnUser = new User();
+		    if(user != null) {
+		    returnUser.setUserId(user.getUserId());
+		    returnUser.setUsername(user.getUsername());
+		    returnUser.setIsLogin(user.getIsLogin());
+		    returnUser.setLastLogin(user.getLastLogin());
+		    returnUser.setPasswordHash(user.getPasswordHash());
+		    returnUser.setRole(user.getRole());
+		    return returnUser;
+		    }
+	    }
+	    catch(Exception e) {
+	    	user = null;
+	    }
+	    
+	    return user;
+	}
+	
 	
 	// it will add the user with the role as doctor if just want to create user as doctor
 
@@ -205,4 +256,10 @@ public class UserDaoImp implements GenericDao<User, Integer> {
             return null;
         }
     }
+
+	@Override
+	public boolean create(User entity) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

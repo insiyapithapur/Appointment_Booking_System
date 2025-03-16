@@ -354,7 +354,7 @@
         
         function bookAppointment(doctorId) {
             console.log("Booking appointment with doctor ID: " + doctorId);
-            window.location.href = "${pageContext.request.contextPath}/Patient/Appointments?doctorId=" + doctorId;
+            window.location.href = "${pageContext.request.contextPath}/Patient/BookAppointment?doctorId=" + doctorId;
         }
         
         function searchDoctors() {

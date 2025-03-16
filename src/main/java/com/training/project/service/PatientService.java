@@ -17,6 +17,7 @@ public class PatientService {
 	private AppointmentDaoImp appointmentDao;
 	private DoctorDaoImp doctorDao;
 	private UserDaoImp userDao;
+	private ScheduleDaoImp scheduleDao;
 	
 	public PatientService() {
 	    try {
@@ -141,12 +142,14 @@ public class PatientService {
 	 * pending, cancelled and completed
 	 */
 	public List<String> getPatientAppointmentHistory(int patientId) {
+		System.out.println("patientId "+patientId);
 	    List<String> appointmentHistory = new ArrayList<>();
 	    Session session = sessionFactory.openSession();
 	    
 	    try {
 	        appointmentDao = new AppointmentDaoImp(session);
 	        List<Object[]> results = appointmentDao.findAppointmentsByPatientId(patientId);
+	        System.out.println("results "+results);
 	        
 	        // Format the results into readable strings
 	        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
@@ -162,7 +165,6 @@ public class PatientService {
 	            String notes = (String) row[7];
 	            String diagnosis = (String) row[8];
 	            String treatment = (String) row[9];
-	            String filePath = (String) row[10];
 	            
 	            String doctorName = "Dr. " + firstName + " " + lastName;
 	            String formattedDate = appointmentDate != null ? appointmentDate.format(dateFormatter) : "N/A";
@@ -201,10 +203,6 @@ public class PatientService {
 	                    }
 	                    appointmentInfo.append("Notes: ").append(notes);
 	                }
-	                
-	                if (filePath != null && !filePath.isEmpty()) {
-	                    appointmentInfo.append(" | File: ").append(filePath);
-	                }
 	            }
 	            
 	            appointmentHistory.add(appointmentInfo.toString());
@@ -226,6 +224,7 @@ public class PatientService {
 	public boolean bookAppointment(int patientId, int scheduleId, LocalDate appointmentDate, String reason) {
 		Session session = sessionFactory.openSession();
 		Transaction tx = null;
+		System.out.println("patientId "+patientId+" scheduleId "+scheduleId+" appointmentDate "+appointmentDate+" reason"+reason);
         try{
             tx = session.beginTransaction();
             
@@ -265,7 +264,7 @@ public class PatientService {
 	 * - Patients can change Pending -> Cancelled
 	 *  newStatusId The new status ID (1=Pending, 2=Completed, 3=Cancelled)
 	 */
-	public boolean updateAppointmentStatus(int userId, int appointmentId, int newStatusId) {
+	public boolean updateAppointmentStatus(int appointmentId, int newStatusId) {
 	    Session session = sessionFactory.openSession();
 	    userDao = new UserDaoImp(session);
 	    doctorDao = new DoctorDaoImp(session);
@@ -273,73 +272,16 @@ public class PatientService {
 	    appointmentDao = new AppointmentDaoImp(session);
 
 	    try {
-	        // Step 1: Validate if the user exists
-	        User user = userDao.findById(userId);
-	        if (user == null) {
-	            throw new IllegalArgumentException("User does not exist");
-	        }
-
-	        // Step 2: Get user role
-	        String roleName = user.getRole().getRoleName();
-	        
-	        // Step 3: Fetch the appointment
 	        Appointment appointment = appointmentDao.findById(appointmentId);
 	        if (appointment == null) {
 	            throw new IllegalArgumentException("Appointment not found with ID: " + appointmentId);
 	        }
-	        
-	        // Step 4: Validate current appointment status
 	        int currentStatusId = appointment.getStatus().getStatusId();
 	        
-	        // Only allow updates if appointment is in Pending status (statusId = 1)
 	        if (currentStatusId != 1) {
 	            throw new IllegalArgumentException("Cannot update appointment: current status is not Pending");
 	        }
-
-	        // Step 5: Check role-specific permissions and validate ownership
-	        if (roleName.equalsIgnoreCase("Doctor")) {
-	            // For doctors
-	            
-	            // Check if the doctor exists
-	            Doctor doctor = doctorDao.findByUserId(userId);
-	            if (doctor == null) {
-	                throw new IllegalArgumentException("Doctor not found for userId: " + userId);
-	            }
-	            
-	            // Validate if the appointment belongs to the doctor
-	            if (!appointment.getSchedule().getDoctor().getDoctorId().equals(doctor.getDoctorId())) {
-	                throw new IllegalArgumentException("Doctor does not own this appointment");
-	            }
-	            
-	            // Verify allowed status changes for doctors (Pending -> Completed)
-	            if (newStatusId != 2) {
-	                throw new IllegalArgumentException("Doctors can only mark appointments as Completed");
-	            }
-	            
-	        } else if (roleName.equalsIgnoreCase("Patient")) {
-	            // For patients
-	            
-	            // Check if the patient exists
-	            Patient patient = patientDao.findByUserId(userId);
-	            if (patient == null) {
-	                throw new IllegalArgumentException("Patient not found for userId: " + userId);
-	            }
-	            
-	            // Validate if the appointment belongs to the patient
-	            if (!appointment.getPatient().getPatientId().equals(patient.getPatientId())) {
-	                throw new IllegalArgumentException("Patient does not own this appointment");
-	            }
-	            
-	            // Verify allowed status changes for patients (Pending -> Cancelled)
-	            if (newStatusId != 3) {
-	                throw new IllegalArgumentException("Patients can only cancel appointments");
-	            }
-	            
-	        } else {
-	            throw new IllegalArgumentException("User role is not authorized to update appointment status");
-	        }
-
-	        // Step 6: Update appointment status
+	        
 	        boolean isUpdated = appointmentDao.updateAppointmentStatus(appointmentId, newStatusId);
 
 	        return isUpdated;
@@ -397,5 +339,115 @@ public class PatientService {
 	    }
 
 	    return doctorDetailsList;
+	}
+	
+	/*
+	 * Get All Schedule of Doctor with its details
+	 */
+	public List<String> getScheduleDetailsByDoctorId(int doctorId) {
+		System.out.println("doctorId "+doctorId);
+	    Session session = sessionFactory.openSession();
+	    List<String> scheduleDetailsList = new ArrayList<>();
+
+	    try {
+	        // Get doctor details first
+	        doctorDao = new DoctorDaoImp(session);
+	        List<Object[]> doctorDetails = doctorDao.findDoctorDetailsById(doctorId);
+	        
+	        // If doctor exists, add doctor info at the beginning of the list
+	        if (doctorDetails != null && !doctorDetails.isEmpty()) {
+	            Object[] doctor = doctorDetails.get(0);
+	            
+	            // Extract doctor data
+	            String firstName = (String) doctor[6];
+	            String lastName = (String) doctor[7];
+	            String specialization = (String) doctor[1];
+	            Float experience = (Float) doctor[3];
+	            String degree = (String) doctor[4];
+	            String phoneNumber = (String) doctor[9];
+	            String email = (String) doctor[10];
+	            
+	            // Format doctor info
+	            String doctorInfo = String.format(
+	                "Doctor: Dr. %s %s | Specialization: %s | Experience: %.1f years | Degree: %s | Contact: %s | Email: %s",
+	                firstName,
+	                lastName,
+	                specialization,
+	                experience,
+	                degree,
+	                phoneNumber,
+	                email
+	            );
+	            
+	            // Add to list
+	            scheduleDetailsList.add(doctorInfo);
+	        }
+	        
+	        // Now get schedule details
+	        scheduleDao = new ScheduleDaoImp(session);
+	        List<Object[]> results = scheduleDao.findSchedulesByDoctorId(doctorId);
+	        System.out.println("results in service "+results);
+	        for (Object[] row : results) {
+	            Integer scheduleId = (Integer) row[0];
+	            Integer docId = (Integer) row[1];
+	            Integer dayOfWeek = (Integer) row[2];
+	            LocalDateTime startTime = (LocalDateTime) row[3];
+	            LocalDateTime endTime = (LocalDateTime) row[4];
+	            Integer maxTokens = (Integer) row[5];
+	            Boolean isAvailable = (Boolean) row[6];
+
+	            String dayName = getDayName(dayOfWeek);
+	            String timeRange = formatTimeRange(startTime, endTime);
+
+	            String scheduleInfo = String.format(
+	                "Schedule ID: %d | Doctor ID: %d | Day: %s | Time: %s | Max Tokens: %d | Available: %s",
+	                scheduleId,
+	                docId,
+	                dayName,
+	                timeRange,
+	                maxTokens,
+	                isAvailable ? "Yes" : "No"
+	            );
+
+	            scheduleDetailsList.add(scheduleInfo);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        session.close();
+	    }
+
+	    return scheduleDetailsList;
+	}
+
+	// Helper method to convert day number to name
+	private String getDayName(Integer dayOfWeek) {
+	    switch (dayOfWeek) {
+	        case 1: return "Sunday";
+	        case 2: return "Monday";
+	        case 3: return "Tuesday";
+	        case 4: return "Wednesday";
+	        case 5: return "Thursday";
+	        case 6: return "Friday";
+	        case 7: return "Saturday";
+	        default: return "Unknown";
+	    }
+	}
+	
+	public MedicalRecord getMedicalRecordByAppointmentId(Integer appointmentId) {
+        Session session = sessionFactory.openSession();
+        appointmentDao = new AppointmentDaoImp(session);
+        
+        try {
+            return appointmentDao.findByAppointmentId(appointmentId);
+        } finally {
+            session.close();
+        }
+    }
+
+	// Helper method to format the time range
+	private String formatTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+	    return startTime.format(formatter) + " - " + endTime.format(formatter);
 	}
 }

@@ -1,5 +1,6 @@
 package com.training.project.service;
 
+import java.time.LocalDate;
 import java.util.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -346,7 +347,41 @@ public class UserService {
 	    session.close(); // Close the session to prevent memory leaks
 	    return users;
 	}
+	
+	/*
+	 * Create UserDetails and Patient Details
+	 */
+	public List<Object> fillUserDetailsForPatient(Integer userId, String firstName, String lastName,
+            LocalDate dob, String gender, String email,
+            String phone, String bloodGroup) {
+		
+			Session session = sessionFactory.openSession();
+			userDetailDao = new UserDetailDaoImp(session);
+			List<Object> result = new ArrayList<>();
 
+try {
+List<Object[]> queryResult = userDetailDao.createPatientDetails(userId, firstName, lastName,
+                                       dob, gender, email,
+                                       phone, bloodGroup);
+
+// Convert List<Object[]> to List<Object> preserving original types
+if (queryResult != null && !queryResult.isEmpty()) {
+Object[] data = queryResult.get(0);
+for (Object item : data) {
+result.add(item); // Keep original types
+}
+}
+
+return result;
+} catch (Exception e) {
+e.printStackTrace();
+return result;
+} finally {
+session.close();
+}
+}
+	
+    
 	 private boolean isAdminRole(Role role) {
 	        return role.getRoleId() == 1;
 	    }

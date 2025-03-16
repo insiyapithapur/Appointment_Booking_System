@@ -3,11 +3,17 @@ SELECT * FROM  USERS;
 SELECT * FROM user_details;
 SELECT * FROM  DOCTORS;
 SELECT * FROM SCHEDULES;
+
 SELECT * FROM  PATIENTS;
 SELECT * FROM appointments_status;
 SELECT * FROM  APPOINTMENTS; 
 SELECT * FROM  MEDICAL_RECORDS;
 
+UPDATE MEDICAL_RECORDS
+SET appointment_id = 1
+WHERE record_id = 1;
+
+SELECT * FROM medical_records WHERE appointment_id = 1;
 INSERT INTO users (
     username,
     password_hash,

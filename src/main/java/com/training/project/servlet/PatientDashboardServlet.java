@@ -32,11 +32,11 @@ public class PatientDashboardServlet  extends HttpServlet {
         
         // Check if user is logged in
         if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("/Login.jsp");
             return;
         }
         
-        Integer patientId = (Integer) session.getAttribute("roleSpecificId");
+        Integer patientId = (Integer) session.getAttribute("userId");
         String patientName = (String) session.getAttribute("username");
         LocalDate today = LocalDate.now();
         

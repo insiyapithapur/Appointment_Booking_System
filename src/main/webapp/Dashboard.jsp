@@ -359,6 +359,18 @@
         <h2>Dashboard</h2>
         <p class="text-muted" id="current-datetime"></p>
         
+        <!-- Display any error or success messages -->
+        <c:if test="${not empty errorMessage}">
+            <div class="alert alert-danger" role="alert">
+                ${errorMessage}
+            </div>
+        </c:if>
+        <c:if test="${not empty successMessage}">
+            <div class="alert alert-success" role="alert">
+                ${successMessage}
+            </div>
+        </c:if>
+        
         <!-- Appointments Table -->
         <div class="appointments-container">
             <div class="appointments-header">Today's Appointments</div>
@@ -387,7 +399,7 @@
                             <td>${appointment.appointmentToken}</td>
                             <td class="reason-cell">
                                 <div class="reason-tooltip">
-                                    ${appointment.reason.length() > 25 ? appointment.reason.substring(0, 25) + '...' : appointment.reason}
+                                    ${fn:length(appointment.reason) > 25 ? fn:substring(appointment.reason, 0, 25).concat('...') : appointment.reason}
                                     <span class="reason-text">${appointment.reason}</span>
                                 </div>
                             </td>
@@ -401,22 +413,32 @@
                                 <c:choose>
                                     <c:when test="${appointment.status == 'Completed'}">
                                         <!-- If completed: View enabled, Complete disabled -->
-                                        <button class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;"
-                                            onclick="viewAppointment(${appointment.appointmentId})">
-                                            View
-                                        </button>
+                                        <a href="${pageContext.request.contextPath}/Doctor/ViewMedicalRecord?appointmentId=${appointment.appointmentId}" 
+                                           class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
                                     </c:when>
                                     <c:otherwise>
-                                        <!-- If pending: View disabled, Complete enabled -->
-                                        <button class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;" 
-                                                onclick="markCompleted(${appointment.appointmentId})">
-                                                Complete
-                                        </button>
+                                        <!-- If pending or confirmed: Complete enabled -->
+                                        <a href="${pageContext.request.contextPath}/Doctor/CompleteAppointment?appointmentId=${appointment.appointmentId}" 
+                                           class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;">
+                                            <i class="fas fa-check-circle"></i> Complete
+                                        </a>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
                         </tr>
                     </c:forEach>
+                    
+                    <c:if test="${empty appointments}">
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="alert alert-info mb-0">
+                                    No appointments scheduled for today.
+                                </div>
+                            </td>
+                        </tr>
+                    </c:if>
                 </tbody>
             </table>
         </div>
@@ -456,37 +478,6 @@
         function navigateTo(page) {
             const contextPath = '${pageContext.request.contextPath}';
             window.location.href = contextPath + '/' + page;
-        }
-        
-        function viewAppointment(id) {
-            console.log("Viewing appointment: " + id);
-            // You can implement navigation to appointment details
-            // window.location.href = "appointment-details.jsp?id=" + id;
-        }
-        
-        function markCompleted(id) {
-            if(confirm("Are you sure you want to mark this appointment as completed?")) {
-                console.log("Marking appointment as completed: " + id);
-                
-                // AJAX call to update the status
-                $.ajax({
-                    url: "UpdateAppointmentStatus",
-                    type: "POST",
-                    data: {
-                        appointmentId: id,
-                        status: "COMPLETED"
-                    },
-                    success: function(response) {
-                        alert("Appointment marked as completed");
-                        // Reload the page to reflect changes
-                        location.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        alert("Error updating appointment status");
-                        console.error(error);
-                    }
-                });
-            }
         }
         
         // Handle responsive behavior

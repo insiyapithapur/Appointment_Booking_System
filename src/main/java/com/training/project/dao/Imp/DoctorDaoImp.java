@@ -103,6 +103,35 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
 	    return doctor;
 	}
 	
+	public List<Object[]> findDoctorDetailsById(Integer doctorId) {
+	    Transaction transaction = null;
+	    List<Object[]> doctorDetails = null;
+	    
+	    try {
+	        transaction = session.beginTransaction();
+	        
+	        String hql = "SELECT d.doctorId, d.specialization, d.licenseNumber, d.experience, d.degree, d.isActive, " +
+	                     "ud.firstName, ud.lastName, ud.gender, ud.phoneNumber, ud.email, ud.dateOfBirth " +
+	                     "FROM Doctor d " +
+	                     "JOIN d.user u " +
+	                     "JOIN UserDetail ud ON u.userId = ud.user.userId " +
+	                     "WHERE d.doctorId = :doctorId";
+	        
+	        Query<Object[]> query = session.createQuery(hql, Object[].class);
+	        query.setParameter("doctorId", doctorId);
+	        doctorDetails = query.getResultList();
+	        
+	        transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	    }
+	    
+	    return doctorDetails;
+	}
+	
 	public List<Object[]> getDoctorDetails() {
 	    Transaction transaction = null;
 	    List<Object[]> doctorDetails = null;

@@ -312,12 +312,7 @@
             </div>
         </c:if>
         
-        <!-- Book New Appointment Button -->
-        <div class="mb-4">
-            <a href="${pageContext.request.contextPath}/Patient/Doctors" class="btn btn-primary">
-                <i class="fas fa-plus-circle"></i> Book New Appointment
-            </a>
-        </div>
+       
         
         <!-- Appointments Table -->
         <div class="appointments-container">
@@ -328,37 +323,42 @@
                 </div>
             </div>
             <table class="appointments-table" id="appointmentsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Doctor</th>
-                        <th>Date</th>
-                        <th>Token</th>
-                        <th>Reason</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${appointments}" var="appointmentInfo" varStatus="status">
-                        <c:set var="appointmentParts" value="${fn:split(appointmentInfo, '|')}" />
-                        <c:set var="appointmentId" value="${fn:trim(fn:substringAfter(appointmentParts[0], 'ID:'))}" />
-                        <c:set var="doctorName" value="${fn:trim(fn:substringAfter(appointmentParts[1], 'Doctor:'))}" />
-                        <c:set var="appointmentDate" value="${fn:trim(fn:substringAfter(appointmentParts[2], 'Date:'))}" />
-                        <c:set var="tokenNo" value="${fn:trim(fn:substringAfter(appointmentParts[3], 'Token:'))}" />
-                        <c:set var="reason" value="${fn:trim(fn:substringAfter(appointmentParts[4], 'Reason:'))}" />
-                        <c:set var="status" value="${fn:trim(fn:substringAfter(appointmentParts[5], 'Status:'))}" />
-                        
-                        <tr>
-                            <td>${appointmentId}</td>
-                            <td>
-                                <div class="doctor-info">
-                                    <div class="doctor-avatar" style="background-color: hsl(${(status.index * 40) % 360}, 70%, 60%)">
-                                        ${fn:substring(doctorName, 4, 5)}
-                                    </div>
-                                    ${doctorName}
-                                </div>
-                            </td>
+                <!-- In the thead section, remove the ID column -->
+				<thead>
+				    <tr>
+				        <!-- Remove this line: <th>ID</th> -->
+				        <th>Doctor</th>
+				        <th>Date</th>
+				        <th>Token</th>
+				        <th>Reason</th>
+				        <th>Status</th>
+				        <th>Action</th>
+				    </tr>
+				</thead>
+				<tbody>
+				    <c:forEach items="${appointments}" var="appointmentInfo" varStatus="status">
+				        <!-- Keep parsing the appointmentId but don't display it -->
+				        <c:set var="appointmentParts" value="${fn:split(appointmentInfo, '|')}" />
+				        <c:set var="appointmentId" value="${fn:trim(fn:substringAfter(appointmentParts[0], 'ID:'))}" />
+				        <c:set var="doctorName" value="${fn:trim(fn:substringAfter(appointmentParts[1], 'Doctor:'))}" />
+				        <c:set var="appointmentDate" value="${fn:trim(fn:substringAfter(appointmentParts[2], 'Date:'))}" />
+				        <c:set var="tokenNo" value="${fn:trim(fn:substringAfter(appointmentParts[3], 'Token:'))}" />
+				        <c:set var="reason" value="${fn:trim(fn:substringAfter(appointmentParts[4], 'Reason:'))}" />
+				        <c:set var="status" value="${fn:trim(fn:substringAfter(appointmentParts[5], 'Status:'))}" />
+				        
+				        <!-- Set a predefined color based on appointmentId -->
+				        <c:set var="avatarColor" value="hsl(${(appointmentId * 40) % 360}, 70%, 60%)" />
+				        
+				        <tr>
+				            <!-- Remove this line: <td>${appointmentId}</td> -->
+				            <td>
+				                <div class="doctor-info">
+				                    <div class="doctor-avatar" style="background-color: ${avatarColor}">
+				                        ${fn:substring(doctorName, 4, 5)}
+				                    </div>
+				                    ${doctorName}
+				                </div>
+				            </td>
                             <td>${appointmentDate}</td>
                             <td>${tokenNo}</td>
                             <td class="reason-cell">
@@ -399,42 +399,45 @@
                     </c:forEach>
                     
                     <c:if test="${empty appointments}">
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <div class="alert alert-info mb-0">
-                                    You don't have any appointments yet. 
-                                    <a href="${pageContext.request.contextPath}/Patient/Doctors" class="alert-link">Book an appointment</a> to get started.
-                                </div>
-                            </td>
-                        </tr>
-                    </c:if>
+					    <tr>
+					        <td colspan="6" class="text-center py-4">
+					            <div class="alert alert-info mb-0">
+					                You don't have any appointments yet. 
+					            </div>
+					        </td>
+					    </tr>
+					</c:if>
                 </tbody>
             </table>
         </div>
     </div>
     
-    <!-- Cancel Appointment Modal -->
-    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancelModalLabel">Cancel Appointment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to cancel this appointment?</p>
-                    <p class="text-danger">This action cannot be undone.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form id="cancelForm" action="${pageContext.request.contextPath}/Patient/CancelAppointment" method="post">
-                        <input type="hidden" id="appointmentIdToCancel" name="appointmentId" value="">
-                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+   <!-- Cancel Appointment Modal -->
+	<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="cancelModalLabel">Cancel Appointment</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body">
+	                <p>Are you sure you want to cancel this appointment?</p>
+	                <p class="text-danger">This action cannot be undone.</p>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                <form id="cancelForm" action="${pageContext.request.contextPath}/Patient/Appointments" method="post">
+	                    <input type="hidden" id="appointmentIdToCancel" name="appointmentId" value="">
+	                    <input type="hidden" name="action" value="cancelAppointment">
+	                    <input type="hidden" name="newStatusId" value="3">
+	                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+	                </form>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
     
     <!-- Bootstrap & jQuery JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

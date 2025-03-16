@@ -6,11 +6,13 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import com.training.project.dao.GenericDao;
 import com.training.project.model.Appointment;
 import com.training.project.model.AppointmentsStatus;
+import com.training.project.model.MedicalRecord;
 
 public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	private Session session;
@@ -196,60 +198,63 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	    try {
 	        // First check if the user is a doctor
 	        Query<String> roleQuery = session.createQuery(
-	            "SELECT u.role.roleName FROM User u " +
-	            "JOIN Doctor d ON d.user.id = u.id " +
-	            "WHERE d.doctorId = :doctorId", String.class);
+	                "SELECT u.role.roleName FROM User u " +
+	                "JOIN Doctor d ON d.user.id = u.id " +
+	                "WHERE d.doctorId = :doctorId", String.class);
 	        roleQuery.setParameter("doctorId", doctorId);
 	        String role = roleQuery.uniqueResult();
-
+	        
 	        if (role == null || !role.equals("Doctor")) {
 	            return appointmentDetails; // Return empty list if not a doctor
 	        }
-
+	        
 	        // HQL query to get upcoming appointments for the doctor with required details
-	        // Modified to use a different join path to get user details
+	        // Added appointment ID as the first column in the result
 	        Query<Object[]> query = session.createQuery(
-	            "SELECT CONCAT(ud.firstName, ' ', ud.lastName), " + // Patient Name
-	            "a.appointmentDate, " +                        // Appointment Date
-	            "a.tokenNo, " +                                // Token Number
-	            "a.reason, " +                                 // Reason
-	            "aps.statusName, " +                           // Status
-	            "ud.phoneNumber " +                            // Contact No
-	            "FROM Appointment a " +
-	            "JOIN a.schedule s " +
-	            "JOIN s.doctor d " +
-	            "JOIN a.patient p " +
-	            "JOIN p.user pu " +
-	            "JOIN UserDetail ud ON ud.user.id = pu.id " +  // Changed this join
-	            "JOIN a.status aps " +
-	            "WHERE d.doctorId = :doctorId " +
-	            "AND a.appointmentDate >= :fromDate " +
-	            "ORDER BY a.appointmentDate ASC, a.tokenNo ASC", 
-	            Object[].class);
+	                "SELECT a.appointmentId, " + // Added appointment ID
+	                "CONCAT(ud.firstName, ' ', ud.lastName), " + // Patient Name
+	                "a.appointmentDate, " + // Appointment Date
+	                "a.tokenNo, " + // Token Number
+	                "a.reason, " + // Reason
+	                "aps.statusName, " + // Status
+	                "ud.phoneNumber " + // Contact No
+	                "FROM Appointment a " +
+	                "JOIN a.schedule s " +
+	                "JOIN s.doctor d " +
+	                "JOIN a.patient p " +
+	                "JOIN p.user pu " +
+	                "JOIN UserDetail ud ON ud.user.id = pu.id " + // Changed this join
+	                "JOIN a.status aps " +
+	                "WHERE d.doctorId = :doctorId " +
+	                "AND a.appointmentDate >= :fromDate " +
+	                "ORDER BY a.appointmentDate ASC, a.tokenNo ASC",
+	                Object[].class);
 	        
 	        query.setParameter("doctorId", doctorId);
 	        query.setParameter("fromDate", fromDate);
 	        
 	        List<Object[]> results = query.getResultList();
-	        System.out.println("results "+results);
+	        System.out.println("results " + results);
 	        
 	        // Format the results
 	        for (Object[] row : results) {
-	            String patientName = (String) row[0];
-	            LocalDate appointmentDate = (LocalDate) row[1];
-	            Integer tokenNo = (Integer) row[2];
-	            String reason = (String) row[3];
-	            String status = (String) row[4];
-	            String contactNo = (String) row[5];
+	            Integer appointmentId = (Integer) row[0]; // Get appointment ID
+	            String patientName = (String) row[1];
+	            LocalDate appointmentDate = (LocalDate) row[2];
+	            Integer tokenNo = (Integer) row[3];
+	            String reason = (String) row[4];
+	            String status = (String) row[5];
+	            String contactNo = (String) row[6];
 	            
 	            String formattedAppointment = String.format(
-	                "Patient: %s | Date: %s | Token: %d | Reason: %s | Status: %s | Contact: %s",
-	                patientName,
-	                appointmentDate,
-	                tokenNo,
-	                reason != null ? reason : "N/A",
-	                status,
-	                contactNo
+	                    "ID: %d | Patient: %s | Date: %s | Token: %d | Reason: %s | Status: %s | Contact: %s",
+	                    appointmentId,
+	                    patientName,
+	                    appointmentDate,
+	                    tokenNo,
+	                    reason != null ? reason : "N/A",
+	                    status,
+	                    contactNo
 	            );
 	            
 	            appointmentDetails.add(formattedAppointment);
@@ -261,7 +266,7 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	        session.close();
 	    }
 	    
-	    System.out.println("appointmentDetails "+appointmentDetails);
+	    System.out.println("appointmentDetails " + appointmentDetails);
 	    return appointmentDetails;
 	}
 	
@@ -348,21 +353,22 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
     }
     
     public List<Object[]> findAppointmentsByPatientId(int patientId) {
+        System.out.println("patientId "+patientId);
         List<Object[]> appointments = null;
         try {
             String hql = "SELECT a.appointmentId, ud.firstName, ud.lastName, a.appointmentDate, a.tokenNo, a.reason, " +
-                        "s.statusName, " +
-                        "mr.notes, mr.diagnosis, mr.treatment, mr.filePath " +
-                        "FROM Appointment a " +
-                        "JOIN a.patient p " +
-                        "JOIN a.schedule sch " +
-                        "JOIN sch.doctor d " +
-                        "JOIN d.user u " +
-                        "JOIN UserDetail ud ON u.userId = ud.user.userId " +
-                        "JOIN a.status s " +
-                        "LEFT JOIN a.medicalRecord mr " +
-                        "WHERE p.id = :patientId " +
-                        "ORDER BY a.appointmentDate DESC";
+                         "s.statusName, " +
+                         "mr.notes, mr.diagnosis, mr.treatment " +
+                         "FROM Appointment a " +
+                         "JOIN a.patient p " +
+                         "JOIN a.schedule sch " +
+                         "JOIN sch.doctor d " +
+                         "JOIN d.user u " +
+                         "JOIN UserDetail ud ON u.userId = ud.user.userId " +
+                         "JOIN a.status s " +
+                         "LEFT JOIN MedicalRecord mr ON mr.appointment = a " +
+                         "WHERE p.id = :patientId " +
+                         "ORDER BY a.appointmentDate DESC";
 
             Query<Object[]> query = session.createQuery(hql, Object[].class);
             query.setParameter("patientId", patientId);
@@ -371,5 +377,67 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
             e.printStackTrace();
         }
         return appointments;
+    }
+    
+    public boolean addMedicalRecord(Integer appointmentId, String diagnosis, String treatment, String notes) {
+    	Transaction transaction = null;
+    	try {
+    		System.out.println("appointmentId +"+appointmentId);
+        	transaction = session.beginTransaction();
+            
+            // Find the appointment
+            Appointment appointment = session.get(Appointment.class, appointmentId);
+            if (appointment == null) {
+                throw new IllegalArgumentException("Appointment not found with ID: " + appointmentId);
+            }
+            
+            // Create new medical record
+            MedicalRecord medicalRecord = new MedicalRecord();
+            medicalRecord.setAppointment(appointment);
+            medicalRecord.setDiagnosis(diagnosis);
+            medicalRecord.setTreatment(treatment);
+            medicalRecord.setNotes(notes);
+            
+            // Save the medical record
+            session.save(medicalRecord);
+            
+            updateAppointmentStatus(appointmentId,2);
+            
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public MedicalRecord findByAppointmentId(Integer appointmentId) {
+        System.out.println("appointmentId DAO " + appointmentId);
+        Transaction tx = null;
+        try {
+            // Start a new transaction
+            tx = session.beginTransaction();
+            
+            // Try with native SQL
+            NativeQuery<MedicalRecord> query = session.createNativeQuery(
+                "SELECT * FROM medical_records WHERE appointment_id = :appId", 
+                MedicalRecord.class);
+            query.setParameter("appId", appointmentId);
+            
+            MedicalRecord result = query.uniqueResult();
+            
+            // Commit the transaction
+            tx.commit();
+            System.out.println("medical "+result);
+            return result;
+        } catch (Exception e) {
+            // Rollback on error
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            return null;
+        }
     }
 }

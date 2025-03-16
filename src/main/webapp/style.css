@@ -5,60 +5,54 @@
 #91BDEC - Light Blue
 #61CE70 - Green Button */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  background-color: #f5f5f5;
-  font-family: Arial, sans-serif;
-}
-
-/* Remove browser default margins */
 body {
-  margin: 0 !important;
-  padding: 0 !important;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  height: auto;
+  margin: 0;
+  background-color: #f5f5f5;
+  padding: 0;
 }
 
 .main-container {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  
+  justify-content: center;
+  align-items: center;
+  margin: 0;
   width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #f5f5f5;
+  max-width: 100rem;
+  max-height: 100rem;
+  padding: 1rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+  min-height: calc(100vh - 2rem);
 }
 
+/* Updated image container for better coverage */
 .image-container {
-  height: 100vh;
-  width: auto;
-  position: relative;
-  display: block;
-  margin: 0;
-  padding: 0;
-  line-height: 0; /* Remove line-height spacing */
-  font-size: 0; /* Remove font spacing */
+  flex: 1;
+  min-width: 300px;
+  max-width: 450px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: calc(100vh - 4rem);
+  max-height: 721px;
+  overflow: hidden;
 }
 
 .responsive-image {
-  height: 100vh;
-  width: auto;
-  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  object-position: left;
-  margin: 0;
-  padding: 0;
-  border: none;
-  outline: none;
+  min-height: calc(100vh - 4rem);
+  max-height: 721px;
 }
 
 .login-container {
@@ -67,16 +61,15 @@ body {
   padding: 2rem;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 24rem;
+  max-width: 20rem;
   height: auto;
   min-height: 24rem;
+  max-height: calc(100vh - 4rem);
   text-align: center;
-  margin: auto;
-  margin-left: 2rem;
+  flex: 1;
+  min-width: 280px;
+  margin: 0 auto;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 h1 {
@@ -175,69 +168,121 @@ input::placeholder {
   text-decoration: underline;
 }
 
+/* Error message styling */
 .error-message {
-  color: #ff0000;
+  color: #ff0033;
   margin-bottom: 15px;
   font-size: 14px;
 }
 
-/* Media queries for responsiveness */
-@media (max-width: 992px) {
+/* Media Queries */
+@media (max-width: 1200px) {
   .main-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    max-width: 90%;
+    gap: 1.5rem;
   }
   
   .image-container {
-    height: 50vh;
+    max-height: min(721px, calc(100vh - 4rem));
+  }
+}
+
+@media (max-width: 992px) {
+  .main-container {
+    flex-direction: column;
+    gap: 2rem;
+    min-height: auto;
+  }
+  
+  .image-container {
+    height: 450px;
     width: 100%;
-    grid-row: 1;
+    max-width: 450px;
+    order: -1;
+    min-height: auto;
   }
   
   .responsive-image {
     width: 100%;
     height: 100%;
+    min-height: auto;
   }
   
   .login-container {
     margin: 0 auto;
-    padding: 1.5rem;
-    max-height: 50vh;
-    overflow-y: auto;
+    max-width: 24rem;
+    max-height: none;
   }
 }
 
 @media (max-width: 768px) {
   .image-container {
-    height: 40vh;
+    width: 90%;
+    height: 400px;
   }
   
   .login-container {
-    max-height: 60vh;
+    padding: 1.5rem;
   }
 }
 
 @media (max-width: 576px) {
-  .image-container {
-    height: 35vh;
+  .main-container {
+    padding: 0.5rem;
   }
   
   .login-container {
     padding: 1.2rem;
+    min-height: 20rem;
+  }
+  
+  .image-container {
+    width: 85%;
+    height: 350px;
   }
   
   input, .login-button {
     padding: 10px;
     font-size: 14px;
   }
+  
+  body {
+    padding: 0.5rem;
+  }
 }
 
 @media (max-width: 375px) {
   .image-container {
-    height: 30vh;
+    width: 80%;
+    height: 300px;
   }
   
   .login-container {
     padding: 1rem;
+  }
+}
+
+@media (min-height: 900px) {
+  .main-container {
+    align-items: center;
+  }
+  
+  .image-container {
+   	max-height: calc(100vh - 2rem);
+    
+  }
+}
+
+@media (max-height: 700px) {
+  .login-container {
+    padding: 1rem;
+  }
+  
+  .input-container {
+    margin-bottom: 15px;
+  }
+
+  .image-container {
+    max-height: calc(100vh - 2rem);
   }
 }

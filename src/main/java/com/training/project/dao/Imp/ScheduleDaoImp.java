@@ -84,10 +84,25 @@ public class ScheduleDaoImp implements GenericDao<Schedule, Integer> {
 		return false;
 	}
 	
-	public List<Schedule> findByDoctorId(int doctorId) {
-        Query<Schedule> query = session.createQuery(
-            "FROM Schedule WHERE doctor.id = :doctorId", Schedule.class);
-        query.setParameter("doctorId", doctorId);
-        return query.list();
-    }
+	public List<Object[]> findSchedulesByDoctorId(int doctorId) {
+		Transaction transaction = null;
+	    List<Object[]> scheduleDetails = null;
+	    System.out.println("doctorId DAO"+doctorId);
+	    try {
+	    	String hql = "SELECT s.scheduleId, s.doctor.id, s.dayOfWeek, s.startTime, s.endTime, s.maxTokens, s.isAvailable " +
+	                 "FROM Schedule s " +
+	                 "WHERE s.doctor.id = :doctorId";
+	    
+		    Query<Object[]> query = session.createQuery(hql, Object[].class);
+		    query.setParameter("doctorId", doctorId);
+		    scheduleDetails = query.getResultList();
+		    transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	    }
+	    return scheduleDetails;
+	}
 }

@@ -226,4 +226,24 @@ public class DoctorService {
 	        System.out.println("appointmentDetails"+appointmentDetails);
 	        return appointmentDetails;
 	    }
+	 
+	 /*
+	  * update to completed ==2 and add medical records
+	  */
+	 public boolean addMedicalRecord(Integer appointmentId, String diagnosis, String treatment, String notes) {
+		Session session = sessionFactory.openSession();
+		appointmentDao = new AppointmentDaoImp(session);
+		System.out.println("appointmentId "+appointmentId);
+		try {
+			boolean result = appointmentDao.addMedicalRecord(
+			appointmentId, diagnosis, treatment, notes);
+			System.out.println("result "+result);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			session.close();
+		}
+	 }
 }

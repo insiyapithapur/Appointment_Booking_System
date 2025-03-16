@@ -33,7 +33,8 @@ public class LoginServlet extends HttpServlet {
 
 	   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 			
-			response.getWriter().append("Invalid try again ");
+//			response.getWriter().append("Invalid try again ");
+		   request.getRequestDispatcher("/Login.jsp").forward(request, response);
 		}
 		
 		protected void doPost(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
@@ -42,8 +43,9 @@ public class LoginServlet extends HttpServlet {
 	
 				// getting parameters from form
 				String username = request.getParameter("username").trim();
+				System.out.println("username "+username);
 				String password = request.getParameter("password").trim();
-	
+				System.out.println("password "+password);
 				// setting attributes
 				request.setAttribute("username", username);
 				request.setAttribute("password", password);

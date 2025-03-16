@@ -49,7 +49,7 @@ public class DashboardServlet extends HttpServlet {
         System.out.println("Processing dashboard for doctor ID: " + doctorId);
         if (doctorId == null) {
             // If not logged in, redirect to login page
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("Login.jsp");
             return;
         }
         
@@ -84,36 +84,41 @@ public class DashboardServlet extends HttpServlet {
         for (String appointmentString : appointmentStrings) {
             try {
                 // Parse the formatted appointment string
-                // Format is "Patient: %s | Date: %s | Token: %d | Reason: %s | Status: %s | Contact: %s"
+                // Updated format is "ID: %d | Patient: %s | Date: %s | Token: %d | Reason: %s | Status: %s | Contact: %s"
                 String[] parts = appointmentString.split(" \\| ");
                 
-                if (parts.length >= 6) {
+                if (parts.length >= 7) { // Make sure we have all parts including ID
                     AppointmentDisplayData data = new AppointmentDisplayData();
                     
+                    // Extract appointment ID
+                    String idStr = parts[0].substring(parts[0].indexOf(":") + 1).trim();
+                    int appointmentId = Integer.parseInt(idStr);
+                    data.setAppointmentId(appointmentId);
+                    
                     // Extract patient name
-                    String patientName = parts[0].substring(parts[0].indexOf(":") + 1).trim();
+                    String patientName = parts[1].substring(parts[1].indexOf(":") + 1).trim();
                     data.setPatientName(patientName);
                     
                     // Extract appointment date
-                    String dateStr = parts[1].substring(parts[1].indexOf(":") + 1).trim();
+                    String dateStr = parts[2].substring(parts[2].indexOf(":") + 1).trim();
                     LocalDate appointmentDate = LocalDate.parse(dateStr);
                     data.setAppointmentTime(appointmentDate);
                     
                     // Extract token number
-                    String tokenStr = parts[2].substring(parts[2].indexOf(":") + 1).trim();
+                    String tokenStr = parts[3].substring(parts[3].indexOf(":") + 1).trim();
                     int token = Integer.parseInt(tokenStr);
                     data.setappointmentToken(token);
                     
                     // Extract reason
-                    String reason = parts[3].substring(parts[3].indexOf(":") + 1).trim();
+                    String reason = parts[4].substring(parts[4].indexOf(":") + 1).trim();
                     data.setReason(reason);
                     
                     // Extract status
-                    String status = parts[4].substring(parts[4].indexOf(":") + 1).trim();
+                    String status = parts[5].substring(parts[5].indexOf(":") + 1).trim();
                     data.setStatus(status);
                     
                     // Extract contact
-                    String contact = parts[5].substring(parts[5].indexOf(":") + 1).trim();
+                    String contact = parts[6].substring(parts[6].indexOf(":") + 1).trim();
                     data.setContactNumber(contact);
                     
                     // Generate initials from patient name

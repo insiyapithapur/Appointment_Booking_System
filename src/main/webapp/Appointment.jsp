@@ -537,7 +537,7 @@
                                                         <c:when test="${statusValue eq 'Completed'}">
                                                             <!-- If completed: View enabled, Complete disabled -->
                                                             <button class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;"
-                                                                onclick="viewAppointmentDetails('${fn:replace(appointment, "'", "\\'")}')">
+                                                                onclick="viewAppointmentDetails('${fn:replace(appointment,"'", "\\'")}')">
                                                                  View
                                                             </button>
                                                         </c:when>
