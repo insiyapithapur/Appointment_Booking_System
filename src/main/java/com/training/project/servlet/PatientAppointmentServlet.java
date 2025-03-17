@@ -42,7 +42,8 @@ public class PatientAppointmentServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
-        Integer patientId = (Integer) session.getAttribute("userId");
+        Integer patientId = (Integer) session.getAttribute("roleSpecificId");
+        System.out.println("patientId patientId"+patientId);
         
         if (patientId == null) {
             response.sendRedirect(request.getContextPath() + "/login.jsp");
@@ -50,6 +51,7 @@ public class PatientAppointmentServlet extends HttpServlet {
         }
         
         List<String> appointments = patientService.getPatientAppointmentHistory(patientId);
+        System.out.println("appointments servlet"+appointments);
         request.setAttribute("appointments", appointments);
         
         request.getRequestDispatcher("/PatientAppointment.jsp").forward(request, response);

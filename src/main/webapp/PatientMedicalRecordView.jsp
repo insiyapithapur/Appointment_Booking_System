@@ -7,19 +7,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Record</title>
+    <title>Medical Record Details</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f95e9;
-            --primary-color: #4f95e9;
+            --sidebar-bg: #4f5e95;
+            --primary-color: #4f5e95;
             --light-bg: #f7f9fc;
-            --completed-color: #e8f5e9;
+            --confirmed-color: #e8f5e9;
             --pending-color: #e3f2fd;
-            --cancelled-color: #ffebee;
             --text-color: #333;
         }
         
@@ -107,43 +106,26 @@
             padding: 20px;
         }
         
+        .medical-record-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .medical-record-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
         .section-title {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 10px;
             font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
         }
         
         .section-content {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            white-space: pre-line;
-        }
-        
-        .appointment-info {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f0f7ff;
-            border-radius: 5px;
-        }
-        
-        .appointment-info-item {
-            flex: 1 0 30%;
-            margin-bottom: 10px;
-        }
-        
-        .appointment-info-label {
-            font-weight: 600;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .appointment-info-value {
-            font-size: 16px;
+            margin-left: 15px;
         }
         
         .toggle-sidebar {
@@ -162,7 +144,7 @@
         }
         
         .toggle-sidebar:hover {
-            background-color: #3d75a4;
+            background-color: #3d4a75;
         }
         
         /* Overlay for mobile when sidebar is active */
@@ -175,6 +157,35 @@
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 999;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3d4a75;
+            border-color: #3d4a75;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .metadata {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .medical-info {
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 10px;
         }
         
         /* Responsive styles */
@@ -205,8 +216,22 @@
             .content {
                 margin-left: 0;
             }
-            .appointment-info-item {
-                flex: 1 0 100%;
+            .actions {
+                flex-direction: column;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .sidebar, .toggle-sidebar, .sidebar-overlay, .actions {
+                display: none !important;
+            }
+            .content {
+                margin-left: 0;
+                padding: 0;
+            }
+            .medical-record-container {
+                box-shadow: none;
             }
         }
     </style>
@@ -226,179 +251,88 @@
     </div>
     
     <div class="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Medical Record</h2>
             <a href="${pageContext.request.contextPath}/Patient/Appointments" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left"></i> Back to Appointments
             </a>
         </div>
+        <p class="text-muted" id="current-datetime"></p>
         
         <!-- Display any error messages -->
-        <c:if test="${not empty errorMessage}">
+        <c:if test="${not empty sessionScope.errorMessage}">
             <div class="alert alert-danger" role="alert">
-                ${errorMessage}
+                ${sessionScope.errorMessage}
+                <c:remove var="errorMessage" scope="session" />
             </div>
         </c:if>
         
+        <!-- Medical Record Display -->
         <div class="medical-record-container">
             <div class="medical-record-header">
                 Medical Record Details
             </div>
-            
             <div class="medical-record-content">
-                <!-- Appointment information -->
-				<!-- Appointment information -->
-<div class="appointment-info">
-    <div class="appointment-info-item">
-        <div class="appointment-info-label">Patient Name</div>
-        <div class="appointment-info-value">
-            <c:choose>
-                <c:when test="${not empty medicalRecord and not empty medicalRecord.appointment and not empty medicalRecord.appointment.patient and not empty medicalRecord.appointment.patient.user}">
-                    ${medicalRecord.appointment.patient.user.username}
-                </c:when>
-                <c:otherwise>
-                    <span class="text-muted">Information not available</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-    
-    <div class="appointment-info-item">
-        <div class="appointment-info-label">Doctor Name</div>
-        <div class="appointment-info-value">
-            <c:choose>
-                <c:when test="${not empty medicalRecord and not empty medicalRecord.appointment and not empty medicalRecord.appointment.schedule and not empty medicalRecord.appointment.schedule.doctor and not empty medicalRecord.appointment.schedule.doctor.user}">
-                    Dr. ${medicalRecord.appointment.schedule.doctor.user.username}
-                </c:when>
-                <c:otherwise>
-                    <span class="text-muted">Information not available</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-    
-    <div class="appointment-info-item">
-        <div class="appointment-info-label">Appointment Date</div>
-        <div class="appointment-info-value">
-            <c:choose>
-                <c:when test="${not empty medicalRecord and not empty medicalRecord.appointment and not empty medicalRecord.appointment.appointmentDate}">
-                    ${medicalRecord.appointment.appointmentDate}
-                </c:when>
-                <c:otherwise>
-                    <span class="text-muted">Date not available</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-    
-    <div class="appointment-info-item">
-        <div class="appointment-info-label">Token Number</div>
-        <div class="appointment-info-value">
-            <c:choose>
-                <c:when test="${not empty medicalRecord and not empty medicalRecord.appointment and not empty medicalRecord.appointment.tokenNo}">
-                    ${medicalRecord.appointment.tokenNo}
-                </c:when>
-                <c:otherwise>
-                    <span class="text-muted">Not available</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-    
-    <div class="appointment-info-item">
-        <div class="appointment-info-label">Status</div>
-        <div class="appointment-info-value">
-            <c:choose>
-                <c:when test="${not empty medicalRecord and not empty medicalRecord.appointment and not empty medicalRecord.appointment.status}">
-                    <span class="badge-completed">
-                        ${medicalRecord.appointment.status.statusName}
-                    </span>
-                </c:when>
-                <c:otherwise>
-                    <span class="text-muted">Status not available</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-    
-    <div class="appointment-info-item">
-        <div class="appointment-info-label">Reason for Visit</div>
-        <div class="appointment-info-value">
-            <c:choose>
-                <c:when test="${not empty medicalRecord and not empty medicalRecord.appointment and not empty medicalRecord.appointment.reason}">
-                    ${medicalRecord.appointment.reason}
-                </c:when>
-                <c:otherwise>
-                    <span class="text-muted">Not specified</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-</div>
-
-<!-- Diagnosis -->
-<div class="section-title">
-    <i class="fas fa-stethoscope me-2"></i> Diagnosis
-</div>
-<div class="section-content">
-    <c:choose>
-        <c:when test="${not empty medicalRecord and not empty medicalRecord.diagnosis}">
-            ${medicalRecord.diagnosis}
-        </c:when>
-        <c:otherwise>
-            <span class="text-muted">No diagnosis information available</span>
-        </c:otherwise>
-    </c:choose>
-</div>
-
-<!-- Treatment Plan -->
-<div class="section-title">
-    <i class="fas fa-prescription-bottle-alt me-2"></i> Treatment Plan
-</div>
-<div class="section-content">
-    <c:choose>
-        <c:when test="${not empty medicalRecord and not empty medicalRecord.treatment}">
-            ${medicalRecord.treatment}
-        </c:when>
-        <c:otherwise>
-            <span class="text-muted">No treatment plan available</span>
-        </c:otherwise>
-    </c:choose>
-</div>
-
-<!-- Additional Notes -->
-<c:if test="${not empty medicalRecord and not empty medicalRecord.notes}">
-    <div class="section-title">
-        <i class="fas fa-clipboard me-2"></i> Additional Notes
-    </div>
-    <div class="section-content">
-        ${medicalRecord.notes}
-    </div>
-</c:if>
-
-<!-- Created Date -->
-<div class="text-muted mt-4">
-    <small>
-        <i class="far fa-calendar-alt me-1"></i> Record created on:
-        <c:choose>
-            <c:when test="${not empty medicalRecord and not empty medicalRecord.createdAt}">
-                ${medicalRecord.createdAt.format(java.time.format.DateTimeFormatter.ofPattern('MMMM dd, yyyy'))} at 
-                ${medicalRecord.createdAt.format(java.time.format.DateTimeFormatter.ofPattern('hh:mm a'))}
-            </c:when>
-            <c:otherwise>
-                <span>Date not available</span>
-            </c:otherwise>
-        </c:choose>
-    </small>
-</div>
+                <!-- Appointment Details -->
+                <div class="medical-record-section">
+                    <div class="section-title">Appointment Information</div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="metadata">Appointment ID: ${appointmentId}</p>
+                                <p class="metadata">Date: 
+                                    <c:if test="${not empty medicalRecord.appointment.appointmentDate}">
+                                        <fmt:parseDate value="${medicalRecord.appointment.appointmentDate}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />
+                                        <fmt:formatDate value="${parsedDate}" pattern="MMMM dd, yyyy" />
+                                    </c:if>
+                                </p>
+                                <p class="metadata">Token Number: ${medicalRecord.appointment.tokenNo}</p>
+                                <p class="metadata">Reason: ${medicalRecord.appointment.reason}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="metadata">Doctor: Dr. ${medicalRecord.appointment.schedule.doctor.user.username}</p>
+                                <p class="metadata">Specialization: ${medicalRecord.appointment.schedule.doctor.specialization}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-                <!-- Print button -->
-                <div class="mt-4 text-end">
-                    <button onclick="window.print()" class="btn btn-primary">
-                        <i class="fas fa-print me-2"></i> Print Record
-                    </button>
+                <!-- Diagnosis -->
+                <div class="medical-record-section">
+                    <div class="section-title">Diagnosis</div>
+                    <div class="section-content">
+                        <div class="medical-info">
+                            ${not empty medicalRecord.diagnosis ? medicalRecord.diagnosis : 'No diagnosis provided.'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Treatment -->
+                <div class="medical-record-section">
+                    <div class="section-title">Treatment</div>
+                    <div class="section-content">
+                        <div class="medical-info">
+                            ${not empty medicalRecord.treatment ? medicalRecord.treatment : 'No treatment information provided.'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notes -->
+                <div class="medical-record-section">
+                    <div class="section-title">Additional Notes</div>
+                    <div class="section-content">
+                        <div class="medical-info">
+                            ${not empty medicalRecord.notes ? medicalRecord.notes : 'No additional notes provided.'}
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Medical Record
+            </button>
         </div>
     </div>
     
@@ -406,6 +340,28 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Function to update date and time
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format the date: Weekday, Month Day, Year
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            
+            const formattedDateTime = now.toLocaleDateString('en-US', options);
+            document.getElementById('current-datetime').textContent = formattedDateTime;
+        }
+        
+        // Update date and time when page loads
+        updateDateTime();
+        
+        // Update date and time every minute
+        setInterval(updateDateTime, 60000);
+        
         function toggleSidebar() {
             document.getElementById("sidebar").classList.toggle("active");
             document.getElementById("sidebar-overlay").classList.toggle("active");

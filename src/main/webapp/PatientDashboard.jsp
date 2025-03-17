@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +14,7 @@
     <style>
         :root {
             --sidebar-bg: #4f5e95;
-            --primary-color: #4f95e9;
+            --primary-color: #4f5e95;
             --light-bg: #f7f9fc;
             --confirmed-color: #e8f5e9;
             --pending-color: #e3f2fd;
@@ -85,36 +84,6 @@
             transform: translateX(5px);
         }
         
-        .stats-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            flex: 1;
-            min-width: 200px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-title {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .stat-value {
-            font-size: 36px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
         .appointments-container {
             background: white;
             border-radius: 10px;
@@ -132,11 +101,11 @@
             font-weight: bold;
         }
         
-        .appointments-table {
+        .appointment-table {
             width: 100%;
         }
         
-        .appointments-table th {
+        .appointment-table th {
             background-color: #f5f5f5;
             color: #666;
             font-weight: 500;
@@ -144,33 +113,16 @@
             text-align: left;
         }
         
-        .appointments-table td {
+        .appointment-table td {
             padding: 12px 20px;
             border-bottom: 1px solid #eee;
         }
         
-        .appointments-table tr:last-child td {
+        .appointment-table tr:last-child td {
             border-bottom: none;
         }
         
-        .doctor-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        
-        .doctor-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Custom badge styles with CSS variables */
+        /* Badge styles */
         .badge-confirmed {
             background-color: var(--confirmed-color);
             color: #2e7d32;
@@ -219,7 +171,7 @@
         }
         
         .toggle-sidebar:hover {
-            background-color: #3d75a4;
+            background-color: #3d4a75;
         }
         
         /* Overlay for mobile when sidebar is active */
@@ -234,6 +186,27 @@
             z-index: 999;
         }
         
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3d4a75;
+            border-color: #3d4a75;
+        }
+        
+        .btn-danger {
+            background-color: #f44336;
+            border-color: #f44336;
+        }
+        
         .reason-cell {
             max-width: 200px;
             white-space: nowrap;
@@ -241,38 +214,9 @@
             text-overflow: ellipsis;
         }
         
-        .reason-tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-        }
-        
-        .reason-tooltip .reason-text {
-            visibility: hidden;
-            width: 250px;
-            background-color: #555;
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -125px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            white-space: normal;
-        }
-        
-        .reason-tooltip:hover .reason-text {
-            visibility: visible;
-            opacity: 1;
-        }
-        
         /* Responsive styles */
         @media (max-width: 1250px) {
-            .appointments-table {
+            .appointment-table {
                 display: block;
                 overflow-x: auto;
             }
@@ -284,12 +228,6 @@
             }
             .content {
                 margin-left: 220px;
-            }
-            .stats-container {
-                flex-wrap: wrap;
-            }
-            .stat-card {
-                flex: 0 0 calc(50% - 15px);
             }
         }
         
@@ -311,8 +249,8 @@
             .content {
                 margin-left: 0;
             }
-            .stat-card {
-                flex: 0 0 100%;
+            .actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -332,89 +270,88 @@
     </div>
     
     <div class="content">
-        <h2>My Dashboard</h2>
+        <h2>Dashboard</h2>
         <p class="text-muted" id="current-datetime"></p>
         
-        <!-- Appointments Table -->
+        <!-- Display any error or success messages -->
+        <c:if test="${not empty errorMessage}">
+            <div class="alert alert-danger" role="alert">
+                ${errorMessage}
+            </div>
+        </c:if>
+        <c:if test="${not empty successMessage}">
+            <div class="alert alert-success" role="alert">
+                ${successMessage}
+            </div>
+        </c:if>
+        
+        <!-- Upcoming Appointments -->
         <div class="appointments-container">
             <div class="appointments-header">Upcoming Appointments</div>
-            <table class="appointments-table">
-                <thead>
-                    <tr>
-                        <th>Doctor</th>
-                        <th>Date</th>
-                        <th>Token No</th>
-                        <th>Reason</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${upcomingAppointments}" var="appointmentInfo" varStatus="status">
-                        <c:set var="appointmentParts" value="${fn:split(appointmentInfo, '|')}" />
-                        <c:set var="doctorInfo" value="${fn:trim(fn:substringAfter(appointmentParts[0], 'Doctor:'))}" />
-                        <c:set var="appointmentDate" value="${fn:trim(fn:substringAfter(appointmentParts[1], 'Date:'))}" />
-                        <c:set var="tokenNo" value="${fn:trim(fn:substringAfter(appointmentParts[2], 'Token:'))}" />
-                        <c:set var="reason" value="${fn:trim(fn:substringAfter(appointmentParts[3], 'Reason:'))}" />
-                        <c:set var="status" value="${fn:trim(fn:substringAfter(appointmentParts[4], 'Status:'))}" />
-                        
+            
+            <c:if test="${empty upcomingAppointments}">
+                <div class="p-4 text-center">
+                    <div class="alert alert-info mb-0">
+                        You have no upcoming appointments.
+                    </div>
+                </div>
+            </c:if>
+            
+            <c:if test="${not empty upcomingAppointments}">
+                <table class="appointment-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="doctor-info">
-                                    <div class="doctor-avatar" style="background-color: hsl(${(status.index * 40) % 360}, 70%, 60%)">
-                                        ${fn:substring(doctorInfo, 0, 1)}
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Token Number</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="appointmentInfo" items="${upcomingAppointments}">
+                            <tr>
+                                <c:set var="parts" value="${fn:split(appointmentInfo, '|')}" />
+                                
+                                <td>
+                                    <div class="patient-info">
+                                        <div class="patient-avatar" style="background-color: #61CE70; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: bold; margin-right: 10px;">
+                                            Dr
+                                        </div>
+                                        ${fn:trim(fn:substring(parts[0], 8, fn:length(parts[0])))}
                                     </div>
-                                    ${doctorInfo}
-                                </div>
-                            </td>
-                            <td>${appointmentDate}</td>
-                            <td>${tokenNo}</td>
-                            <td class="reason-cell">
-                                <div class="reason-tooltip">
-                                    ${fn:length(reason) > 25 ? fn:substring(reason, 0, 25).concat('...') : reason}
-                                    <span class="reason-text">${reason}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge-${fn:toLowerCase(status)}">
-                                    ${status}
-                                </span>
-                            </td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${status == 'COMPLETED' || status == 'Completed'}">
-                                        <button class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;"
-                                            onclick="viewAppointmentDetails(${tokenNo})">
-                                            View Details
-                                        </button>
-                                    </c:when>
-                                    <c:when test="${status == 'CONFIRMED' || status == 'Confirmed'}">
-                                        <button class="btn btn-sm btn-warning" style="background-color: #f0ad4e; border-color: #f0ad4e;"
-                                            onclick="cancelAppointment(${tokenNo})">
-                                            Cancel
-                                        </button>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <button class="btn btn-sm btn-secondary" disabled>
-                                            ${status}
-                                        </button>
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    
-                    <c:if test="${empty upcomingAppointments}">
-                        <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <div class="alert alert-info mb-0">
-                                    You don't have any upcoming appointments. 
-                                </div>
-                            </td>
-                        </tr>
-                    </c:if>
-                </tbody>
-            </table>
+                                </td>
+                                <td>${fn:trim(fn:substring(parts[2], 6, fn:length(parts[2])))}</td>
+                                <td>${fn:trim(fn:substring(parts[3], 7, fn:length(parts[3])))}</td>
+                                <td class="reason-cell">${fn:trim(fn:substring(parts[4], 8, fn:length(parts[4])))}</td>
+                                <td>
+                                    <c:set var="status" value="${fn:trim(fn:substring(parts[5], 8, fn:length(parts[5])))}" />
+                                    <span class="badge-${fn:toLowerCase(status)}">
+                                        ${status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <c:if test="${status == 'Pending'}">
+                                        <a href="CancelAppointment?id=${fn:trim(fn:substring(parts[1], 15, fn:length(parts[1])))}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times-circle"></i> Cancel
+                                        </a>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </c:if>
+        </div>
+        
+        <div class="actions">
+            <a href="BookAppointment" class="btn btn-primary">
+                <i class="fas fa-calendar-plus"></i> Book New Appointment
+            </a>
+            <a href="ViewHistory" class="btn btn-secondary">
+                <i class="fas fa-history"></i> View Medical History
+            </a>
         </div>
     </div>
     
@@ -450,38 +387,8 @@
         }
         
         function navigateTo(page) {
-        	const contextPath = '${pageContext.request.contextPath}';
+            const contextPath = '${pageContext.request.contextPath}';
             window.location.href = contextPath + '/' + page;
-        }
-        
-        function viewAppointmentDetails(tokenNo) {
-            console.log("Viewing appointment details for token: " + tokenNo);
-            // Navigate to appointment details page
-            window.location.href = "${pageContext.request.contextPath}/Patient/AppointmentDetails?token=" + tokenNo;
-        }
-        
-        function cancelAppointment(tokenNo) {
-            if(confirm("Are you sure you want to cancel this appointment?")) {
-                console.log("Cancelling appointment with token: " + tokenNo);
-                
-                // AJAX call to cancel the appointment
-                $.ajax({
-                    url: "${pageContext.request.contextPath}/Patient/CancelAppointment",
-                    type: "POST",
-                    data: {
-                        tokenNo: tokenNo
-                    },
-                    success: function(response) {
-                        alert("Appointment cancelled successfully");
-                        // Reload the page to reflect changes
-                        location.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        alert("Error cancelling appointment");
-                        console.error(error);
-                    }
-                });
-            }
         }
         
         // Handle responsive behavior

@@ -54,6 +54,7 @@ public class LoginServlet extends HttpServlet {
 				
 				if(userService.checkUser(username)) {
 						List<Object> userDetails = userService.checkPassword(username,password);
+						System.out.println("userDetails LOGIN"+userDetails.get(0));
 						if (userDetails != null) {
 						    Integer userId = (Integer) userDetails.get(0);
 						    Integer roleSpecificId = (Integer) userDetails.get(1);

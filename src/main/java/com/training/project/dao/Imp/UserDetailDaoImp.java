@@ -94,6 +94,21 @@ public class UserDetailDaoImp implements GenericDao<UserDetail, Integer> {
 		}
 	}
 	
+	public UserDetail findByEmail(String email) {
+		try {
+			
+			String hql = "FROM UserDetail ud WHERE ud.email = :email";
+			Query<UserDetail> query = session.createQuery(hql, UserDetail.class);
+			query.setParameter("email", email);
+			
+			// Get a single result or null if not found
+			return query.uniqueResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public List<Object[]> createPatientDetails(Integer userId, String firstName, String lastName, 
             LocalDate dob, String gender, String email, 
             String phone, String bloodGroup) {

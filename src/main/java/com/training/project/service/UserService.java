@@ -262,7 +262,8 @@ public class UserService {
 	    profileDetails.add("User ID: " + user.getUserId());
 	    profileDetails.add("Username: " + user.getUsername());
 	    
-	    UserDetail userDetails = userDetailDao.findById(userId);
+	    UserDetail userDetails = userDetailDao.findByUserId(userId);
+	    System.out.println("userDetails.EMAIL"+userDetails.getEmail());
 	    if (userDetails != null) {
 	        profileDetails.add("Name: " + userDetails.getFirstName()+" "+userDetails.getLastName());
 	        profileDetails.add("Email: " + userDetails.getEmail());
@@ -308,6 +309,8 @@ public class UserService {
 		userDao = new UserDaoImp(session);
 		
 		List<Object> sessionContent =  userDao.findIdsByUsername(username);
+		System.out.println("sessionContent "+sessionContent.get(0));
+		System.out.println("sessionContent "+sessionContent.get(1));
 		if(sessionContent == null) {
 			return null;
 		}

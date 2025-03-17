@@ -270,26 +270,29 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	    return appointmentDetails;
 	}
 	
-	public List<Object[]> findUpcomingAppointmentsForPatient(int patientId, LocalDate fromDate) {
-	    String hql = "SELECT new list(d.user.name as doctorName, " +
-	                 "a.appointmentDate, " +
-	                 "a.tokenNo, " +
-	                 "a.reason, " +
-	                 "st.statusName) " +  // Using st for status
-	                 "FROM Appointment a " +
-	                 "JOIN a.patient p " +
-	                 "JOIN a.schedule s " +
-	                 "JOIN s.doctor d " +
-	                 "JOIN d.user u " +
-	                 "JOIN a.status st " +  // Using st for status
-	                 "WHERE p.id = :patientId " +
-	                 "AND a.appointmentDate >= :fromDate " +
-	                 "ORDER BY a.appointmentDate ASC";
-	    
+	public List<Object> findUpcomingAppointmentsForPatient(int patientId, LocalDate fromDate) {
+		System.out.println("patientId uppcoming"+patientId);
+	    String hql = "SELECT new list(concat(ud.firstName, ' ', ud.lastName) as doctorName, " +
+	    			"a.appointmentId, "+
+	                "a.appointmentDate, " +
+	                "a.tokenNo, " +
+	                "a.reason, " +
+	                "st.statusName) " +
+	                "FROM Appointment a " +
+	                "JOIN a.patient p " +
+	                "JOIN a.schedule s " +
+	                "JOIN s.doctor d " +
+	                "JOIN d.user u " +
+	                "JOIN UserDetail ud ON ud.user = u " +  // Changed join to use the inverse relationship
+	                "JOIN a.status st " +
+	                "WHERE p.id = :patientId " +
+	                "AND a.appointmentDate >= :fromDate " +
+	                "ORDER BY a.appointmentDate ASC";
+
 	    Query query = session.createQuery(hql);
 	    query.setParameter("patientId", patientId);
 	    query.setParameter("fromDate", fromDate);
-	    
+
 	    return query.list();
 	}
 	

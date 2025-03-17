@@ -34,6 +34,7 @@ public class PatientConfirmedAppointmentServlet extends HttpServlet {
         
         // Get information about the selected schedule to display on confirmation page
         int scheduleIdInt = Integer.parseInt(scheduleId);
+        System.out.println("scheduleIdInt hdwh"+scheduleIdInt);
         request.setAttribute("scheduleId", scheduleIdInt);
         
         // Forward to confirmation page
@@ -41,8 +42,7 @@ public class PatientConfirmedAppointmentServlet extends HttpServlet {
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	HttpSession session = request.getSession();
-        Integer patientId = (Integer) session.getAttribute("rolespecificId");
+        Integer patientId = (Integer) request.getSession().getAttribute("roleSpecificId");
         System.out.println("patientId session"+patientId);
         if (patientId == null) {
             response.sendRedirect(request.getContextPath() + "/Login");

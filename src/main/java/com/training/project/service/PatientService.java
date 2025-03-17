@@ -98,41 +98,47 @@ public class PatientService {
 	public List<String> getUpcomingAppointmentsForPatient(int patientId, LocalDate fromDate) {
 	    List<String> appointmentDetails = new ArrayList<>();
 	    Session session = sessionFactory.openSession();
-	    
+
 	    try {
 	        appointmentDao = new AppointmentDaoImp(session);
-	        List<Object[]> results = appointmentDao.findUpcomingAppointmentsForPatient(patientId, fromDate);
+	        List<Object> results = appointmentDao.findUpcomingAppointmentsForPatient(patientId, fromDate);
+	        System.out.println("results results" + results);
 	        
 	        // Format the results into readable strings
 	        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
-	        
-	        for (Object[] row : results) {
-	            String doctorName = (String) row[0];
-	            LocalDate appointmentDate = (LocalDate) row[1];
-	            Integer tokenNo = (Integer) row[2];
-	            String reason = (String) row[3];
-	            String status = (String) row[4];
+
+	        for (Object result : results) {
+	            // Each result is now an ArrayList
+	            List<?> row = (List<?>) result;
 	            
+	            String doctorName = (String) row.get(0);
+	            int appointmentId = (Integer) row.get(1);
+	            LocalDate appointmentDate = (LocalDate) row.get(2);
+	            Integer tokenNo = (Integer) row.get(3);
+	            String reason = (String) row.get(4);
+	            String status = (String) row.get(5);
+
 	            String formattedDate = appointmentDate != null ? appointmentDate.format(dateFormatter) : "N/A";
-	            
+
 	            String appointmentInfo = String.format(
-	                "Doctor: %s | Date: %s | Token: %s | Reason: %s | Status: %s",
+	                "Doctor: %s | Appointment ID: %d | Date: %s | Token: %s | Reason: %s | Status: %s",
 	                doctorName,
+	                appointmentId,
 	                formattedDate,
 	                tokenNo,
 	                reason,
 	                status
 	            );
-	            
+
 	            appointmentDetails.add(appointmentInfo);
 	        }
-	        
+
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    } finally {
 	        session.close();
 	    }
-	    
+
 	    System.out.println("Appointment details: " + appointmentDetails);
 	    return appointmentDetails;
 	}

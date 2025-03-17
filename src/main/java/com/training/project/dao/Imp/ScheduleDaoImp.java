@@ -85,7 +85,6 @@ public class ScheduleDaoImp implements GenericDao<Schedule, Integer> {
 	}
 	
 	public List<Object[]> findSchedulesByDoctorId(int doctorId) {
-		Transaction transaction = null;
 	    List<Object[]> scheduleDetails = null;
 	    System.out.println("doctorId DAO"+doctorId);
 	    try {
@@ -96,11 +95,7 @@ public class ScheduleDaoImp implements GenericDao<Schedule, Integer> {
 		    Query<Object[]> query = session.createQuery(hql, Object[].class);
 		    query.setParameter("doctorId", doctorId);
 		    scheduleDetails = query.getResultList();
-		    transaction.commit();
 	    } catch (Exception e) {
-	        if (transaction != null) {
-	            transaction.rollback();
-	        }
 	        e.printStackTrace();
 	    }
 	    return scheduleDetails;

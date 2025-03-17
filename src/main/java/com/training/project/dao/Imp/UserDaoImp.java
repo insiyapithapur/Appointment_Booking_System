@@ -142,52 +142,56 @@ public class UserDaoImp implements GenericDao<User, Integer> {
 	    try {
 	        String role = null;
 	        List<Object> detailsList = new ArrayList<>();
-
+	        
 	        // First, get the user's role
 	        User user = session.createQuery("FROM User WHERE username = :username", User.class)
-	                .setParameter("username", username)
-	                .uniqueResult();
+	            .setParameter("username", username)
+	            .uniqueResult();
 
 	        if (user == null) {
 	            return null;
 	        }
 
 	        role = user.getRole().getRoleName();
-	        detailsList.add(role);   // Add role name
-	        detailsList.add(username); // Add username
 
 	        // Now get both IDs in a single query based on role
 	        if ("DOCTOR".equalsIgnoreCase(role)) {
 	            List<Object[]> results = session.createQuery(
-	                    "SELECT u.userId, d.doctorId FROM User u JOIN Doctor d ON u = d.user WHERE u.username = :username")
-	                    .setParameter("username", username)
-	                    .list();
-	                    
+	                "SELECT u.userId, d.doctorId FROM User u JOIN Doctor d ON u = d.user WHERE u.username = :username")
+	                .setParameter("username", username)
+	                .list();
+	                
 	            if (results != null && !results.isEmpty()) {
 	                Object[] ids = results.get(0);
-	                detailsList.add(0, ids[0]); // userId at index 0
-	                detailsList.add(1, ids[1]); // doctorId at index 1
+	                detailsList.add(ids[0]); // userId
+	                detailsList.add(ids[1]); // doctorId
+	                detailsList.add(role);   // role name
+	                detailsList.add(username); // username
 	            }
 	        } else if ("PATIENT".equalsIgnoreCase(role)) {
 	            List<Object[]> results = session.createQuery(
-	                    "SELECT u.userId, p.patientId FROM User u JOIN Patient p ON u = p.user WHERE u.username = :username")
-	                    .setParameter("username", username)
-	                    .list();
-	                    
+	                "SELECT u.userId, p.patientId FROM User u JOIN Patient p ON u = p.user WHERE u.username = :username")
+	                .setParameter("username", username)
+	                .list();
+	                
 	            if (results != null && !results.isEmpty()) {
 	                Object[] ids = results.get(0);
-	                detailsList.add(0, ids[0]); // userId at index 0
-	                detailsList.add(1, ids[1]); // patientId at index 1
+	                detailsList.add(ids[0]); // userId
+	                detailsList.add(ids[1]); // patientId
+	                detailsList.add(role);   // role name
+	                detailsList.add(username); // username
 	            }
 	        } else if ("ADMIN".equalsIgnoreCase(role)) {
 	            Integer userId = (Integer) session.createQuery(
-	                    "SELECT u.userId FROM User u WHERE u.username = :username")
-	                    .setParameter("username", username)
-	                    .uniqueResult();
-	                    
+	                "SELECT u.userId FROM User u WHERE u.username = :username")
+	                .setParameter("username", username)
+	                .uniqueResult();
+
 	            if (userId != null) {
-	                detailsList.add(0, userId); // userId at index 0
-	                detailsList.add(1, userId); // Use userId as roleSpecificId for admin too
+	                detailsList.add(userId); // userId
+	                detailsList.add(userId); // Use userId as roleSpecificId for admin
+	                detailsList.add(role);   // role name
+	                detailsList.add(username); // username
 	            }
 	        }
 

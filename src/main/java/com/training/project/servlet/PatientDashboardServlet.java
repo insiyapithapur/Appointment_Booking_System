@@ -26,29 +26,35 @@ public class PatientDashboardServlet  extends HttpServlet {
     }
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-		HttpSession session = request.getSession();
-        
-        // Check if user is logged in
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("/Login.jsp");
-            return;
-        }
-        
-        Integer patientId = (Integer) session.getAttribute("userId");
-        String patientName = (String) session.getAttribute("username");
-        LocalDate today = LocalDate.now();
-        
-        // Get upcoming appointments
-        List<String> upcomingAppointments = patientService.getUpcomingAppointmentsForPatient(patientId, today);
-        
-        // Set appointments as request attribute
-        request.setAttribute("upcomingAppointments", upcomingAppointments);
-        
-        // Forward to the dashboard JSP
-        request.getRequestDispatcher("/PatientDashboard.jsp").forward(request, response);
-    }
+	        throws ServletException, IOException {
+	    
+	    HttpSession session = request.getSession();
+	    
+	    // Check if user is logged in
+	    if (session == null || session.getAttribute("userId") == null) {
+	        response.sendRedirect("/Login.jsp");
+	        return;
+	    }
+	    
+	    try {
+	        Integer patientId = (Integer) session.getAttribute("roleSpecificId");
+	        String patientName = (String) session.getAttribute("username");
+	        LocalDate today = LocalDate.now();
+	        
+	        // Get upcoming appointments
+	        List<String> upcomingAppointments = patientService.getUpcomingAppointmentsForPatient(patientId, today);
+	        
+	        // Set appointments as request attribute
+	        request.setAttribute("upcomingAppointments", upcomingAppointments);
+	        
+	        // Forward to the dashboard JSP
+	        request.getRequestDispatcher("/PatientDashboard.jsp").forward(request, response);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        request.setAttribute("errorMessage", "Error loading dashboard data: " + e.getMessage());
+	        request.getRequestDispatcher("/error.jsp").forward(request, response);
+	    }
+	}
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Handle any POST requests if needed
