@@ -411,22 +411,26 @@
                             </td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${appointment.status == 'Completed'}">
-                                        <!-- If completed: View enabled, Complete disabled -->
-                                        <a href="${pageContext.request.contextPath}/Doctor/ViewMedicalRecord?appointmentId=${appointment.appointmentId}" 
-                                           class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <!-- If pending or confirmed: Complete enabled -->
-                                        <a href="${pageContext.request.contextPath}/Doctor/CompleteAppointment?appointmentId=${appointment.appointmentId}" 
-                                           class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;">
-                                            <i class="fas fa-check-circle"></i> Complete
-                                        </a>
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
+								    <c:when test="${appointment.status == 'Completed'}">
+								        <!-- If completed: View enabled, Complete disabled -->
+								        <a href="${pageContext.request.contextPath}/Doctor/ViewMedicalRecord?appointmentId=${appointment.appointmentId}"
+								           class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;">
+								            <i class="fas fa-eye"></i> View
+								        </a>
+								    </c:when>
+								    <c:when test="${appointment.status == 'Cancelled'}">
+								        <!-- If cancelled: No button shown -->
+								        <span class="text-muted">NA</span>
+								    </c:when>
+								    <c:otherwise>
+								        <!-- If pending/confirmed: Complete enabled -->
+								        <a href="${pageContext.request.contextPath}/Doctor/CompleteAppointment?appointmentId=${appointment.appointmentId}"
+								           class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;">
+								            <i class="fas fa-check-circle"></i> Complete
+								        </a>
+								    </c:otherwise>
+								</c:choose>
+                               </td>
                         </tr>
                     </c:forEach>
                     

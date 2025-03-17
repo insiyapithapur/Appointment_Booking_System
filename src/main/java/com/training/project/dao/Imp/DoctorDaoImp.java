@@ -138,11 +138,11 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
 	    try {
 	        transaction = session.beginTransaction();
 
-	        String hql = "SELECT d.doctorId, d.specialization, d.licenseNumber, d.experience, d.degree, " +
-	                     "ud.firstName, ud.lastName, u.username, ud.email, ud.gender, ud.phoneNumber, d.isActive " +
-	                     "FROM Doctor d " +
-	                     "JOIN d.user u " +
-	                     "JOIN UserDetail ud ON u.userId = ud.user.userId";
+	        String hql = "SELECT d.doctorId, d.specialization, d.licenseNumber, d.experience, COALESCE(d.degree, 'N/A'), " +
+	                "ud.firstName, ud.lastName, u.username, ud.email, ud.gender, ud.phoneNumber, d.isActive " +
+	                "FROM Doctor d " +
+	                "JOIN d.user u " +
+	                "JOIN UserDetail ud ON u.userId = ud.user.userId";
 
 	        Query<Object[]> query = session.createQuery(hql, Object[].class);
 	        doctorDetails = query.getResultList();

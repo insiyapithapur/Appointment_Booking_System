@@ -158,7 +158,7 @@ public class AdminAddDoctorServlet extends HttpServlet {
             // Commit the transaction
             transaction.commit();
             
-            request.getRequestDispatcher("/AdminDoctor.jsp").forward(request, response);
+            request.getRequestDispatcher("/Admin/Doctors").forward(request, response);
             
         } catch (Exception e) {
             if (transaction != null && transaction.isActive()) {

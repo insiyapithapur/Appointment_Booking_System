@@ -441,6 +441,7 @@ public class PatientService {
 	}
 	
 	public MedicalRecord getMedicalRecordByAppointmentId(Integer appointmentId) {
+		System.out.println("appointmentId "+appointmentId);
         Session session = sessionFactory.openSession();
         appointmentDao = new AppointmentDaoImp(session);
         

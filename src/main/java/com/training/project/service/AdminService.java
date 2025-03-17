@@ -16,6 +16,7 @@ public class AdminService {
 	private ScheduleDaoImp scheduleDao;
 	private UserDaoImp userDao;
 	private UserDetailDaoImp userDetailDao;
+	private AppointmentDaoImp appointmentDao;
 	
 	public AdminService() {
 	    try {
@@ -289,9 +290,14 @@ public class AdminService {
 	}
 	
 	public List<Appointment> fetchAppointments() {
-        AppointmentDaoImp appointmentDao = new AppointmentDaoImp();
-        return appointmentDao.getAllAppointments();
-    }
+	    Session session = sessionFactory.openSession();
+	    try {
+	    	appointmentDao = new AppointmentDaoImp(session);
+	        return appointmentDao.getAllAppointments();
+	    } finally {
+	        session.close();
+	    }
+	}
 	
 	/*
 	 * Get list of active doctors with details

@@ -313,6 +313,8 @@
                         <c:forEach var="appointmentInfo" items="${upcomingAppointments}">
                             <tr>
                                 <c:set var="parts" value="${fn:split(appointmentInfo, '|')}" />
+                                <c:set var="appointmentId" value="${fn:trim(fn:substring(parts[1], 15, fn:length(parts[1])))}" />
+                                <c:set var="status" value="${fn:trim(fn:substring(parts[5], 8, fn:length(parts[5])))}" />
                                 
                                 <td>
                                     <div class="patient-info">
@@ -326,18 +328,34 @@
                                 <td>${fn:trim(fn:substring(parts[3], 7, fn:length(parts[3])))}</td>
                                 <td class="reason-cell">${fn:trim(fn:substring(parts[4], 8, fn:length(parts[4])))}</td>
                                 <td>
-                                    <c:set var="status" value="${fn:trim(fn:substring(parts[5], 8, fn:length(parts[5])))}" />
                                     <span class="badge-${fn:toLowerCase(status)}">
                                         ${status}
                                     </span>
                                 </td>
-                                <td>
-                                    <c:if test="${status == 'Pending'}">
-                                        <a href="CancelAppointment?id=${fn:trim(fn:substring(parts[1], 15, fn:length(parts[1])))}" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-times-circle"></i> Cancel
+                                <!-- Updated Action Buttons Code -->
+								<td>
+                                <c:choose>
+                                    <c:when test="${fn:containsIgnoreCase(status, 'Completed')}">
+                                        <!-- View medical record button for completed appointments -->
+                                        <a href="${pageContext.request.contextPath}/Patient/Appointments?action=viewMedicalRecord&appointmentId=${appointmentId}" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-file-medical"></i> View Record
                                         </a>
-                                    </c:if>
-                                </td>
+                                    </c:when>
+                                    <c:when test="${fn:containsIgnoreCase(status, 'Pending') || fn:containsIgnoreCase(status, 'Confirmed')}">
+                                        <!-- Cancel button for pending appointments -->
+                                        <button class="btn btn-sm btn-danger" onclick="cancelAppointment(${appointmentId})">
+                                            <i class="fas fa-times-circle"></i> Cancel
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Disabled button for other statuses -->
+                                        <button class="btn btn-sm btn-secondary" disabled>
+                                            ${status}
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
                             </tr>
                         </c:forEach>
                     </tbody>
@@ -355,49 +373,98 @@
         </div>
     </div>
     
+    <!-- Cancel Appointment Modal -->
+	<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="cancelModalLabel">Cancel Appointment</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	            </div>
+	            <div class="modal-body">
+	                <p>Are you sure you want to cancel this appointment?</p>
+	                <p class="text-danger">This action cannot be undone.</p>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	                <form id="cancelForm" action="${pageContext.request.contextPath}/Patient/Appointments" method="post">
+	                    <input type="hidden" id="appointmentIdToCancel" name="appointmentId" value="">
+	                    <input type="hidden" name="action" value="cancelAppointment">
+	                    <input type="hidden" name="newStatusId" value="3">
+	                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+	                </form>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+	
+	<!-- Alternative direct implementation of the cancel button functionality -->
+	<script>
+	    // Alternative manual implementation in case Bootstrap modal isn't working
+	    function cancelAppointmentDirect(appointmentId) {
+	        if (confirm("Are you sure you want to cancel this appointment? This action cannot be undone.")) {
+	            window.location.href = "${pageContext.request.contextPath}/CancelAppointment?id=" + appointmentId;
+	        }
+	    }
+	</script>
+    
     <!-- Bootstrap & jQuery JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to update date and time
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Format the date: Weekday, Month Day, Year
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric'
-            };
-            
-            const formattedDateTime = now.toLocaleDateString('en-US', options);
-            document.getElementById('current-datetime').textContent = formattedDateTime;
+ // Function to update date and time
+    function updateDateTime() {
+        const now = new Date();
+        
+        // Format the date: Weekday, Month Day, Year
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric'
+        };
+        
+        const formattedDateTime = now.toLocaleDateString('en-US', options);
+        document.getElementById('current-datetime').textContent = formattedDateTime;
+    }
+
+    // Update date and time when page loads
+    updateDateTime();
+
+    // Update date and time every minute
+    setInterval(updateDateTime, 60000);
+
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+        document.getElementById("sidebar-overlay").classList.toggle("active");
+    }
+
+    function navigateTo(page) {
+        const contextPath = '${pageContext.request.contextPath}';
+        window.location.href = contextPath + '/' + page;
+    }
+
+    function cancelAppointment(appointmentId) {
+        // Set the appointment ID in the modal form
+        document.getElementById('appointmentIdToCancel').value = appointmentId;
+        
+        // Show the modal
+        var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        modal.show();
+    }
+
+    // Handle responsive behavior
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            document.getElementById("sidebar").classList.remove("active");
+            document.getElementById("sidebar-overlay").classList.remove("active");
         }
-        
-        // Update date and time when page loads
-        updateDateTime();
-        
-        // Update date and time every minute
-        setInterval(updateDateTime, 60000);
-        
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("active");
-            document.getElementById("sidebar-overlay").classList.toggle("active");
-        }
-        
-        function navigateTo(page) {
-            const contextPath = '${pageContext.request.contextPath}';
-            window.location.href = contextPath + '/' + page;
-        }
-        
-        // Handle responsive behavior
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                document.getElementById("sidebar").classList.remove("active");
-                document.getElementById("sidebar-overlay").classList.remove("active");
-            }
-        });
+    });
+
+    // Add this to make sure functions are accessible in the global scope
+    window.viewMedicalRecord = viewMedicalRecord;
+    window.cancelAppointment = cancelAppointment;
     </script>
 </body>
 </html>

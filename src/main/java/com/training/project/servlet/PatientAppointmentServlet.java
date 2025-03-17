@@ -20,6 +20,7 @@ public class PatientAppointmentServlet extends HttpServlet {
     
     @Override
     public void init() throws ServletException {
+    	System.out.println("patient appointment servlet");
         super.init();
         patientService = new PatientService();
     }

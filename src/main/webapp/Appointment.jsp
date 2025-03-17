@@ -533,23 +533,27 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <c:choose>
-                                                        <c:when test="${statusValue eq 'Completed'}">
-                                                            <!-- If completed: View enabled, Complete disabled -->
-                                                            <button class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;"
-                                                                onclick="viewAppointmentDetails('${fn:replace(appointment,"'", "\\'")}')">
-                                                                 View
-                                                            </button>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <!-- If pending/confirmed: Complete enabled -->
-                                                            <button class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;" 
-                                                                onclick="completeAppointment(${status.index})">
-                                                                Complete
-                                                            </button>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
+                                <c:choose>
+								    <c:when test="${statusValue eq 'Completed'}">
+								        <!-- If completed: View enabled, Complete disabled -->
+								        <a href="${pageContext.request.contextPath}/Doctor/ViewMedicalRecord?appointmentId=${appointment.appointmentId}"
+								           class="btn btn-sm btn-primary" style="background-color: #61CE70; border-color: #61CE70;">
+								            <i class="fas fa-eye"></i> View
+								        </a>
+								    </c:when>
+								    <c:when test="${statusValue eq 'Cancelled'}">
+								        <!-- If cancelled: No button shown -->
+								        <span class="text-muted">NA</span>
+								    </c:when>
+								    <c:otherwise>
+								        <!-- If pending/confirmed: Complete enabled -->
+								        <a href="${pageContext.request.contextPath}/Doctor/CompleteAppointment?appointmentId=${appointment.appointmentId}"
+								           class="btn btn-sm btn-success" style="background-color: #61CE70; border-color: #61CE70;">
+								            <i class="fas fa-check-circle"></i> Complete
+								        </a>
+								    </c:otherwise>
+								</c:choose>
+                               </td>
                                             </tr>
                                         </c:forEach>
                                     </tbody>
@@ -619,30 +623,6 @@
         
         function viewAppointmentDetails(appointmentData) {
             alert('Appointment Details:\n' + appointmentData);
-        }
-        
-        function completeAppointment(index) {
-            if (confirm('Mark this appointment as completed?')) {
-                // In a real application, you would send an AJAX request to update the appointment status
-                // Similar to the code in Dashboard.jsp
-                $.ajax({
-                    url: "UpdateAppointmentStatus",
-                    type: "POST",
-                    data: {
-                        appointmentId: index,
-                        status: "COMPLETED"
-                    },
-                    success: function(response) {
-                        alert("Appointment marked as completed");
-                        // Reload the page to reflect changes
-                        location.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        alert("Error updating appointment status: " + error);
-                        console.error(error);
-                    }
-                });
-            }
         }
         
         // Filter functions

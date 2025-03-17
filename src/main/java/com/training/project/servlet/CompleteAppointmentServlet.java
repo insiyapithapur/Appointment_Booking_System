@@ -74,9 +74,11 @@ public class CompleteAppointmentServlet extends HttpServlet {
         try {
             // Parse appointmentId
             Integer appointmentId = Integer.parseInt(appointmentIdStr);
+            System.out.println("appointmentId "+appointmentId);
             
             // Add medical record
             boolean success = doctorService.addMedicalRecord(appointmentId, diagnosis, treatment, notes);
+            System.out.println("success "+success);
             
             HttpSession session = request.getSession();
             if (success) {

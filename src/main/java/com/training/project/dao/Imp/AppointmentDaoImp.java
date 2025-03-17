@@ -102,37 +102,6 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
 	    return appointments;
 	}
 	
-	public boolean updateAppointmentStatus(int appointmentId, Integer newStatusId) {
-	    Transaction tx = null;
-	    try {
-	        tx = session.beginTransaction();
-	        
-	        // Fetch the appointment by ID
-	        Appointment appointment = session.get(Appointment.class, appointmentId);
-	        if (appointment == null) {
-	            throw new IllegalArgumentException("Appointment not found with ID: " + appointmentId);
-	        }
-
-	        // Fetch the new status from the AppointmentStatus table
-	        AppointmentsStatus newStatus = session.get(AppointmentsStatus.class, newStatusId);
-	        
-	        if (newStatus == null) {
-	            throw new IllegalArgumentException("Invalid status ID: " + newStatusId);
-	        }
-
-	        // Update appointment status
-	        appointment.setStatus(newStatus);
-	        session.update(appointment);
-	        
-	        tx.commit();
-	        return true;
-	    } catch (Exception e) {
-	        if (tx != null) tx.rollback();
-	        e.printStackTrace();
-	        return false;
-	    }
-	}
-	
 	public List<Appointment> getAllAppointments() {
         Transaction transaction = null;
         List<Appointment> appointments = null;
@@ -383,34 +352,115 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
     }
     
     public boolean addMedicalRecord(Integer appointmentId, String diagnosis, String treatment, String notes) {
-    	Transaction transaction = null;
-    	try {
-    		System.out.println("appointmentId +"+appointmentId);
-        	transaction = session.beginTransaction();
+        Transaction transaction = null;
+        try {
+            System.out.println("Adding medical record for appointmentId: " + appointmentId);
+            transaction = session.beginTransaction();
+
+            // First check if a medical record already exists for this appointment
+            Query<MedicalRecord> query = session.createQuery(
+                "FROM MedicalRecord WHERE appointment.appointmentId = :appointmentId", 
+                MedicalRecord.class
+            );
+            query.setParameter("appointmentId", appointmentId);
+            List<MedicalRecord> existingRecords = query.getResultList();
             
-            // Find the appointment
+            if (!existingRecords.isEmpty()) {
+                System.out.println("Warning: Medical record already exists for appointment ID: " + appointmentId);
+                // Update existing record instead of creating a new one
+                MedicalRecord existingRecord = existingRecords.get(0);
+                existingRecord.setDiagnosis(diagnosis);
+                existingRecord.setTreatment(treatment);
+                existingRecord.setNotes(notes);
+                session.update(existingRecord);
+            } else {
+                // Find the appointment
+                Appointment appointment = session.get(Appointment.class, appointmentId);
+                if (appointment == null) {
+                    throw new IllegalArgumentException("Appointment not found with ID: " + appointmentId);
+                }
+
+                // Create new medical record
+                MedicalRecord medicalRecord = new MedicalRecord();
+                medicalRecord.setAppointment(appointment);
+                medicalRecord.setDiagnosis(diagnosis);
+                medicalRecord.setTreatment(treatment);
+                medicalRecord.setNotes(notes);
+                
+                // Save the medical record
+                session.save(medicalRecord);
+            }
+
+            // Update appointment status to Completed (status 2)
+            Appointment appointment = session.get(Appointment.class, appointmentId);
+            if (appointment != null) {
+                AppointmentsStatus completedStatus = session.get(AppointmentsStatus.class, 2);
+                if (completedStatus != null) {
+                    appointment.setStatus(completedStatus);
+                    session.update(appointment);
+                    System.out.println("Updated appointment status to Completed (2) for appointmentId: " + appointmentId);
+                } else {
+                    System.out.println("Error: Could not find status with ID 2");
+                }
+            }
+
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateAppointmentStatus(int appointmentId, Integer newStatusId) {
+        boolean isActiveTransaction = session.getTransaction().isActive();
+        System.out.println("Updating status for appointmentId: " + appointmentId + ", newStatusId: " + newStatusId);
+        Transaction tx = null;
+
+        try {
+            // Only begin a new transaction if one is not already active
+            if (!isActiveTransaction) {
+                tx = session.beginTransaction();
+                System.out.println("Starting new transaction for status update");
+            } else {
+                System.out.println("Using existing transaction for status update");
+            }
+
+            // Clear the session to ensure we get fresh data
+            session.clear();
+            
+            // Fetch the appointment by ID
             Appointment appointment = session.get(Appointment.class, appointmentId);
             if (appointment == null) {
                 throw new IllegalArgumentException("Appointment not found with ID: " + appointmentId);
             }
-            
-            // Create new medical record
-            MedicalRecord medicalRecord = new MedicalRecord();
-            medicalRecord.setAppointment(appointment);
-            medicalRecord.setDiagnosis(diagnosis);
-            medicalRecord.setTreatment(treatment);
-            medicalRecord.setNotes(notes);
-            
-            // Save the medical record
-            session.save(medicalRecord);
-            
-            updateAppointmentStatus(appointmentId,2);
-            
-            transaction.commit();
+
+            // Fetch the new status from the AppointmentStatus table
+            AppointmentsStatus newStatus = session.get(AppointmentsStatus.class, newStatusId);
+            if (newStatus == null) {
+                throw new IllegalArgumentException("Invalid status ID: " + newStatusId);
+            }
+
+            // Update appointment status
+            System.out.println("Current status: " + appointment.getStatus().getStatusId() + ", changing to: " + newStatusId);
+            appointment.setStatus(newStatus);
+            session.update(appointment);
+            session.flush(); // Force synchronization with the database
+
+            // Only commit if we started the transaction
+            if (!isActiveTransaction && tx != null) {
+                tx.commit();
+                System.out.println("Committed transaction for status update");
+            }
             return true;
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+            // Only rollback if we started the transaction
+            if (!isActiveTransaction && tx != null && tx.isActive()) {
+                tx.rollback();
+                System.out.println("Rolled back transaction for status update");
             }
             e.printStackTrace();
             return false;
