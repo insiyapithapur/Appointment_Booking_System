@@ -248,6 +248,9 @@
         <div class="nav-item" onclick="navigateTo('Doctor/Patient')">Patients</div>
         <div class="nav-item active" onclick="navigateTo('Doctor/Appointment')">Appointments</div>
         <div class="nav-item" onclick="navigateTo('Doctor/Profile')">Profile</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
     </div>
     
     <div class="content">

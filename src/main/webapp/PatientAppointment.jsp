@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f95e9;
-            --primary-color: #4f95e9;
+            --sidebar-bg: #4f5e95;
+            --primary-color: #4f5e95;
             --light-bg: #f7f9fc;
             --completed-color: #e8f5e9;
             --pending-color: #e3f2fd;
@@ -239,6 +239,21 @@
             white-space: normal;
         }
         
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3d4a75;
+            border-color: #3d4a75;
+        }
+        
+        .btn-danger {
+            background-color: #f44336;
+            border-color: #f44336;
+        }
+        
         .reason-tooltip:hover .reason-text {
             visibility: visible;
             opacity: 1;
@@ -294,6 +309,9 @@
         <div class="nav-item active" onclick="navigateTo('Patient/Appointments')">Appointments</div>
         <div class="nav-item" onclick="navigateTo('Patient/Doctors')">Doctors</div>
         <div class="nav-item" onclick="navigateTo('Patient/Profile')">Profile</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
     </div>
     
     <div class="content">

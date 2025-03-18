@@ -267,6 +267,9 @@
         <div class="nav-item" onclick="navigateTo('Patient/Appointments')">Appointments</div>
         <div class="nav-item" onclick="navigateTo('Patient/Doctors')">Doctors</div>
         <div class="nav-item" onclick="navigateTo('Patient/Profile')">Profile</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
     </div>
     
     <div class="content">
@@ -364,11 +367,8 @@
         </div>
         
         <div class="actions">
-            <a href="BookAppointment" class="btn btn-primary">
+            <a href="${pageContext.request.contextPath}/Patient/BookAppointment" class="btn btn-primary">
                 <i class="fas fa-calendar-plus"></i> Book New Appointment
-            </a>
-            <a href="ViewHistory" class="btn btn-secondary">
-                <i class="fas fa-history"></i> View Medical History
             </a>
         </div>
     </div>

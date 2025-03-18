@@ -2,10 +2,14 @@ package com.training.project.service;
 
 import java.time.LocalDate;
 import java.util.*;
+
+import javax.mail.MessagingException;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import com.training.project.dao.Imp.*;
 import com.training.project.model.*;
+import com.training.project.util.EmailUtil;
 import com.training.project.util.HibernateUtil;
 
 public class UserService {
@@ -308,7 +312,7 @@ public class UserService {
 		Session session = sessionFactory.openSession();
 		userDao = new UserDaoImp(session);
 		
-		List<Object> sessionContent =  userDao.findIdsByUsername(username);
+		List<Object> sessionContent =  userDao.findIdsByUsername(username,password);
 		System.out.println("sessionContent "+sessionContent.get(0));
 		System.out.println("sessionContent "+sessionContent.get(1));
 		if(sessionContent == null) {
@@ -320,22 +324,98 @@ public class UserService {
 	/*
 	 * Forget Password
 	 */
-	public boolean resetPassword(String username, String oldPassword,String newPassword) {
-	    Session session = sessionFactory.openSession();
-	    boolean result = false;
-	    userDao = new UserDaoImp(session);
-	    
-	    User user = userDao.checkUsername(username);
-
-	    if(user != null&&user.getUsername().equals(username)) {
-	    	if(oldPassword.equals(user.getPasswordHash())) {
-	    		user.setPasswordHash(newPassword);
-	    		result = userDao.update(user);
-	    	}
-        }
-	 	session.close();
-	    return result;
+	public boolean resetPassword(String username , String newPassword) {
+		System.out.println("email"+username+" new password "+newPassword);
+		boolean result = false;
+		Session session = sessionFactory.openSession();
+		userDao = new UserDaoImp(session);
+		 userDetailDao = new UserDetailDaoImp(session);
+		 
+		 User user = userDao.findByUserName(username);
+		 
+		 System.out.println("user "+user.getPasswordHash());
+		 System.out.println("user "+user.getUsername());
+		if (user != null) {
+			//user.setPasswordHash(newPassword);
+			result = userDao.updateById(user.getUserId(), newPassword);
+			System.out.println("result reset password service"+result);
+		}
+		session.close();
+		System.out.println("result reset password"+result);
+		return result;
 	}
+	
+	public UserDetail findByEmail(String email) {
+        try {
+            Session session = sessionFactory.openSession();
+            userDetailDao = new UserDetailDaoImp(session);
+            return userDetailDao.findByEmail(email);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
+	public UserDetail findByUsername(String username) {
+        try {
+            Session session = sessionFactory.openSession();
+            userDetailDao = new UserDetailDaoImp(session);
+            return userDetailDao.findByUsername(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
+	public boolean sendEmailByUsername(String username, String otp) {
+		System.out.println("send email by username");
+        Session session = sessionFactory.openSession();
+        userDetailDao = new UserDetailDaoImp(session);
+        UserDetail userDetail = userDetailDao.findByUsername(username);
+        
+        if (userDetail == null) {
+            return false;
+        }
+        
+        String email = userDetail.getEmail();
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+
+        String emailBody = "<p>Hello " + userDetail.getUser().getUsername() + ",</p>" + 
+                           "<p>This is your one time password: <strong>" + otp + "</strong></p>" + 
+                           "<p>Please enter the OTP on the website to update your password!</p>";
+
+        try {
+            EmailUtil.sendHtmlEmail(email, "Password Change Request", emailBody);
+            return true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+	
+	public boolean sendEmail(String email, String otp) {
+        Session session = sessionFactory.openSession();
+        UserDetailDaoImp userDetailDao = new UserDetailDaoImp(session);
+        UserDetail userDetail = userDetailDao.findByEmail(email);
+        
+        if (userDetail == null) {
+            return false;
+        }
+
+        String emailBody = "<p>Hello " + userDetail.getUser().getUsername() + ",</p>" + 
+                           "<p>This is your one time password: <strong>" + otp + "</strong></p>" + 
+                           "<p>Please enter the OTP on the website to update your password!</p>";
+
+        try {
+            EmailUtil.sendHtmlEmail(userDetail.getEmail(), "Password Change Request", emailBody);
+            return true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 	
 	public List<User> AllUser() {
 	    Session session = sessionFactory.openSession();
@@ -362,27 +442,27 @@ public class UserService {
 			userDetailDao = new UserDetailDaoImp(session);
 			List<Object> result = new ArrayList<>();
 
-try {
-List<Object[]> queryResult = userDetailDao.createPatientDetails(userId, firstName, lastName,
+			try {
+				List<Object[]> queryResult = userDetailDao.createPatientDetails(userId, firstName, lastName,
                                        dob, gender, email,
                                        phone, bloodGroup);
 
-// Convert List<Object[]> to List<Object> preserving original types
-if (queryResult != null && !queryResult.isEmpty()) {
-Object[] data = queryResult.get(0);
-for (Object item : data) {
-result.add(item); // Keep original types
-}
-}
+				// Convert List<Object[]> to List<Object> preserving original types
+				if (queryResult != null && !queryResult.isEmpty()) {
+					Object[] data = queryResult.get(0);
+					for (Object item : data) {
+						result.add(item); // Keep original types
+					}
+				}
 
-return result;
-} catch (Exception e) {
-e.printStackTrace();
-return result;
-} finally {
-session.close();
-}
-}
+				return result;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return result;
+			} finally {
+				session.close();
+			}
+	}
 	
     
 	 private boolean isAdminRole(Role role) {

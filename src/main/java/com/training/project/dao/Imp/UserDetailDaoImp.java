@@ -80,6 +80,21 @@ public class UserDetailDaoImp implements GenericDao<UserDetail, Integer> {
 		return false;
 	}
 	
+	public UserDetail findByUsername(String username) {
+		System.out.println("find by username");
+        try {
+            String hql = "FROM UserDetail ud WHERE ud.user.username = :username";
+            Query<UserDetail> query = session.createQuery(hql, UserDetail.class);
+            query.setParameter("username", username);
+
+            // Get a single result or null if not found
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
 	public UserDetail findByUserId(Integer userId) {
 		try {
 			String hql = "FROM UserDetail ud WHERE ud.user.userId = :userId";
@@ -95,71 +110,71 @@ public class UserDetailDaoImp implements GenericDao<UserDetail, Integer> {
 	}
 	
 	public UserDetail findByEmail(String email) {
-		try {
-			
-			String hql = "FROM UserDetail ud WHERE ud.email = :email";
-			Query<UserDetail> query = session.createQuery(hql, UserDetail.class);
-			query.setParameter("email", email);
-			
-			// Get a single result or null if not found
-			return query.uniqueResult();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+		System.out.println("email dao"+email);
+        try {
+            String hql = "FROM UserDetail ud WHERE ud.email = :email";
+            Query<UserDetail> query = session.createQuery(hql, UserDetail.class);
+            query.setParameter("email", email);
+
+            // Get a single result or null if not found
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 	
 	public List<Object[]> createPatientDetails(Integer userId, String firstName, String lastName, 
             LocalDate dob, String gender, String email, 
             String phone, String bloodGroup) {
-Transaction transaction = null;
-List<Object[]> result = null;
+		Transaction transaction = null;
+		List<Object[]> result = null;
 
-try {
-// First, create/update the user detail
-transaction = session.beginTransaction();
+		try {
+			// First, create/update the user detail
+			transaction = session.beginTransaction();
+			
+			// Create UserDetail if not exists
+			UserDetail userDetail = new UserDetail();
+			userDetail.setFirstName(firstName);
+			userDetail.setLastName(lastName);
+			userDetail.setDateOfBirth(dob);
+			userDetail.setGender(gender);
+			userDetail.setEmail(email);
+			userDetail.setPhoneNumber(phone);
 
-// Create UserDetail if not exists
-UserDetail userDetail = new UserDetail();
-userDetail.setFirstName(firstName);
-userDetail.setLastName(lastName);
-userDetail.setDateOfBirth(dob);
-userDetail.setGender(gender);
-userDetail.setEmail(email);
-userDetail.setPhoneNumber(phone);
+			// Associate with user
+			User user = session.get(User.class, userId);
+			userDetail.setUser(user);
+			session.save(userDetail);
 
-// Associate with user
-User user = session.get(User.class, userId);
-userDetail.setUser(user);
-session.save(userDetail);
+			// Create Patient record
+			Patient patient = new Patient();
+			patient.setBloodGrp(bloodGroup);
+			patient.setUser(user);
+			session.save(patient);
 
-// Create Patient record
-Patient patient = new Patient();
-patient.setBloodGrp(bloodGroup);
-patient.setUser(user);
-session.save(patient);
+			transaction.commit();
 
-transaction.commit();
+			// Now execute the query to get required data
+			String hql = "SELECT u.userId, p.patientId, u.username, r.roleName " +
+			"FROM User u " +
+			"JOIN u.role r " +
+			"JOIN Patient p ON p.user.userId = u.userId " +
+			"WHERE u.userId = :userId";
+			
+			Query query = session.createQuery(hql);
+			query.setParameter("userId", userId);
+			result = query.list();
 
-// Now execute the query to get required data
-String hql = "SELECT u.userId, p.patientId, u.username, r.roleName " +
-"FROM User u " +
-"JOIN u.role r " +
-"JOIN Patient p ON p.user.userId = u.userId " +
-"WHERE u.userId = :userId";
-
-Query query = session.createQuery(hql);
-query.setParameter("userId", userId);
-result = query.list();
-
-return result;
-} catch (Exception e) {
-if (transaction != null) {
-transaction.rollback();
-}
-e.printStackTrace();
-return null;
-}
-}
+			return result;
+		} catch (Exception e) {
+			if (transaction != null) {
+			transaction.rollback();
+			}
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 }

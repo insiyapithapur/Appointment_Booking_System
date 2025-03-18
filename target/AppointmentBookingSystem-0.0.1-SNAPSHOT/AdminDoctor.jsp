@@ -396,13 +396,14 @@
                         <div class="doctor-avatar" style="background-color: <%= bgColor %>;"><%= initials.toUpperCase() %></div>
                         <div class="doctor-info">
                             <div class="doctor-name">Dr. <%= row[4] %> <%= row[5] %></div>
-                            <div class="doctor-details"><%= row[3] %> | Exp: <%= row[2] %> years</div>
-                            <div class="doctor-details">License: <%= row[1] %></div>
-                            <div class="doctor-details">Email: <%= row[7] %></div>
-                            <div class="doctor-details">Phone: <%= row[9] %></div>
+                            <div class="doctor-details"><%= row[3] %> | <b>Licence:</b>  <%= row[2] %> years</div>
+                            <div class="doctor-details"><b>Specialization:</b> <%= row[1] %></div>
+                            <div class="doctor-details"><b>Username:</b> <%= row[7] %></div>
+                            <div class="doctor-details"><b>Gender:</b>  <%= row[9] %></div>
+                            <div class="doctor-details"><b>Email: </b> <%= row[8] %></div>
+                            <div class="doctor-details"><b>Contact: </b> <%= row[10] %></div>
                         </div>
                     </div>
-                    <div class="doctor-specialization"><%= row[0] %></div>
                 </div>
                 <%
                         }

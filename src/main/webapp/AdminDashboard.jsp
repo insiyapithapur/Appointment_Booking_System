@@ -384,6 +384,9 @@ body {
 		<div class="nav-item" onclick="navigateTo('Admin/Patients')">Patients</div>
 		<div class="nav-item " onclick="navigateTo('Admin/Doctors')">Doctors</div>
         <div class="nav-item" onclick="navigateTo('Admin/Appointments')">Appointments</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
 	</div>
 
 	<div class="content">

@@ -226,7 +226,7 @@
 <body>
   <div class="page-container">
     <div class="image-container">
-      <img src="./asset/imgLandingPage.png" alt="Healthcare">
+      <img src="imgLandingPage.png" alt="Healthcare">
     </div>
     <div class="form-container">
       <div class="login-container">

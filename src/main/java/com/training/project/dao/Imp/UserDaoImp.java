@@ -3,6 +3,7 @@ package com.training.project.dao.Imp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -138,7 +139,7 @@ public class UserDaoImp implements GenericDao<User, Integer> {
     }
 	
 	@SuppressWarnings("unchecked")
-	public List<Object> findIdsByUsername(String username) {
+	public List<Object> findIdsByUsername(String username,String password) {
 	    try {
 	        String role = null;
 	        List<Object> detailsList = new ArrayList<>();
@@ -151,7 +152,13 @@ public class UserDaoImp implements GenericDao<User, Integer> {
 	        if (user == null) {
 	            return null;
 	        }
-
+	        
+	        if (!user.getPasswordHash().equals(password)) {
+	        	System.out.println("jakcbnk");
+	            return null; // Password doesn't match
+	        }
+	        
+	        System.out.println("dwkdh");
 	        role = user.getRole().getRoleName();
 
 	        // Now get both IDs in a single query based on role
@@ -260,7 +267,26 @@ public class UserDaoImp implements GenericDao<User, Integer> {
             return null;
         }
     }
-
+    
+    public boolean updateById(Integer id, String newPassword) {
+	    Transaction transaction = null;
+	    try {
+	        transaction = session.beginTransaction();
+	        User user = session.get(User.class, id);
+	        
+	        if (user != null) {
+	            user.setPasswordHash(newPassword);
+	            session.update(user);
+	            transaction.commit();
+	            return true;
+	        }
+	    } catch (HibernateException e) {
+	        if (transaction != null) transaction.rollback();
+	       return false;
+	    } 
+	    return true;
+	}
+    
 	@Override
 	public boolean create(User entity) {
 		// TODO Auto-generated method stub

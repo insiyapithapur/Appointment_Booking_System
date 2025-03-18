@@ -320,6 +320,9 @@
 		<div class="nav-item" onclick="navigateTo('Admin/Patients')">Patients</div>
 		<div class="nav-item " onclick="navigateTo('Admin/Doctors')">Doctors</div>
         <div class="nav-item" onclick="navigateTo('Admin/Appointments')">Appointments</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
     </div>
 
     <div class="content">
@@ -388,15 +391,14 @@
                             String initials = row[4].toString().charAt(0) + "" + row[5].toString().charAt(0);
                 %>
                 <div class="doctor-card" 
-                     onclick="viewDoctor('<%= row[6] %>')" 
                      data-name="<%= row[4] %> <%= row[5] %>" 
                      data-license="<%= row[1] %>"
-                     data-specialization="<%= row[0] %>">
+                     data-specialization="<%= row[1] %>">
                     <div class="d-flex align-items-center">
                         <div class="doctor-avatar" style="background-color: <%= bgColor %>;"><%= initials.toUpperCase() %></div>
                         <div class="doctor-info">
-                            <div class="doctor-name">Dr. <%= row[4] %> <%= row[5] %></div>
-                            <div class="doctor-details"><%= row[3] %> | <b>Licence:</b>  <%= row[2] %> years</div>
+                            <div class="doctor-name">Dr. <%= row[5] %> <%= row[6] %></div>
+                            <div class="doctor-details">Exp: <%= row[3] %> | <b>Licence:</b>  <%= row[2] %> years</div>
                             <div class="doctor-details"><b>Specialization:</b> <%= row[1] %></div>
                             <div class="doctor-details"><b>Username:</b> <%= row[7] %></div>
                             <div class="doctor-details"><b>Gender:</b>  <%= row[9] %></div>
@@ -415,19 +417,7 @@
                 %>
             </div>
 
-            <div class="pagination-container">
-                <ul class="pagination">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
-            </div>
+            
         </div>
     </div>
     

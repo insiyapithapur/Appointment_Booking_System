@@ -378,12 +378,15 @@
     
     <div class="sidebar" id="sidebar">
         <div class="avatar" onclick="navigateTo('profile.jsp')">MD+</div>
-        <div class="doctor-name mb-4">Dr. ${doctorName}</div>
+        <div class="doctor-name mb-4">${doctorName}</div>
         
-        <div class="nav-item" onclick="navigateTo('Doctor/Dashboard')">Dashboard</div>
-        <div class="nav-item" onclick="navigateTo('Doctor/Patient')">Patients</div>
-        <div class="nav-item active" onclick="navigateTo('Doctor/Appointment')">Appointments</div>
-        <div class="nav-item" onclick="navigateTo('Doctor/Profile')">Profile</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/Doctor/Dashboard'">Dashboard</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/Doctor/Patient'">Patients</div>
+        <div class="nav-item active" onclick="window.location.href='${pageContext.request.contextPath}/Doctor/Appointment'">Appointments</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/Doctor/Profile'">Profile</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
     </div>
 
     <div class="content">

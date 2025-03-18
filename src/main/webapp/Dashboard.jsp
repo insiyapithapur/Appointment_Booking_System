@@ -347,12 +347,15 @@
     
     <div class="sidebar" id="sidebar">
         <div class="avatar">MD+</div>
-        <div class="doctor-name mb-3">Dr. ${doctorName}</div>
+        <div class="doctor-name mb-3">${doctorName}</div>
         
         <div class="nav-item active" onclick="navigateTo('Doctor/Dashboard')">Dashboard</div>
         <div class="nav-item" onclick="navigateTo('Doctor/Patient')">Patients</div>
         <div class="nav-item" onclick="navigateTo('Doctor/Appointment')">Appointments</div>
         <div class="nav-item" onclick="navigateTo('Doctor/Profile')">Profile</div>
+        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
+    Logout
+</div>
     </div>
     
     <div class="content">
