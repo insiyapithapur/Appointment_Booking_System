@@ -394,41 +394,7 @@
         <p class="text-muted" id="current-datetime"></p>
         
         <div class="container-fluid px-0">
-            <!-- Filters Row -->
-            <div class="filters-row mb-4">
-                <div class="row align-items-center">
-                    <div class="col-md-4 mb-2 mb-md-0">
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="form-control" id="searchInput" placeholder="Search appointments..." oninput="filterAppointments()">
-                        </div>
-                    </div>
-                    <div class="col-md-2 mb-2 mb-md-0">
-                        <select class="form-select" id="statusFilter" onchange="filterAppointments()">
-                            <option value="">All Statuses</option>
-                            <option value="CONFIRMED">Confirmed</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="CANCELLED">Cancelled</option>
-                            <option value="COMPLETED">Completed</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 mb-2 mb-md-0">
-                        <select class="form-select" id="sortBy" onchange="sortAppointments()">
-                            <option value="dateAsc">Date (Oldest First)</option>
-                            <option value="dateDesc">Date (Newest First)</option>
-                            <option value="nameAsc">Patient Name (A-Z)</option>
-                            <option value="nameDesc">Patient Name (Z-A)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 text-md-end">
-                        <div class="reset-container">
-                            <button class="btn btn-reset" onclick="resetFilters()">
-                                <i class="fas fa-redo me-1"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
             
             <!-- Appointments Table -->
             <div class="card appointment-table">
@@ -571,20 +537,6 @@
                     </c:choose>
                 </div>
             </div>
-
-            <div class="pagination-container">
-                <ul class="pagination">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -697,6 +649,8 @@
             
             filterAppointments();
         }
+        
+        
         
         // Handle responsive behavior
         window.addEventListener('resize', function() {

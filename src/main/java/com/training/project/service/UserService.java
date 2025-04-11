@@ -30,54 +30,6 @@ public class UserService {
 	        e.printStackTrace();
 	    }
 	}
-//	/*
-//	 * Registration of doctor
-//	 */
-////	public boolean createDoctorByAdmin(int adminId, User doctorUser) {
-//	public boolean createDoctorByAdmin(Integer adminId) {
-//	    Session session = sessionFactory.openSession();
-//	    userDao = new UserDaoImp(session);
-//	    
-//	    RoleDaoImp roledao = new RoleDaoImp(session);
-//    	Role role = roledao.findById(3);
-//    	User doctorUser = new User("Insiya_Doc3","ROOT",true,role);
-//    	
-//	    try {
-//	    	System.out.println("Session in createDoctorByAdmin: 1 " + session);
-//	        // 1. Verify the admin ID is valid
-//	        User adminUser = userDao.findById(adminId);
-//	        System.out.println("Session in createDoctorByAdmin: 2 " + session);
-//
-//	        if (adminUser == null) {
-//	            System.out.println("Admin user not found with ID: " + adminId);
-//	            return false;
-//	        }
-//	        
-//	        // 2. Verify the user has admin role
-//	        Role adminRole = adminUser.getRole();
-//	        if (adminRole == null || !isAdminRole(adminRole)) {
-//	            System.out.println("User with ID " + adminId + " does not have admin privileges");
-//	            return false;
-//	        }
-//	        
-//	        // 3. Check if the username already exists
-//	        User existingUser = userDao.findByUsername(doctorUser.getUsername());
-//	        if (existingUser != null) {
-//	            System.out.println("Username '" + doctorUser.getUsername() + "' already exists");
-//	            return false;
-//	        }
-//	        
-//	        // 5. Create the doctor user
-//	        boolean result = userDao.create(doctorUser);
-//	        return result;
-//	    } catch (Exception e) {
-//	        e.printStackTrace();
-//	        return false;
-//	    } finally {
-//	    	System.out.println("Session in createDoctorByAdmin: closing " + session);
-//	        session.close();
-//	    }
-//	}
 	
 	/*
 	 * After Login Details Checking Existence for doctor
@@ -104,62 +56,6 @@ public class UserService {
 	        return "All details complete.";
 	    }
 	}
-	
-//	/*
-//	 * Fill UserDetails and Doctor Details
-//	 */
-////	public boolean createDoctorDetails(UserDetail userDetail, Doctor doctor) {
-//	public boolean createDoctorDetails() {
-//		Session session = sessionFactory.openSession();
-//		doctorDao = new DoctorDaoImp(session);
-//		userDetailDao = new UserDetailDaoImp(session);
-//		
-//		UserDaoImp userDao = new UserDaoImp(session);
-//    	User user = userDao.findById(2);
-//    	
-//    	LocalDate dateOfBirth = LocalDate.of(2003, 4, 8);
-//    	UserDetail userDetail = new UserDetail("Insiya","Pithapur",dateOfBirth,"F","9016222140","banupithapur@gmail.com",user);
-//		
-//    	Doctor doctor = new Doctor("ENT","L123456",(float)1.5,"MBBS",true,user);
-//    	
-//		if (userDetail.getUser() == null || doctor.getUser() == null || 
-//		        !userDetail.getUser().getUserId().equals(doctor.getUser().getUserId())) {
-//		        return false;
-//		    }
-//		try {
-//	        // Check if userDetail already exists for this user
-//	        UserDetail existingUserDetail = userDetailDao.findById(userDetail.getUser().getUserId());
-//	        if (existingUserDetail != null) {
-//	            return true;
-//	        } else {
-//	            // Create new userDetail
-//	            boolean userDetailCreated = userDetailDao.create(userDetail);
-//	            if (!userDetailCreated) {
-//	                return false;
-//	            }
-//	        }
-//	        
-//	        // Check if doctor details already exist for this user
-//	        Doctor existingDoctor = doctorDao.findById(doctor.getUser().getUserId());
-//	        if (existingDoctor != null) {
-//	            return true;
-//	        } else {
-//	            // Create new doctor
-//	            boolean doctorCreated = doctorDao.create(doctor);
-//	            if (!doctorCreated) {
-//	                return false;
-//	            }
-//	        }
-//	        
-//	        return true;
-//	    } catch (Exception e) {
-//	        System.out.println("Error creating doctor details: " + e.getMessage());
-//	        e.printStackTrace();
-//	        return false;
-//	    }finally {
-//	    	session.close();
-//	    }
-//	}
 	
 	/*
 	 * Registration of Patient
@@ -191,62 +87,7 @@ public class UserService {
 	    }
 	}
 	
-//	/*
-//	 * Fill UserDetails and Patient Details
-//	 */
-////	public boolean createDoctorDetails(UserDetail userDetail, Doctor doctor) {
-//	public boolean createPatientDetails() {
-//		Session session = sessionFactory.openSession();
-//		patientDao = new PatientDaoImp(session);
-//		userDetailDao = new UserDetailDaoImp(session);
-//		
-//		UserDaoImp userDao = new UserDaoImp(session);
-//    	User user = userDao.findById(5);
-//    	
-//    	LocalDate dateOfBirth = LocalDate.of(2003, 4, 8);
-//    	UserDetail userDetail = new UserDetail("Insiya","Patient",dateOfBirth,"F","9016222140","banupithapur@gmail.com",user);
-//		
-//    	Patient patient = new Patient("A+",user);
-//    	
-//		if (userDetail.getUser() == null || patient.getUser() == null || 
-//		        !userDetail.getUser().getUserId().equals(patient.getUser().getUserId())) {
-//		        return false;
-//		    }
-//		try {
-//	        // Check if userDetail already exists for this user
-//	        UserDetail existingUserDetail = userDetailDao.findById(userDetail.getUser().getUserId());
-//	        if (existingUserDetail != null) {
-//	            return true;
-//	        } else {
-//	            // Create new userDetail
-//	            boolean userDetailCreated = userDetailDao.create(userDetail);
-//	            if (!userDetailCreated) {
-//	                return false;
-//	            }
-//	        }
-//	        
-//	        // Check if Patient details already exist for this user
-//	        Patient existingPatient = patientDao.findById(patient.getUser().getUserId());
-//	        if (existingPatient != null) {
-//	            return true;
-//	        } else {
-//	            // Create new Patient
-//	            boolean patientCreated = patientDao.create(patient);
-//	            if (!patientCreated) {
-//	                return false;
-//	            }
-//	        }
-//	        
-//	        return true;
-//	    } catch (Exception e) {
-//	        System.out.println("Error creating patient details: " + e.getMessage());
-//	        e.printStackTrace();
-//	        return false;
-//	    }finally {
-//	    	session.close();
-//	    }
-//	}
-	
+
 	/*
 	 * Get Profile Details by user_id for both doctor and patient
 	 */

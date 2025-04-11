@@ -45,6 +45,7 @@ public class PatientBookAppointmentServlet extends HttpServlet {
             
             // Get schedule details which include doctor info
             List<String> scheduleDetails = patientService.getScheduleDetailsByDoctorId(doctorId);
+            scheduleDetails.forEach(System.out::println);
             
             if (scheduleDetails.isEmpty()) {
                 // No details found for this doctor

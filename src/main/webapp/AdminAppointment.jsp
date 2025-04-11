@@ -89,45 +89,48 @@ body {
 	transform: translateX(5px);
 }
 
-.appointment-list {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-	gap: 20px;
-	margin-bottom: 30px;
+.appointment-table-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
 }
 
-.appointment-card {
-	background-color: white;
-	border-radius: 10px;
-	padding: 20px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	cursor: pointer;
-	transition: all 0.3s;
+.table {
+    margin-bottom: 0;
 }
 
-.appointment-card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.table thead th {
+    background-color: #f5f5f5;
+    color: #555;
+    font-weight: 600;
+    padding: 12px 15px;
+    border-bottom: 2px solid #e0e0e0;
 }
 
-.appointment-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 15px;
+.table tbody tr {
+    transition: all 0.2s;
+    cursor: pointer;
 }
 
-.appointment-id {
-	font-weight: bold;
-	color: var(--text-color);
+.table tbody tr:hover {
+    background-color: rgba(79, 94, 149, 0.05);
 }
 
-.appointment-status {
-	padding: 5px 15px;
-	border-radius: 20px;
-	font-size: 12px;
-	font-weight: bold;
-	text-transform: uppercase;
+.table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
 }
 
 .status-confirmed {
@@ -148,27 +151,6 @@ body {
 .status-completed {
 	background-color: #64B5F6;
 	color: white;
-}
-
-.appointment-info {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: 10px;
-}
-
-.info-group {
-	margin-bottom: 10px;
-}
-
-.info-label {
-	color: #777;
-	font-size: 14px;
-	margin-bottom: 3px;
-}
-
-.info-value {
-	font-weight: bold;
-	color: var(--text-color);
 }
 
 .error {
@@ -231,33 +213,28 @@ body {
 	z-index: 999;
 }
 
-/* Pagination styles */
-.pagination-container {
-	display: flex;
-	justify-content: center;
-	margin: 20px 0;
+/* Alert styles for "No records found" */
+.alert-no-results {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #6c757d;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
 }
 
 /* Responsive styles */
-@media ( max-width : 1200px) {
-	.appointment-list {
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	}
-}
-
-@media ( max-width : 992px) {
+@media (max-width: 992px) {
 	.sidebar {
 		width: 220px;
 	}
 	.content {
 		margin-left: 220px;
 	}
-	.appointment-list {
-		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-	}
 }
 
-@media ( max-width : 768px) {
+@media (max-width: 768px) {
 	.toggle-sidebar {
 		display: block;
 	}
@@ -274,24 +251,29 @@ body {
 	.content {
 		margin-left: 0;
 	}
-	.appointment-list {
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	}
 	.filters-row .col-md-3 {
 		margin-bottom: 10px;
 	}
+	
+	.appointment-table-container {
+        overflow-x: auto;
+    }
+    
+    .table th, 
+    .table td {
+        white-space: nowrap;
+    }
 }
 
-@media ( max-width : 576px) {
-	.appointment-list {
-		grid-template-columns: 1fr;
-	}
-	.appointment-card {
-		max-width: 100%;
-	}
+@media (max-width: 576px) {
 	.content {
 		padding: 15px 10px;
 	}
+	
+	/* Hide less important columns on very small screens */
+    .hide-xs {
+        display: none;
+    }
 }
 </style>
 </head>
@@ -305,8 +287,8 @@ body {
 		<div class="doctor-name mb-4"></div>
 		<div class="nav-item" onclick="navigateTo('Admin/Dashboard')">Dashboard</div>
 		<div class="nav-item" onclick="navigateTo('Admin/Patients')">Patients</div>
-		<div class="nav-item " onclick="navigateTo('Admin/Doctors')">Doctors</div>
-        <div class="nav-item" onclick="navigateTo('Admin/Appointments')">Appointments</div>
+		<div class="nav-item" onclick="navigateTo('Admin/Doctors')">Doctors</div>
+        <div class="nav-item active" onclick="navigateTo('Admin/Appointments')">Appointments</div>
         <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
     Logout
 </div>
@@ -353,48 +335,60 @@ body {
 				</div>
 			</div>
 
-			<div class="appointment-list" id="appointmentList">
-				<c:forEach var="a" items="${appointments}">
-					<div class="appointment-card"
-						data-id="${a.appointmentId}" data-date="${a.appointmentDate}"
-						data-patient="${a.patient.user.username}"
-						data-status="${a.status.statusName.toLowerCase()}">
-						<div class="appointment-header">
-							<span class="appointment-id">Appointment
-								#${a.appointmentId}</span> <span
-								class="appointment-status status-${a.status.statusName.toLowerCase()}">${a.status.statusName}</span>
-						</div>
-						<div class="appointment-info">
-							<div class="info-group">
-								<div class="info-label">Date</div>
-								<div class="info-value">${a.appointmentDate}</div>
-							</div>
-							<div class="info-group">
-								<div class="info-label">Day</div>
-								<div class="info-value">${a.schedule.dayOfWeek}</div>
-							</div>
-							<div class="info-group">
-								<div class="info-label">Patient</div>
-								<div class="info-value">${a.patient.user.username}</div>
-							</div>
-							<div class="info-group">
-								<div class="info-label">Patient ID</div>
-								<div class="info-value">${a.patient.patientId}</div>
-							</div>
-							<div class="info-group">
-								<div class="info-label">Doctor</div>
-								<div class="info-value">${a.schedule.doctor.user.username}</div>
-							</div>
-							<div class="info-group">
-								<div class="info-label">Reason</div>
-								<div class="info-value">${a.reason}</div>
-							</div>
-						</div>
-					</div>
-				</c:forEach>
-			</div>
-
-			
+			<!-- Appointment Table -->
+            <div class="appointment-table-container">
+                <table class="table" id="appointmentTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th class="hide-xs">Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentTableBody">
+                        <c:forEach var="a" items="${appointments}">
+                            <tr class="appointment-row" onclick="viewAppointment('${a.appointmentId}')"
+                                data-id="${a.appointmentId}" 
+                                data-date="${a.appointmentDate}"
+                                data-patient="${a.patient.user.username}"
+                                data-status="${a.status.statusName.toLowerCase()}">
+                                <td>${a.appointmentDate}</td>
+                                <td>${a.patient.user.username}</td>
+                                <td>${a.schedule.doctor.user.username}</td>
+                                <td class="hide-xs">
+                                    <div class="d-inline-block text-truncate" style="max-width: 150px;" 
+                                         title="${a.reason}">
+                                        ${a.reason}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-${a.status.statusName.toLowerCase()}">
+                                        ${a.status.statusName}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); viewAppointment('${a.appointmentId}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        
+                        <c:if test="${empty appointments}">
+                            <tr id="noResultsRow">
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="alert-no-results">
+                                        <i class="fas fa-calendar-times me-2"></i> No appointments found
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
 		</div>
 	</div>
 
@@ -449,7 +443,7 @@ body {
             const searchText = document.getElementById('searchInput').value.toLowerCase();
             const dateFilter = document.getElementById('dateFilter').value;
             
-            const appointments = document.querySelectorAll('.appointment-card');
+            const appointments = document.querySelectorAll('.appointment-row');
             let visibleCount = 0;
             
             appointments.forEach(appointment => {
@@ -474,26 +468,33 @@ body {
             });
             
             // Show "No results" message if no appointments match filters
-            if (visibleCount === 0) {
-                // If no "No results" element exists, create one
-                if (!document.getElementById('noResults')) {
-                    const noResults = document.createElement('div');
-                    noResults.id = 'noResults';
-                    noResults.className = 'text-center text-danger w-100';
-                    noResults.textContent = 'No appointments found';
-                    document.getElementById('appointmentList').appendChild(noResults);
-                } else {
-                    document.getElementById('noResults').style.display = 'block';
-                }
-            } else if (document.getElementById('noResults')) {
-                document.getElementById('noResults').style.display = 'none';
+            const tbody = document.getElementById('appointmentTableBody');
+            const existingNoResults = document.getElementById('dynamicNoResults');
+            
+            // Remove existing "no results" row if it exists
+            if (existingNoResults) {
+                existingNoResults.remove();
+            }
+            
+            if (visibleCount === 0 && appointments.length > 0) {
+                // Create a "no results" row
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.id = 'dynamicNoResults';
+                noResultsRow.innerHTML = `
+                    <td colspan="8" class="text-center py-4">
+                        <div class="alert-no-results">
+                            <i class="fas fa-filter me-2"></i> No appointments match your filters
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(noResultsRow);
             }
         }
         
         function sortAppointments() {
             const sortBy = document.getElementById('sortBy').value;
-            const appointmentList = document.getElementById('appointmentList');
-            const appointments = Array.from(document.querySelectorAll('.appointment-card'));
+            const tbody = document.getElementById('appointmentTableBody');
+            const appointments = Array.from(document.querySelectorAll('.appointment-row'));
             
             // Sort appointments based on selected criteria
             appointments.sort((a, b) => {
@@ -511,9 +512,20 @@ body {
                 }
             });
             
-            // Reappend sorted appointments to the container
+            // Get any non-appointment rows (like "no results" message)
+            const otherRows = Array.from(tbody.querySelectorAll('tr:not(.appointment-row)'));
+            
+            // Clear the table body
+            tbody.innerHTML = '';
+            
+            // Add the sorted appointment rows
             appointments.forEach(appointment => {
-                appointmentList.appendChild(appointment);
+                tbody.appendChild(appointment);
+            });
+            
+            // Add back the other rows
+            otherRows.forEach(row => {
+                tbody.appendChild(row);
             });
         }
         

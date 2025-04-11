@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f95e9;
-            --primary-color: #4f95e9;
+            --sidebar-bg: #4f5e95;
+            --primary-color: #4f5e95;
             --light-bg: #f7f9fc;
             --completed-color: #e8f5e9;
             --pending-color: #e3f2fd;

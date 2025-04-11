@@ -15,9 +15,6 @@ import javax.servlet.http.HttpSession;
 import com.training.project.service.DoctorService;
 import com.training.project.service.UserService;
 
-/**
- * Servlet to handle profile display
- */
 @WebServlet("/Doctor/Profile")
 public class ProfileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -31,10 +28,7 @@ public class ProfileServlet extends HttpServlet {
         doctorService = new DoctorService();
         userService = new UserService();
     }
-       
-    /**
-     * Handles GET requests for displaying profile
-     */
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("===== ProfileServlet doGet method called =====");
         
@@ -63,7 +57,6 @@ public class ProfileServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Error retrieving profile data: " + e.getMessage());
         }
         
-        // Forward to the JSP
         request.getRequestDispatcher("/Profile.jsp").forward(request, response);
     }
 

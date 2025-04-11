@@ -75,13 +75,6 @@ public class AdminService {
 		doctorDao.deleteDoctor(doctorId);
 	}
 
-//	public Doctor addDoctor(String username, String passwordHash, String specialization, String licenseNumber,
-//			Float experience, String degree) {
-//		Session session = sessionFactory.openSession();
-//		doctorDao = new DoctorDaoImp(session);
-//		return doctorDao.addDoctor(username, passwordHash, specialization, licenseNumber, experience, degree);
-//	}
-	
 	/*
 	 * Registration of doctor by admin
 	 */

@@ -316,15 +316,12 @@
                         <c:forEach var="appointmentInfo" items="${upcomingAppointments}">
                             <tr>
                                 <c:set var="parts" value="${fn:split(appointmentInfo, '|')}" />
-                                <c:set var="appointmentId" value="${fn:trim(fn:substring(parts[1], 15, fn:length(parts[1])))}" />
+                                <c:set var="appointmentId" value="${fn:trim(fn:substring(parts[1], 17, fn:length(parts[1])))}" />
                                 <c:set var="status" value="${fn:trim(fn:substring(parts[5], 8, fn:length(parts[5])))}" />
                                 
                                 <td>
                                     <div class="patient-info">
-                                        <div class="patient-avatar" style="background-color: #61CE70; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: bold; margin-right: 10px;">
-                                            Dr
-                                        </div>
-                                        ${fn:trim(fn:substring(parts[0], 8, fn:length(parts[0])))}
+                                        Dr. ${fn:trim(fn:substring(parts[0], 8, fn:length(parts[0])))}
                                     </div>
                                 </td>
                                 <td>${fn:trim(fn:substring(parts[2], 6, fn:length(parts[2])))}</td>
@@ -347,9 +344,9 @@
                                     </c:when>
                                     <c:when test="${fn:containsIgnoreCase(status, 'Pending') || fn:containsIgnoreCase(status, 'Confirmed')}">
                                         <!-- Cancel button for pending appointments -->
-                                        <button class="btn btn-sm btn-danger" onclick="cancelAppointment(${appointmentId})">
+										<button class="btn btn-sm btn-danger" onclick="cancelAppointment(${appointmentId})">
                                             <i class="fas fa-times-circle"></i> Cancel
-                                        </button>
+                                        </button>                                    
                                     </c:when>
                                     <c:otherwise>
                                         <!-- Disabled button for other statuses -->
@@ -397,6 +394,7 @@
 	        </div>
 	    </div>
 	</div>
+
 
 	
 	<!-- Alternative direct implementation of the cancel button functionality -->
@@ -448,10 +446,17 @@
     function cancelAppointment(appointmentId) {
         // Set the appointment ID in the modal form
         document.getElementById('appointmentIdToCancel').value = appointmentId;
-        
-        // Show the modal
-        var modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-        modal.show();
+        console.log("appointmentId ",appointmentId);
+        // Show the modal - make sure it exists in the DOM
+        const modalElement = document.getElementById('cancelModal');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            console.error("Modal element not found");
+            // Fallback to direct cancellation
+            cancelAppointmentDirect(appointmentId);
+        }
     }
 
     // Handle responsive behavior
@@ -463,8 +468,8 @@
     });
 
     // Add this to make sure functions are accessible in the global scope
-    window.viewMedicalRecord = viewMedicalRecord;
-    window.cancelAppointment = cancelAppointment;
+    //window.viewMedicalRecord = viewMedicalRecord;
+    //window.cancelAppointment = cancelAppointment;
     </script>
 </body>
 </html>

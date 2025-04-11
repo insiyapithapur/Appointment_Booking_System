@@ -9,33 +9,19 @@ import javax.servlet.http.HttpSession;
 
 import com.training.project.service.RegisterService;
 
-/**
- * Servlet implementation class RegisterServlet
- */
 @WebServlet("/Register")
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private RegisterService registerService;
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+
     public RegisterServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-//		request.getRequestDispatcher("/Register.jsp").forward(request, response);
-//		response.getWriter().append("Served at: ").append(request.getContextPath());
+
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try{
 			

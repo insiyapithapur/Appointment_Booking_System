@@ -20,9 +20,6 @@ import com.training.project.model.User;
 import com.training.project.service.DoctorService;
 import com.training.project.service.UserService;
 
-/**
- * Servlet to handle appointments display
- */
 @WebServlet("/Doctor/Appointment")
 public class AppointmentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -37,15 +34,6 @@ public class AppointmentServlet extends HttpServlet {
         userService = new UserService();
     }
        
-    /**
-     * Handles GET requests for displaying appointments
-     */
-	 // This is a partial code snippet showing what you should modify in your AppointmentServlet
-	 // Assuming doctorService.getAppointmentsForDoctor() returns List<String> as shown in your code
-	
-	 /**
-	  * Handles GET requests for displaying appointments
-	  */
 	 protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	     System.out.println("===== AppointmentServlet doGet method called =====");
 	     

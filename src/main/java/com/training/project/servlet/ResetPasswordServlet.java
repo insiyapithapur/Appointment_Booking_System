@@ -14,32 +14,20 @@ import org.hibernate.SessionFactory;
 
 import com.training.project.service.UserService;
 
-/**
- * Servlet implementation class resetPassword
- */
 @WebServlet(name = "ResetPasswordServlet",urlPatterns= {"/UpdatePassword"})
 public class ResetPasswordServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+
     public ResetPasswordServlet() {
         super();
         System.out.println("reset password servlet");
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Please Enter Email");
 	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
 		try{

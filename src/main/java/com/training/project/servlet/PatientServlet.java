@@ -18,9 +18,6 @@ import javax.servlet.http.HttpSession;
 import com.training.project.service.DoctorService;
 import com.training.project.service.UserService;
 
-/**
- * Servlet to handle patient list and appointment display
- */
 @WebServlet("/Doctor/Patient")
 public class PatientServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -34,19 +31,11 @@ public class PatientServlet extends HttpServlet {
         doctorService = new DoctorService();
         userService = new UserService();
     }
-       
-    /**
-     * Handles GET requests for displaying patient list and appointments
-     */
+   
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         System.out.println("patient servlet doGet");
-        // Check if user is logged in
-        // if (session == null || session.getAttribute("userId") == null) {
-        //     response.sendRedirect("login.jsp");
-        //     return;
-        // }
-        
+
         Integer doctorId = (Integer) session.getAttribute("roleSpecificId");
         String doctorName = "Dr. "+(String) session.getAttribute("username");
         
@@ -56,18 +45,9 @@ public class PatientServlet extends HttpServlet {
             // Get patient data
             List<String> patientInfoList = doctorService.getAllPatients(doctorId);
             List<Object[]> patients = convertToDisplayFormat(patientInfoList);
-            
-            /*// Get appointment data
-            List<String> appointmentInfoList = doctorService.getAppointmentsForDoctor(doctorId);
-            List<Object[]> appointments = convertAppointmentsToDisplayFormat(appointmentInfoList);
-            
-            // Create a map of patient appointments for easy lookup
-            Map<String, List<Object[]>> patientAppointments = mapPatientAppointments(appointments);*/
-            
+ 
             // Set attributes for the JSP
             request.setAttribute("patients", patients);
-            /*request.setAttribute("appointments", appointments);
-            request.setAttribute("patientAppointments", patientAppointments);*/
             
         } catch (Exception e) {
             e.printStackTrace();

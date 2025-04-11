@@ -103,66 +103,6 @@ public class DoctorService {
 	        System.out.println("patient details "+patientDetails);
 	        return patientDetails;
 	    }
-	
-	/*
-	 * Get All Appointments for a user, regardless of whether they are a doctor or patient
-	 * integrate medical records are left
-	 */
-	/*public List<Appointment> getAppointmentsForUser(int userId) {
-	    Session session = sessionFactory.openSession();
-	    userDao = new UserDaoImp(session);
-	    doctorDao = new DoctorDaoImp(session);
-	    patientDao = new PatientDaoImp(session);
-	    scheduleDao = new ScheduleDaoImp(session);
-	    appointmentDao = new AppointmentDaoImp(session);
-	    
-	    try {
-	        // Step 1: Validate if the user exists
-	        User user = userDao.findById(userId);
-	        if (user == null) {
-	            throw new IllegalArgumentException("User does not exist");
-	        }
-	        
-	        String roleName = user.getRole().getRoleName();
-	        
-	        // Check role and get appointments accordingly
-	        if (roleName.equalsIgnoreCase("Doctor")) {
-	            // Get doctor's appointments
-	            Doctor doctor = doctorDao.findByUserId(userId);
-	            if (doctor == null) {
-	                throw new IllegalArgumentException("Doctor not found for the userId: " + userId);
-	            }
-	            
-	            // Fetch schedules for the doctor
-	            List<Schedule> schedules = scheduleDao.findByDoctorId(doctor.getDoctorId());
-	            
-	            if (schedules.isEmpty()) {
-	                return new ArrayList<>(); // Return empty list instead of throwing exception
-	            }
-	            
-	            // Fetch appointments for the schedules
-	            return appointmentDao.findByScheduleIds(
-	                schedules.stream().map(Schedule::getScheduleId).toList()
-	            );
-	        } 
-	        else if (roleName.equalsIgnoreCase("Patient")) {
-	            // Get patient's appointments
-	            Patient patient = patientDao.findByUserId(userId);
-	            if (patient == null) {
-	                throw new IllegalArgumentException("Patient not found for the userId: " + userId);
-	            }
-	            
-	            // Fetch appointments for the patient
-	            return appointmentDao.findByPatientId(patient.getPatientId());
-	        }
-	        else {
-	            throw new IllegalArgumentException("User role " + roleName + " is not supported for appointment retrieval");
-	        }
-	    } finally {
-	        session.close();
-	    }
-	}*/
-	 
 	 
 	 /*
 	  * Get All Appointments for doctor

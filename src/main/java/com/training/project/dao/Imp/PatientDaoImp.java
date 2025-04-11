@@ -1,5 +1,6 @@
 package com.training.project.dao.Imp;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -73,7 +74,6 @@ public class PatientDaoImp implements GenericDao<Patient, Integer> {
 
 	@Override
 	public boolean exists(Integer id) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	public Patient findByUserId(Integer userId) {
@@ -135,14 +135,7 @@ public class PatientDaoImp implements GenericDao<Patient, Integer> {
         }
         return patientDetails;
     }
-    
-    
-    
-    
-    //patient by id 
-    
-    
-    
+
     public Object[] getPatientById(int patientId) {
         Transaction transaction = null;
         Object[] patientDetails = null;
@@ -169,5 +162,49 @@ public class PatientDaoImp implements GenericDao<Patient, Integer> {
             e.printStackTrace();
         }
         return patientDetails;
+    }
+    
+    /**
+     * Get the count of active appointments for a specific schedule and date
+     * 
+     * @param scheduleId The schedule ID
+     * @param appointmentDate The appointment date
+     * @return The number of non-cancelled appointments
+     */
+    public int getActiveAppointmentCount(int scheduleId, LocalDate appointmentDate) {
+        int count = 0;
+        
+        try {
+            // Get the status ID for "Cancelled" appointments
+            Integer cancelledStatusId = 3;
+            System.out.println("scheduleId "+scheduleId);
+            System.out.println("appointmentDate "+appointmentDate);
+            
+            String countQuery;
+            System.out.println("in if");
+			// Exclude appointments with cancelled status
+			countQuery = "SELECT COUNT(*) FROM appointments a " +
+			            "WHERE a.schedule_id = :scheduleId " +
+			            "AND TRUNC(a.appointment_date) = :appointmentDate " +
+			            "AND (a.status_id != :cancelledStatusId)";
+            
+            Query query = session.createNativeQuery(countQuery)
+                    .setParameter("scheduleId", scheduleId)
+                    .setParameter("appointmentDate", java.sql.Date.valueOf(appointmentDate));
+            
+            if (cancelledStatusId != null) {
+                query.setParameter("cancelledStatusId", cancelledStatusId);
+            }
+            
+            Number result = (Number) query.uniqueResult();
+            System.out.println("result "+result);
+            count = (result != null) ? result.intValue() : 0;
+            
+        } catch (Exception e) {
+            System.out.println("Error counting active appointments: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return count;
     }
 }

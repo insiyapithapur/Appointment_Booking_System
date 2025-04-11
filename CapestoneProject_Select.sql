@@ -3,7 +3,6 @@ SELECT * FROM  USERS;
 SELECT * FROM user_details;
 SELECT * FROM  DOCTORS;
 SELECT * FROM SCHEDULES;
-
 SELECT * FROM  PATIENTS;
 SELECT * FROM appointments_status;
 SELECT * FROM  APPOINTMENTS; 
@@ -54,3 +53,15 @@ drop table SCHEDULES;
 drop table APPOINTMENTS; 
 drop table MEDICAL_RECORDS;
 drop table appointments_status;
+
+TRUNCATE  table USERS;
+TRUNCATE  table user_details;
+TRUNCATE  table DOCTORS;
+TRUNCATE  table PATIENTS;
+TRUNCATE  table SCHEDULES;
+TRUNCATE  table APPOINTMENTS; 
+TRUNCATE  table MEDICAL_RECORDS;
+desc user_details;
+DESC USERS;
+DELETE FROM user_details WHERE USERDETAIL_ID = 102;
+DELETE FROM USERS WHERE USER_ID = 103;

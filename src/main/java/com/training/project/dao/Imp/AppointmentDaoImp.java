@@ -125,43 +125,6 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
         return appointments;
     }
 	
-	/*public List<Appointment> findUpcomingAppointmentsForUser(int dooctorId, LocalDate fromDate) {
-	    try {
-	        // Fetch role of the user
-	        String roleQuery = "SELECT u.role.roleName FROM User u WHERE u.userId = :userId";
-	        Query<String> queryRole = session.createQuery(roleQuery, String.class);
-	        queryRole.setParameter("userId", userId);
-	        String roleName = queryRole.uniqueResult();
-
-	        if (roleName == null) {
-	            throw new IllegalArgumentException("User not found with userId: " + userId);
-	        }
-
-	        String hql;
-	        if (roleName.equalsIgnoreCase("Patient")) {
-	            // Query for patient: Fetch all upcoming appointments
-	            hql = "FROM Appointment a WHERE a.patient.user.userId = :userId "
-	                + "AND a.appointmentDate >= :fromDate ORDER BY a.appointmentDate ASC";
-	        } else if (roleName.equalsIgnoreCase("Doctor")) {
-	            // Query for doctor: Fetch appointments only for the specific date
-	            hql = "SELECT a FROM Appointment a JOIN a.schedule s "
-	                + "WHERE s.doctor.user.userId = :userId "
-	                + "AND a.appointmentDate >= :fromDate ORDER BY a.appointmentDate ASC";
-	        } else {
-	            throw new IllegalArgumentException("User role " + roleName + " is not supported for appointment retrieval");
-	        }
-
-	        Query<Appointment> query = session.createQuery(hql, Appointment.class);
-	        query.setParameter("userId", userId);
-	        query.setParameter("fromDate", fromDate);
-
-	        return query.list();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return List.of();
-	    }
-	}*/
-	
 	public List<String> findUpcomingAppointmentsForUser(int doctorId, LocalDate fromDate) {
 	    List<String> appointmentDetails = new ArrayList<>();
 	    try {

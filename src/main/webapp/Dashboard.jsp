@@ -148,6 +148,28 @@
             margin-bottom: 30px;
         }
         
+        /* Add these styles for alert transitions */
+		.alert {
+		    transition: opacity 0.15s linear;
+		}
+		
+		.alert.fade {
+		    opacity: 0;
+		}
+		
+		.alert.fade.show {
+		    opacity: 1;
+		}
+		
+		/* Position alerts in a fixed position at the top */
+		.alert-container {
+		    position: fixed;
+		    top: 20px;
+		    right: 20px;
+		    z-index: 2000;
+		    max-width: 350px;
+		}
+
         .appointments-header {
             background-color: var(--primary-color);
             color: white;
@@ -362,17 +384,24 @@
         <h2>Dashboard</h2>
         <p class="text-muted" id="current-datetime"></p>
         
-        <!-- Display any error or success messages -->
-        <c:if test="${not empty errorMessage}">
-            <div class="alert alert-danger" role="alert">
-                ${errorMessage}
-            </div>
-        </c:if>
-        <c:if test="${not empty successMessage}">
-            <div class="alert alert-success" role="alert">
-                ${successMessage}
-            </div>
-        </c:if>
+        <!-- Replace your existing alert code with this -->
+		<!-- Alert Container -->
+		<div class="alert-container">
+		    <c:if test="${not empty errorMessage}">
+		        <div class="alert alert-danger" role="alert">
+		            <i class="fas fa-exclamation-circle me-2"></i>
+		            ${errorMessage}
+		            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+		        </div>
+		    </c:if>
+		    <c:if test="${not empty successMessage}">
+		        <div class="alert alert-success" role="alert">
+		            <i class="fas fa-check-circle me-2"></i>
+		            ${successMessage}
+		            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+		        </div>
+		    </c:if>
+		</div>
         
         <!-- Appointments Table -->
         <div class="appointments-container">
@@ -493,6 +522,34 @@
                 document.getElementById("sidebar").classList.remove("active");
                 document.getElementById("sidebar-overlay").classList.remove("active");
             }
+        });
+        
+     // Add this to your document ready function
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide success and error messages after 5 seconds
+            const alerts = document.querySelectorAll('.alert-success, .alert-danger');
+            
+            alerts.forEach(function(alert) {
+                // Add fade class for smooth transition
+                alert.classList.add('fade', 'show');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(function() {
+                    // Start fade out
+                    alert.classList.remove('show');
+                    
+                    // Remove from DOM after animation completes
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 150); // Matches Bootstrap's transition time
+                }, 5000);
+            });
+            
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         });
     </script>
 </body>

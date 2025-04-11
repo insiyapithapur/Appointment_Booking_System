@@ -275,7 +275,7 @@
         </form>
 
         <div class="redirects">
-          <a href="${pageContext.request.contextPath}/login.jsp">Already have an account? Login here</a>
+          <a href="${pageContext.request.contextPath}/Login.jsp">Already have an account? Login here</a>
         </div>
       </div>
     </div>

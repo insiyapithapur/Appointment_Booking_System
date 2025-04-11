@@ -119,7 +119,7 @@ public class AdminAddDoctorServlet extends HttpServlet {
             session.save(doctorUser);
             
             // Create and save user detail
-            UserDetail userDetail =new UserDetail(firstName, lastName, dateOfBirth, gender, licenseNumber, email, doctorUser);
+            UserDetail userDetail =new UserDetail(firstName, lastName, dateOfBirth, gender, phone, email, doctorUser);
             //UserDetail userDetail = new UserDetail(fullName, address, dateOfBirth, gender, phone, email, doctorUser);
             session.save(userDetail);
             
@@ -143,13 +143,13 @@ public class AdminAddDoctorServlet extends HttpServlet {
                         
                         // Parse max tokens
                         Integer tokens = Integer.parseInt(maxTokens[i]);
-                        
+                        System.out.println("tokens "+i+" "+tokens);
                         // Parse availability
                         Boolean available = Boolean.parseBoolean(isAvailable[i]);
                         
                         System.out.println("GUDYGDUYAGVD");
                         // Create and save schedule
-                        Schedule schedule = new Schedule(dayOfWeek, startDateTime, endDateTime, tokens, available, doctor);
+                        Schedule schedule = new Schedule((dayOfWeek), startDateTime, endDateTime, tokens, available, doctor);
                         session.save(schedule);
                     }
                 }

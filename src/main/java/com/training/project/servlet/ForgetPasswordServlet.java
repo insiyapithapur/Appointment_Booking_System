@@ -9,35 +9,21 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.training.project.service.UserService;
 
-/**
- * Servlet implementation class ResetPasswordServlet
- */
 @WebServlet(name = "ForgetPasswordServlet", urlPatterns = { "/Forget" })
 public class ForgetPasswordServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
+
 	public ForgetPasswordServlet() {
 		super();
 		System.out.println("forget password");
 	}
 	
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Redirect to the forget password page instead of showing error message
 		response.sendRedirect(request.getContextPath() + "/ForgetPassword.jsp");
 	}
 	
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {

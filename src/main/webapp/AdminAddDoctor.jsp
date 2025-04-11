@@ -356,68 +356,68 @@ body {
 				<!-- Add schedule  -->
 				
 				<!-- Schedule Information -->
-<div class="form-card">
-    <div class="form-section-title">Schedule Information</div>
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="d-flex justify-content-between">
-                <h6>Weekly Schedule</h6>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="addScheduleBtn">
-                    <i class="bi bi-plus-circle"></i> Add Schedule
-                </button>
-            </div>
-            <hr>
-        </div>
-    </div>
-    
-    <div id="scheduleContainer">
-        <div class="schedule-item card p-3 mb-3">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="dayOfWeek0" class="form-label required">Day of Week</label>
-                    <select class="form-select" id="dayOfWeek0" name="dayOfWeek[]" required>
-                        <option value="">Select Day</option>
-                        <option value="1">Monday</option>
-                        <option value="2">Tuesday</option>
-                        <option value="3">Wednesday</option>
-                        <option value="4">Thursday</option>
-                        <option value="5">Friday</option>
-                        <option value="6">Saturday</option>
-                        <option value="7">Sunday</option>
-                    </select>
-                    <div class="invalid-feedback">Please select a day</div>
-                </div>
-                <div class="col-md-4">
-                    <label for="startTime0" class="form-label required">Start Time</label>
-                    <input type="time" class="form-control" id="startTime0" name="startTime[]" required>
-                    <div class="invalid-feedback">Please select start time</div>
-                </div>
-                <div class="col-md-4">
-                    <label for="endTime0" class="form-label required">End Time</label>
-                    <input type="time" class="form-control" id="endTime0" name="endTime[]" required>
-                    <div class="invalid-feedback">Please select end time</div>
-                </div>
-                <div class="col-md-6">
-                    <label for="maxTokens0" class="form-label required">Max Tokens</label>
-                    <input type="number" class="form-control" id="maxTokens0" name="maxTokens[]" min="1" required>
-                    <div class="invalid-feedback">Please enter max tokens</div>
-                </div>
-                <div class="col-md-6">
-                    <label for="isAvailable0" class="form-label">Availability</label>
-                    <select class="form-select" id="isAvailable0" name="isAvailable[]">
-                        <option value="true" selected>Available</option>
-                        <option value="false">Not Available</option>
-                    </select>
-                </div>
-                <div class="col-12">
-                    <button type="button" class="btn btn-sm btn-outline-danger remove-schedule" style="display: none;">
-                        <i class="bi bi-trash"></i> Remove
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="form-card">
+				    <div class="form-section-title">Schedule Information</div>
+				    <div class="row mb-3">
+				        <div class="col-12">
+				            <div class="d-flex justify-content-between">
+				                <h6>Weekly Schedule</h6>
+				                <button type="button" class="btn btn-sm btn-outline-primary" id="addScheduleBtn">
+				                    <i class="bi bi-plus-circle"></i> Add Schedule
+				                </button>
+				            </div>
+				            <hr>
+				        </div>
+				    </div>
+				    
+				    <div id="scheduleContainer">
+				        <div class="schedule-item card p-3 mb-3">
+				            <div class="row g-3">
+				                <div class="col-md-4">
+				                    <label for="dayOfWeek0" class="form-label required">Day of Week</label>
+				                    <select class="form-select" id="dayOfWeek0" name="dayOfWeek[]" required>
+				                        <option value="">Select Day</option>
+				                        <option value="1">Monday</option>
+				                        <option value="2">Tuesday</option>
+				                        <option value="3">Wednesday</option>
+				                        <option value="4">Thursday</option>
+				                        <option value="5">Friday</option>
+				                        <option value="6">Saturday</option>
+				                        <option value="0">Sunday</option>
+				                    </select>
+				                    <div class="invalid-feedback">Please select a day</div>
+				                </div>
+				                <div class="col-md-4">
+				                    <label for="startTime0" class="form-label required">Start Time</label>
+				                    <input type="time" class="form-control" id="startTime0" name="startTime[]" required>
+				                    <div class="invalid-feedback">Please select start time</div>
+				                </div>
+				                <div class="col-md-4">
+				                    <label for="endTime0" class="form-label required">End Time</label>
+				                    <input type="time" class="form-control" id="endTime0" name="endTime[]" required>
+				                    <div class="invalid-feedback">Please select end time</div>
+				                </div>
+				                <div class="col-md-6">
+				                    <label for="maxTokens0" class="form-label required">Max Tokens</label>
+				                    <input type="number" class="form-control" id="maxTokens0" name="maxTokens[]" min="1" required>
+				                    <div class="invalid-feedback">Please enter max tokens</div>
+				                </div>
+				                <div class="col-md-6">
+				                    <label for="isAvailable0" class="form-label">Availability</label>
+				                    <select class="form-select" id="isAvailable0" name="isAvailable[]">
+				                        <option value="true" selected>Available</option>
+				                        <option value="false">Not Available</option>
+				                    </select>
+				                </div>
+				                <div class="col-12">
+				                    <button type="button" class="btn btn-sm btn-outline-danger remove-schedule" style="display: none;">
+				                        <i class="bi bi-trash"></i> Remove
+				                    </button>
+				                </div>
+				            </div>
+				        </div>
+				    </div>
+				</div>
 
 
 				<!-- Form Actions -->

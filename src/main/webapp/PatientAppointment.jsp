@@ -106,6 +106,33 @@
             align-items: center;
         }
         
+		.alert {
+		    transition: opacity 0.15s linear;
+		}
+		
+		.alert.fade {
+		    opacity: 0;
+		}
+		
+		.alert.fade.show {
+		    opacity: 1;
+		}
+		
+		/* Position alerts in a fixed position at the top */
+		.alert-container {
+		    position: fixed;
+		    top: 20px;
+		    right: 20px;
+		    z-index: 2000;
+		    max-width: 350px;
+		}
+		
+        .filter-container {
+            background-color: #f9f9f9;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
         .appointments-table {
             width: 100%;
         }
@@ -259,6 +286,17 @@
             opacity: 1;
         }
         
+        /* Filter styles */
+        .filter-item {
+            margin-bottom: 8px;
+        }
+        
+        .filter-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+        
         /* Responsive styles */
         @media (max-width: 1250px) {
             .appointments-table {
@@ -294,6 +332,14 @@
             .content {
                 margin-left: 0;
             }
+            
+            .filter-container .row {
+                flex-direction: column;
+            }
+            
+            .filter-container .col-md-4 {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -319,64 +365,120 @@
         <p class="text-muted">View and manage your medical appointments</p>
         
         <!-- Display any error or success messages -->
-        <c:if test="${not empty errorMessage}">
-            <div class="alert alert-danger" role="alert">
-                ${errorMessage}
-            </div>
-        </c:if>
-        <c:if test="${not empty successMessage}">
-            <div class="alert alert-success" role="alert">
-                ${successMessage}
-            </div>
-        </c:if>
-        
-       
+        <!-- Replace your existing alert code with this -->
+		<!-- Alert Container -->
+		<div class="alert-container">
+		    <c:if test="${not empty errorMessage}">
+		        <div class="alert alert-danger" role="alert">
+		            <i class="fas fa-exclamation-circle me-2"></i>
+		            ${errorMessage}
+		            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+		        </div>
+		    </c:if>
+		    <c:if test="${not empty successMessage}">
+		        <div class="alert alert-success" role="alert">
+		            <i class="fas fa-check-circle me-2"></i>
+		            ${successMessage}
+		            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+		        </div>
+		    </c:if>
+		</div>
         
         <!-- Appointments Table -->
         <div class="appointments-container">
             <div class="appointments-header">
                 <div>Appointment History</div>
-                <div class="search-box">
-                    <input type="text" id="appointmentSearch" class="form-control" placeholder="Search appointments..." onkeyup="searchAppointments()">
-                </div>
             </div>
+            
+            <!-- Filter Controls -->
+			<div class="filter-container">
+			    <div class="row align-items-end">
+			        <!-- Text filter for doctor name or reason -->
+			        <div class="col-md-3">
+			            <div class="filter-item">
+			                <div class="filter-label">
+			                    <i class="fas fa-search me-1"></i> Search
+			                </div>
+			                <input type="text" id="textFilter" class="form-control" 
+			                       placeholder="Doctor name or reason..." 
+			                       onkeyup="applyFilters()">
+			            </div>
+			        </div>
+			        
+			        <!-- Date filter -->
+			        <div class="col-md-3">
+					    <div class="filter-item">
+					        <div class="filter-label">
+					            <i class="far fa-calendar-alt me-1"></i> Date
+					        </div>
+					        <input type="date" id="dateFilter" class="form-control" 
+					               onchange="applyFilters()">
+					    </div>
+					</div>
+			        
+			        <!-- Status filter dropdown -->
+			        <div class="col-md-3">
+			            <div class="filter-item">
+			                <div class="filter-label">
+			                    <i class="fas fa-tasks me-1"></i> Status
+			                </div>
+			                <select id="statusFilter" class="form-select" onchange="applyFilters()">
+			                    <option value="all">All</option>
+			                    <option value="Pending">Pending</option>
+			                    <option value="Completed">Completed</option>
+			                    <option value="Cancelled">Cancelled</option>
+			                </select>
+			            </div>
+			        </div>
+			        
+			        <!-- Reset Filters Button -->
+			        <div class="col-md-3">
+			            <div class="filter-item">
+			                <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+			                    <i class="fas fa-redo-alt me-1"></i> Reset Filters
+			                </button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+            
             <table class="appointments-table" id="appointmentsTable">
-                <!-- In the thead section, remove the ID column -->
-				<thead>
-				    <tr>
-				        <!-- Remove this line: <th>ID</th> -->
-				        <th>Doctor</th>
-				        <th>Date</th>
-				        <th>Token</th>
-				        <th>Reason</th>
-				        <th>Status</th>
-				        <th>Action</th>
-				    </tr>
-				</thead>
-				<tbody>
-				    <c:forEach items="${appointments}" var="appointmentInfo" varStatus="status">
-				        <!-- Keep parsing the appointmentId but don't display it -->
-				        <c:set var="appointmentParts" value="${fn:split(appointmentInfo, '|')}" />
-				        <c:set var="appointmentId" value="${fn:trim(fn:substringAfter(appointmentParts[0], 'ID:'))}" />
-				        <c:set var="doctorName" value="${fn:trim(fn:substringAfter(appointmentParts[1], 'Doctor:'))}" />
-				        <c:set var="appointmentDate" value="${fn:trim(fn:substringAfter(appointmentParts[2], 'Date:'))}" />
-				        <c:set var="tokenNo" value="${fn:trim(fn:substringAfter(appointmentParts[3], 'Token:'))}" />
-				        <c:set var="reason" value="${fn:trim(fn:substringAfter(appointmentParts[4], 'Reason:'))}" />
-				        <c:set var="status" value="${fn:trim(fn:substringAfter(appointmentParts[5], 'Status:'))}" />
-				        
-				        <!-- Set a predefined color based on appointmentId -->
-				        <c:set var="avatarColor" value="hsl(${(appointmentId * 40) % 360}, 70%, 60%)" />
-				        
-				        <tr>
-				            <!-- Remove this line: <td>${appointmentId}</td> -->
-				            <td>
-				                <div class="doctor-info">
-				                    <div class="doctor-avatar" style="background-color: ${avatarColor}">
-				                        ${fn:substring(doctorName, 4, 5)}
-				                    </div>
-				                    ${doctorName}
-				                </div>
-				            </td>
+                <thead>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Token</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach items="${appointments}" var="appointmentInfo" varStatus="status">
+                        <c:set var="appointmentParts" value="${fn:split(appointmentInfo, '|')}" />
+                        <c:set var="appointmentId" value="${fn:trim(fn:substringAfter(appointmentParts[0], 'ID:'))}" />
+                        <c:set var="doctorName" value="${fn:trim(fn:substringAfter(appointmentParts[1], 'Doctor:'))}" />
+                        <c:set var="appointmentDate" value="${fn:trim(fn:substringAfter(appointmentParts[2], 'Date:'))}" />
+                        <c:set var="tokenNo" value="${fn:trim(fn:substringAfter(appointmentParts[3], 'Token:'))}" />
+                        <c:set var="reason" value="${fn:trim(fn:substringAfter(appointmentParts[4], 'Reason:'))}" />
+                        <c:set var="status" value="${fn:trim(fn:substringAfter(appointmentParts[5], 'Status:'))}" />
+                        
+                        <!-- Set a predefined color based on appointmentId -->
+                        <c:set var="avatarColor" value="hsl(${(appointmentId * 40) % 360}, 70%, 60%)" />
+                        
+                        <tr class="appointment-row" 
+                            data-doctor="${doctorName}" 
+                            data-date="${appointmentDate}" 
+                            data-status="${status}" 
+                            data-reason="${reason}">
+                            <td>
+                                <div class="doctor-info">
+                                    <div class="doctor-avatar" style="background-color: ${avatarColor}">
+                                        ${fn:substring(doctorName, 4, 5)}
+                                    </div>
+                                    ${doctorName}
+                                </div>
+                            </td>
                             <td>${appointmentDate}</td>
                             <td>${tokenNo}</td>
                             <td class="reason-cell">
@@ -417,46 +519,55 @@
                     </c:forEach>
                     
                     <c:if test="${empty appointments}">
-					    <tr>
-					        <td colspan="6" class="text-center py-4">
-					            <div class="alert alert-info mb-0">
-					                You don't have any appointments yet. 
-					            </div>
-					        </td>
-					    </tr>
-					</c:if>
+                        <tr id="no-appointments-row">
+                            <td colspan="6" class="text-center py-4">
+                                <div class="alert alert-info mb-0">
+                                    You don't have any appointments yet. 
+                                </div>
+                            </td>
+                        </tr>
+                    </c:if>
+                    
+                    <!-- No results row (hidden by default) -->
+                    <tr id="no-results-row" style="display: none;">
+                        <td colspan="6" class="text-center py-4">
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-filter me-2"></i>
+                                No appointments match your filters.
+                                <button class="btn btn-sm btn-link" onclick="resetFilters()">Reset filters</button>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
     
    <!-- Cancel Appointment Modal -->
-	<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-	    <div class="modal-dialog">
-	        <div class="modal-content">
-	            <div class="modal-header">
-	                <h5 class="modal-title" id="cancelModalLabel">Cancel Appointment</h5>
-	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	            </div>
-	            <div class="modal-body">
-	                <p>Are you sure you want to cancel this appointment?</p>
-	                <p class="text-danger">This action cannot be undone.</p>
-	            </div>
-	            <div class="modal-footer">
-	                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	                <form id="cancelForm" action="${pageContext.request.contextPath}/Patient/Appointments" method="post">
-	                    <input type="hidden" id="appointmentIdToCancel" name="appointmentId" value="">
-	                    <input type="hidden" name="action" value="cancelAppointment">
-	                    <input type="hidden" name="newStatusId" value="3">
-	                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
-	                </form>
-	            </div>
-	        </div>
-	    </div>
-	</div>
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Cancel Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this appointment?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form id="cancelForm" action="${pageContext.request.contextPath}/Patient/Appointments" method="post">
+                        <input type="hidden" id="appointmentIdToCancel" name="appointmentId" value="">
+                        <input type="hidden" name="action" value="cancelAppointment">
+                        <input type="hidden" name="newStatusId" value="3">
+                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-    
     <!-- Bootstrap & jQuery JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -480,28 +591,135 @@
             modal.show();
         }
         
-        function searchAppointments() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("appointmentSearch");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("appointmentsTable");
-            tr = table.getElementsByTagName("tr");
+        // Updated applyFilters function with corrected date formatting for DD-MM-YYYY
+		function applyFilters() {
+		    const textFilter = document.getElementById('textFilter').value.toUpperCase();
+		    const dateInput = document.getElementById('dateFilter').value; // This is in YYYY-MM-DD format
+		    const statusFilter = document.getElementById('statusFilter').value;
+		    
+		    // Log the filters for debugging
+		    console.log("Filters applied - Text:", textFilter, "Date:", dateInput, "Status:", statusFilter);
+		    
+		    let visibleRows = 0;
+		    const rows = document.getElementsByClassName('appointment-row');
+		    
+		    // If there's a date filter, create a Date object for comparison
+		    let selectedDate = null;
+		    if (dateInput) {
+		        selectedDate = new Date(dateInput);
+		        console.log("Selected date object:", selectedDate);
+		    }
+		    
+		    for (let i = 0; i < rows.length; i++) {
+		        const row = rows[i];
+		        
+		        // Check text filter (doctor name or reason)
+		        const doctorName = row.getAttribute('data-doctor').toUpperCase();
+		        const reason = row.getAttribute('data-reason').toUpperCase();
+		        const textMatch = !textFilter || 
+		                         doctorName.includes(textFilter) || 
+		                         reason.includes(textFilter);
+		        
+		        // For debugging: log the data of the first row
+		        if (i === 0) {
+		            console.log("First row data - Doctor:", doctorName, "Reason:", reason, "Match:", textMatch);
+		        }
+		        
+		        // Check date filter with multiple format support
+		        let dateMatch = true;
+		        if (selectedDate) {
+		            dateMatch = false; // Default to false if date filter is applied
+		            const rawAppointmentDate = row.getAttribute('data-date');
+		            
+		            // Log raw date for debugging
+		            if (i === 0) {
+		                console.log("Raw appointment date:", rawAppointmentDate);
+		            }
+		            
+		            // Try different date formats
+		            
+		            // 1. Try "Apr 21, 2025" format
+		            if (rawAppointmentDate.includes(",")) {
+		                try {
+		                    const appDate = new Date(rawAppointmentDate);
+		                    if (i === 0) console.log("Parsed as 'Apr 21, 2025':", appDate);
+		                    
+		                    // Compare year, month, and day
+		                    if (appDate.getFullYear() === selectedDate.getFullYear() &&
+		                        appDate.getMonth() === selectedDate.getMonth() &&
+		                        appDate.getDate() === selectedDate.getDate()) {
+		                        dateMatch = true;
+		                    }
+		                } catch (e) {
+		                    console.log("Error parsing date:", e);
+		                }
+		            }
+		            
+		            // 2. Try "DD-MM-YYYY" format
+		            if (!dateMatch && rawAppointmentDate.includes("-")) {
+		                try {
+		                    const parts = rawAppointmentDate.split("-");
+		                    if (parts.length === 3) {
+		                        // Assume DD-MM-YYYY format
+		                        const day = parseInt(parts[0], 10);
+		                        const month = parseInt(parts[1], 10) - 1; // JS months are 0-indexed
+		                        const year = parseInt(parts[2], 10);
+		                        
+		                        if (i === 0) console.log("Parsed as DD-MM-YYYY:", year, month, day);
+		                        
+		                        if (year === selectedDate.getFullYear() &&
+		                            month === selectedDate.getMonth() &&
+		                            day === selectedDate.getDate()) {
+		                            dateMatch = true;
+		                        }
+		                    }
+		                } catch (e) {
+		                    console.log("Error parsing DD-MM-YYYY:", e);
+		                }
+		            }
+		            
+		            // Debug the final date match result
+		            if (i === 0) {
+		                console.log("Date match result:", dateMatch);
+		            }
+		        }
+		        
+		        // Check status filter
+		        const status = row.getAttribute('data-status');
+		        const statusMatch = statusFilter === "all" || status === statusFilter;
+		        
+		        // Show/hide row based on all filters
+		        if (textMatch && dateMatch && statusMatch) {
+		            row.style.display = "";
+		            visibleRows++;
+		        } else {
+		            row.style.display = "none";
+		        }
+		    }
+		    
+		    // Show "no results" message if no visible rows
+		    const noResultsRow = document.getElementById('no-results-row');
+		    if (visibleRows === 0 && rows.length > 0) {
+		        noResultsRow.style.display = "";
+		    } else {
+		        noResultsRow.style.display = "none";
+		    }
+		    
+		    console.log("Filter applied - Visible rows:", visibleRows);
+		}
+     
+        function resetFilters() {
+            // Reset text filter
+            document.getElementById('textFilter').value = "";
             
-            for (i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
-                let visible = false;
-                // Search in Doctor name (column 1), Date (column 2), Reason (column 4), and Status (column 5)
-                for (let j of [1, 2, 4, 5]) {
-                    td = tr[i].getElementsByTagName("td")[j];
-                    if (td) {
-                        txtValue = td.textContent || td.innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            visible = true;
-                            break;
-                        }
-                    }
-                }
-                tr[i].style.display = visible ? "" : "none";
-            }
+            // Reset date filter
+            document.getElementById('dateFilter').value = "";
+            
+            // Reset status filter
+            document.getElementById('statusFilter').value = "all";
+            
+            // Apply the reset filters
+            applyFilters();
         }
         
         // Handle responsive behavior
@@ -510,6 +728,42 @@
                 document.getElementById("sidebar").classList.remove("active");
                 document.getElementById("sidebar-overlay").classList.remove("active");
             }
+        });
+        
+        // Initialize filters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide success and error messages after 5 seconds
+            const alerts = document.querySelectorAll('.alert-success, .alert-danger');
+            
+            alerts.forEach(function(alert) {
+                // Add fade class for smooth transition
+                alert.classList.add('fade', 'show');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(function() {
+                    // Start fade out
+                    alert.classList.remove('show');
+                    
+                    // Remove from DOM after animation completes
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 150); // Matches Bootstrap's transition time
+                }, 5000);
+            });
+            
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         });
     </script>
 </body>

@@ -1,14 +1,24 @@
 package com.training.project.service;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
+
 import org.hibernate.*;
 import org.hibernate.query.Query;
 import com.training.project.dao.Imp.*;
 import com.training.project.model.*;
 import com.training.project.util.HibernateUtil;
+
+import oracle.jdbc.OracleTypes;
 
 public class PatientService {
 	private SessionFactory sessionFactory;
@@ -229,37 +239,43 @@ public class PatientService {
 	 */
 	public boolean bookAppointment(int patientId, int scheduleId, LocalDate appointmentDate, String reason) {
 		Session session = sessionFactory.openSession();
+		patientDao = new PatientDaoImp(session);
 		Transaction tx = null;
 		System.out.println("patientId "+patientId+" scheduleId "+scheduleId+" appointmentDate "+appointmentDate+" reason"+reason);
-        try{
-            tx = session.beginTransaction();
-            
-            Patient patient = session.get(Patient.class, patientId);
-            Schedule schedule = session.get(Schedule.class, scheduleId);
-            AppointmentsStatus status = session.get(AppointmentsStatus.class, 1); // "Pending"
+		try{
+			tx = session.beginTransaction();
 
-            if (patient == null || schedule == null) {
-                return false;
-            }
+			Patient patient = session.get(Patient.class, patientId);
+			Schedule schedule = session.get(Schedule.class, scheduleId);
+			AppointmentsStatus status = session.get(AppointmentsStatus.class, 1); // "Pending"
+			
+			int activeAppointment = patientDao.getActiveAppointmentCount(scheduleId,appointmentDate);
+			System.out.println("activeAppointment "+activeAppointment);
+			
+			if (patient == null || schedule == null) {
+				return false;
+			}
 
-            Appointment appointment = new Appointment();
-            appointment.setPatient(patient);
-            appointment.setSchedule(schedule);
-            appointment.setAppointmentDate(appointmentDate);
-            appointment.setAptTime(LocalDateTime.now());
-            appointment.setTokenNo(1);
-            appointment.setReason(reason);
-            appointment.setStatus(status);
+			Appointment appointment = new Appointment();
+			appointment.setPatient(patient);
+			appointment.setSchedule(schedule);
+			appointment.setAppointmentDate(appointmentDate);
+			appointment.setAptTime(LocalDateTime.now());
+			appointment.setTokenNo(activeAppointment+1);
+			appointment.setReason(reason);
+			appointment.setStatus(status);
 
-            session.save(appointment);
-            tx.commit();
-            return true;
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            e.printStackTrace();
-            return false;
+			session.save(appointment);
+			tx.commit();
+			return true;
+		} catch (Exception e) {
+			if (tx != null) tx.rollback();
+			e.printStackTrace();
+			return false;
+		}finally {
+            session.close();
         }
-    }
+	}
 	
 	/*
 	 * Appointment Status pending --> cancel
@@ -323,7 +339,7 @@ public class PatientService {
 	            Boolean isActive = (Boolean) row[11];
 	            
 	            String doctorInfo = String.format(
-	            		"ID: %d | Dr. %s %s | %s | Exp: %.1f years | %s | Contact: %s | Email: %s | License: %s | isActive %s",
+	            		"ID: %d | Dr. %s %s | %s | %.1f years | %s | %s |  %s |  %s | %s",
 	                doctorId,
 	                firstName,
 	                lastName,
@@ -429,13 +445,13 @@ public class PatientService {
 	// Helper method to convert day number to name
 	private String getDayName(Integer dayOfWeek) {
 	    switch (dayOfWeek) {
-	        case 1: return "Sunday";
-	        case 2: return "Monday";
-	        case 3: return "Tuesday";
-	        case 4: return "Wednesday";
-	        case 5: return "Thursday";
-	        case 6: return "Friday";
-	        case 7: return "Saturday";
+	        case 0: return "Sunday";
+	        case 1: return "Monday";
+	        case 2: return "Tuesday";
+	        case 3: return "Wednesday";
+	        case 4: return "Thursday";
+	        case 5: return "Friday";
+	        case 6: return "Saturday";
 	        default: return "Unknown";
 	    }
 	}
@@ -456,5 +472,101 @@ public class PatientService {
 	private String formatTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
 	    return startTime.format(formatter) + " - " + endTime.format(formatter);
+	}
+	
+	public List<String> getAvailableSlots(int doctorId, LocalDate startDate, LocalDate endDate) {
+	    List<String> availabilityList = new ArrayList<>();
+	    Session session = sessionFactory.openSession();
+	    Connection connection = null;
+	    CallableStatement callableStatement = null;
+	    ResultSet resultSet = null;
+	    
+	    try {
+	        // Convert LocalDate to java.sql.Date
+	        java.sql.Date sqlStartDate = java.sql.Date.valueOf(startDate);
+	        java.sql.Date sqlEndDate = java.sql.Date.valueOf(endDate);
+	        
+	        System.out.println("sqlStartDate "+sqlStartDate);
+	        System.out.println("sqlEndDate "+sqlEndDate);
+	        
+	        // Get the JDBC connection
+	        connection = session.doReturningWork(c -> c);
+	        
+	        // Prepare the callable statement
+	        callableStatement = connection.prepareCall(
+	            "{ ? = call get_available_slots(?, ?, ?) }"
+	        );
+	        
+	        // Register the OUT parameter (REF CURSOR)
+	        callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
+	        
+	        // Set input parameters
+	        callableStatement.setInt(2, doctorId);
+	        callableStatement.setDate(3, sqlStartDate);
+	        callableStatement.setDate(4, sqlEndDate);
+	        
+	        // Execute the callable statement
+	        callableStatement.execute();
+	        
+	        // Get the result set
+	        resultSet = (ResultSet) callableStatement.getObject(1);
+	        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE, MMM dd, yyyy");
+	        
+	        // Process the results
+	        while (resultSet.next()) {
+	            java.sql.Date appointmentDate = resultSet.getDate("appointment_date");
+	            int scheduleId = resultSet.getInt("schedule_id");
+	            int totalSlots = resultSet.getInt("total_slots");
+	            int bookedSlots = resultSet.getInt("booked_slots");
+	            int availableSlots = resultSet.getInt("available_slots");
+	            
+	            LocalDate localDate = appointmentDate.toLocalDate();
+	            String formattedDate = localDate.format(dateFormatter);
+	            
+	            String slotInfo = String.format(
+	                "%s | Schedule: %d | Total: %d | Booked: %d | Available: %d",
+	                formattedDate,
+	                scheduleId,
+	                totalSlots,
+	                bookedSlots,
+	                availableSlots
+	            );
+	            
+	            availabilityList.add(slotInfo);
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Error getting available slots: " + e.getMessage());
+	        e.printStackTrace();
+	    } finally {
+	        // Close resources
+	        try {
+	            if (resultSet != null) resultSet.close();
+	            if (callableStatement != null) callableStatement.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        session.close();
+	    }
+	    
+	    return availabilityList;
+	}
+	
+	/**
+	 * Get the doctor ID for a given schedule ID
+	 * @param scheduleId The schedule ID
+	 * @return The doctor ID associated with this schedule
+	 */
+	public int getDoctorIdByScheduleId(int scheduleId) {
+	    Session session = sessionFactory.openSession();
+	    try {
+	        scheduleDao = new ScheduleDaoImp(session);
+	        Schedule schedule = scheduleDao.findById(scheduleId);
+	        if (schedule != null) {
+	            return schedule.getDoctor().getDoctorId();
+	        }
+	        throw new IllegalArgumentException("Schedule not found with ID: " + scheduleId);
+	    } finally {
+	        session.close();
+	    }
 	}
 }

@@ -10,11 +10,7 @@ import com.training.project.model.Role;
 import com.training.project.model.User;
 
 public class RoleDaoImp implements GenericDao<Role, Integer>{
-//	private SessionFactory sessionFactory;
-//    
-//    public RoleDaoImpl() {
-//        this.sessionFactory = HibernateUtil.getSessionFactory();
-//    }
+
 	private Session session;
 	
 	public RoleDaoImp() {

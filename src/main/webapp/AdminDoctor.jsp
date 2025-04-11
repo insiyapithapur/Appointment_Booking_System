@@ -9,6 +9,8 @@
     <title>Doctor List</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
             --sidebar-bg: #4f5e95;
@@ -82,68 +84,63 @@
             transform: translateX(5px);
         }
         
-        .doctor-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+        .doctor-table-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
             margin-bottom: 30px;
         }
         
-        .doctor-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-            height: 100%;
+        .doctor-table {
+            width: 100%;
+            margin-bottom: 0;
         }
         
-        .doctor-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .doctor-table th {
+            background-color: #f5f5f5;
+            color: #555;
+            font-weight: 600;
+            padding: 12px 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .doctor-table tbody tr {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .doctor-table tbody tr:hover {
+            background-color: rgba(79, 94, 149, 0.05);
+        }
+        
+        .doctor-table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
         }
         
         .doctor-avatar {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 18px;
-            margin-right: 15px;
-            flex-shrink: 0;
+            font-size: 16px;
+            margin-right: 10px;
         }
         
-        .doctor-info {
-            flex-grow: 1;
-        }
-        
-        .doctor-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-color);
-            margin-bottom: 5px;
-        }
-        
-        .doctor-details {
-            color: #777;
-            font-size: 14px;
-            margin-bottom: 3px;
-        }
-        
-        .doctor-specialization {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            text-align: center;
-            margin-top: 10px;
-            display: inline-block;
+        .specialization-badge {
             background-color: #81C784;
             color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
         }
         
         .toggle-sidebar {
@@ -176,13 +173,6 @@
             z-index: 999;
         }
         
-        /* Pagination styles */
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        
         /* Filter section styles */
         .filter-section {
             background-color: white;
@@ -190,24 +180,6 @@
             padding: 20px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
             margin-bottom: 25px;
-        }
-        
-        .filter-title {
-            font-size: 18px;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .filter-group {
-            margin-bottom: 15px;
-        }
-        
-        .filter-label {
-            font-weight: 500;
-            color: var(--text-color);
-            margin-bottom: 8px;
-            display: block;
         }
         
         .filter-badges {
@@ -248,22 +220,24 @@
             text-decoration: underline;
         }
         
-        /* Responsive styles */
-        @media (max-width: 1200px) {
-            .doctor-list {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
+        /* Alert styles for "No records found" */
+        .alert-no-results {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #6c757d;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%;
         }
         
+        /* Responsive styles */
         @media (max-width: 992px) {
             .sidebar {
                 width: 220px;
             }
             .content {
                 margin-left: 220px;
-            }
-            .doctor-list {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
         }
         
@@ -284,9 +258,6 @@
             .content {
                 margin-left: 0;
             }
-            .doctor-list {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
             .filter-row {
                 flex-direction: column;
             }
@@ -294,17 +265,25 @@
                 margin-bottom: 15px;
                 width: 100%;
             }
+            
+            .doctor-table-container {
+                overflow-x: auto;
+            }
+            
+            .doctor-table th, 
+            .doctor-table td {
+                white-space: nowrap;
+            }
         }
         
         @media (max-width: 576px) {
-            .doctor-list {
-                grid-template-columns: 1fr;
-            }
-            .doctor-card {
-                max-width: 100%;
-            }
             .content {
                 padding: 15px 10px;
+            }
+            
+            /* Hide less important columns on very small screens */
+            .hide-xs {
+                display: none;
             }
         }
     </style>
@@ -314,15 +293,15 @@
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-	<div class="avatar" >Admin</div>
+        <div class="avatar">Admin</div>
         <div class="doctor-name mb-4"></div>        
         <div class="nav-item" onclick="navigateTo('Admin/Dashboard')">Dashboard</div>
-		<div class="nav-item" onclick="navigateTo('Admin/Patients')">Patients</div>
-		<div class="nav-item " onclick="navigateTo('Admin/Doctors')">Doctors</div>
+        <div class="nav-item" onclick="navigateTo('Admin/Patients')">Patients</div>
+        <div class="nav-item active" onclick="navigateTo('Admin/Doctors')">Doctors</div>
         <div class="nav-item" onclick="navigateTo('Admin/Appointments')">Appointments</div>
         <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
-    Logout
-</div>
+            Logout
+        </div>
     </div>
 
     <div class="content">
@@ -331,93 +310,103 @@
         
         <div class="container-fluid px-0">
             <div class="d-flex justify-content-end align-items-center mb-4">
-			    <button class="btn btn-primary" onclick="navigateTo('AdminAddDoctor.jsp')">
-			        <i class="bi bi-plus-circle me-2"></i> Add New Doctor
-			    </button>
-			</div>
+                <button class="btn btn-primary" onclick="navigateTo('AdminAddDoctor.jsp')">
+                    <i class="fas fa-plus-circle me-2"></i> Add New Doctor
+                </button>
+            </div>
             
             <!-- Filter Section - Simplified to only include search and specialization -->
-            <div class="filter-section mb-2 pb-0">
-			    <div class="d-flex justify-content-between align-items-center">
-			        <!-- Search Filter -->
-			        <div class="me-2" style="width: 40%;">
-			            <input type="text" id="search-filter" class="form-control" placeholder="Search by name or license..." oninput="applyFilters()">
-			        </div>
-			        
-			        <!-- Specialization Filter -->
-			        <div class="me-2" style="width: 40%;">
-			            <select id="specialization-filter" class="form-select" onchange="applyFilters()">
-			                <option value="">All Specializations</option>
-			                <option value="Cardiology">Cardiology</option>
-			                <option value="Neurology">Neurology</option>
-			                <option value="Orthopedics">Orthopedics</option>
-			                <option value="Pediatrics">Pediatrics</option>
-			                <option value="Dermatology">Dermatology</option>
-			                <option value="Oncology">Oncology</option>
-			                <option value="Gynecology">Gynecology</option>
-			                <option value="Ophthalmology">Ophthalmology</option>
-			            </select>
-			        </div>
-			        
-			        <!-- Clear Filters Button -->
-			        <button class="clear-filters" onclick="clearAllFilters()">Clear All Filters</button>
-			    </div>
-			    
-			    <!-- Active Filters Display -->
-			    <div class="mt-3">
-			        <div class="filter-badges" id="active-filters">
-			            <!-- Active filters will be displayed here -->
-			        </div>
-			    </div>
-			</div>
-            
-            <!-- Results count -->
-            <div class="mb-3" id="results-count">
-                Showing all doctors
-            </div>
-            
-            <!-- Doctor List -->
-            <div class="doctor-list" id="doctor-list">
-                <%
-                    List<Object[]> doctors = (List<Object[]>) request.getAttribute("doctors");
-                    if (doctors != null && !doctors.isEmpty()) {
-                        for (Object[] row : doctors) {
-                            String[] specializations = {"Cardiology", "Neurology", "Orthopedics", "Pediatrics", "Dermatology"};
-                            String[] colors = {"#42A5F5", "#66BB6A", "#FFA726", "#EC407A", "#AB47BC"};
-                            int colorIndex = Math.abs(row[0].toString().hashCode()) % colors.length;
-                            String bgColor = colors[colorIndex];
-                            
-                            // Get initials from first and last name
-                            String initials = row[4].toString().charAt(0) + "" + row[5].toString().charAt(0);
-                %>
-                <div class="doctor-card" 
-                     data-name="<%= row[4] %> <%= row[5] %>" 
-                     data-license="<%= row[1] %>"
-                     data-specialization="<%= row[1] %>">
-                    <div class="d-flex align-items-center">
-                        <div class="doctor-avatar" style="background-color: <%= bgColor %>;"><%= initials.toUpperCase() %></div>
-                        <div class="doctor-info">
-                            <div class="doctor-name">Dr. <%= row[5] %> <%= row[6] %></div>
-                            <div class="doctor-details">Exp: <%= row[3] %> | <b>Licence:</b>  <%= row[2] %> years</div>
-                            <div class="doctor-details"><b>Specialization:</b> <%= row[1] %></div>
-                            <div class="doctor-details"><b>Username:</b> <%= row[7] %></div>
-                            <div class="doctor-details"><b>Gender:</b>  <%= row[9] %></div>
-                            <div class="doctor-details"><b>Email: </b> <%= row[8] %></div>
-                            <div class="doctor-details"><b>Contact: </b> <%= row[10] %></div>
-                        </div>
+            <div class="filter-section mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Search Filter -->
+                    <div class="me-2" style="width: 40%;">
+                        <input type="text" id="search-filter" class="form-control" placeholder="Search by name or license..." oninput="applyFilters()">
+                    </div>
+                    
+                    <!-- Specialization Filter -->
+                    <div class="me-2" style="width: 40%;">
+                        <select id="specialization-filter" class="form-select" onchange="applyFilters()">
+                            <option value="">All Specializations</option>
+                            <option value="Cardiology">Cardiology</option>
+                            <option value="Neurology">Neurology</option>
+                            <option value="Orthopedics">Orthopedics</option>
+                            <option value="Pediatrics">Pediatrics</option>
+                            <option value="Dermatology">Dermatology</option>
+                            <option value="Oncology">Oncology</option>
+                            <option value="Gynecology">Gynecology</option>
+                            <option value="Ophthalmology">Ophthalmology</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Clear Filters Button -->
+                    <button class="clear-filters" onclick="clearAllFilters()">Clear All Filters</button>
+                </div>
+                
+                <!-- Active Filters Display -->
+                <div class="mt-3">
+                    <div class="filter-badges" id="active-filters">
+                        <!-- Active filters will be displayed here -->
                     </div>
                 </div>
-                <%
-                        }
-                    } else {
-                %>
-                <div class="text-center text-danger w-100" id="no-results">No doctors found</div>
-                <%
-                    }
-                %>
             </div>
-
             
+            <!-- Doctor Table -->
+            <div class="doctor-table-container">
+                <table class="table doctor-table" id="doctor-table">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>License</th>
+                            <th>Specialization</th>
+                            <th class="hide-xs">Experience</th>
+                            <th class="hide-xs">Contact</th>
+                            <th class="hide-xs">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctor-table-body">
+                        <%
+                            List<Object[]> doctors = (List<Object[]>) request.getAttribute("doctors");
+                            if (doctors != null && !doctors.isEmpty()) {
+                                for (Object[] row : doctors) {
+                                    String[] colors = {"#42A5F5", "#66BB6A", "#FFA726", "#EC407A", "#AB47BC"};
+                                    int colorIndex = Math.abs(row[0].toString().hashCode()) % colors.length;
+                                    String bgColor = colors[colorIndex];
+                                    
+                                    // Get initials from first and last name
+                                    String initials = row[4].toString().charAt(0) + "" + row[5].toString().charAt(0);
+                        %>
+                        <tr class="doctor-row"
+                            data-name="<%= row[4] %> <%= row[5] %>" 
+                            data-license="<%= row[1] %>"
+                            data-specialization="<%= row[1] %>">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div>Dr. <%= row[5] %> <%= row[6] %></div>
+                                </div>
+                            </td>
+                            <td><%= row[2] %></td>
+                            <td><%= row[1] %></td>
+                            <td class="hide-xs"><%= row[3] %> years</td>
+                            <td class="hide-xs"><%= row[10] %></td>
+                            <td class="hide-xs"><%= row[8] %></td>
+                        </tr>
+                        <%
+                                }
+                            } else {
+                        %>
+                        <tr id="no-results-row">
+                            <td colspan="7" class="text-center py-4">
+                                <div class="alert-no-results">
+                                    <i class="fas fa-user-md-slash me-2"></i> No doctors found
+                                </div>
+                            </td>
+                        </tr>
+                        <%
+                            }
+                        %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     
@@ -456,7 +445,7 @@
         }
         
         function navigateTo(page) {
-        	const contextPath = '${pageContext.request.contextPath}';
+            const contextPath = '${pageContext.request.contextPath}';
             window.location.href = contextPath + '/' + page;
         }
         
@@ -464,6 +453,20 @@
             // In a real application, this would navigate to the doctor details page
             console.log("Viewing doctor: " + username);
             window.location.href = 'doctor-details.jsp?username=' + username;
+        }
+        
+        function editDoctor(username) {
+            // In a real application, this would navigate to the doctor edit page
+            console.log("Editing doctor: " + username);
+            window.location.href = 'edit-doctor.jsp?username=' + username;
+        }
+        
+        function deleteDoctor(username) {
+            // In a real application, this would show a confirmation dialog before deleting
+            if (confirm("Are you sure you want to delete this doctor?")) {
+                console.log("Deleting doctor: " + username);
+                // Delete logic would go here
+            }
         }
         
         // Handle responsive behavior
@@ -492,15 +495,15 @@
             // Display active filters
             updateActiveFiltersDisplay();
             
-            // Get all doctor cards
-            const doctorCards = document.querySelectorAll('.doctor-card');
+            // Get all doctor rows
+            const doctorRows = document.querySelectorAll('.doctor-row');
             let visibleCount = 0;
             
-            // Filter the cards
-            Array.from(doctorCards).forEach(card => {
-                const name = card.getAttribute('data-name').toLowerCase();
-                const license = card.getAttribute('data-license').toLowerCase();
-                const specialization = card.getAttribute('data-specialization');
+            // Filter the rows
+            Array.from(doctorRows).forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                const license = row.getAttribute('data-license').toLowerCase();
+                const specialization = row.getAttribute('data-specialization');
                 
                 // Apply search filter
                 const matchesSearch = searchValue === '' || 
@@ -515,28 +518,35 @@
                 const isVisible = matchesSearch && matchesSpecialization;
                 
                 if (isVisible) {
-                    card.style.display = '';
+                    row.style.display = '';
                     visibleCount++;
                 } else {
-                    card.style.display = 'none';
+                    row.style.display = 'none';
                 }
             });
             
             // Show or hide no results message
-            const noResults = document.getElementById('no-results');
-            if (noResults) {
-                if (visibleCount === 0) {
-                    noResults.style.display = '';
-                } else {
-                    noResults.style.display = 'none';
-                }
-            } else if (visibleCount === 0) {
-                const doctorList = document.getElementById('doctor-list');
-                const noResultsDiv = document.createElement('div');
-                noResultsDiv.className = 'text-center text-danger w-100';
-                noResultsDiv.id = 'no-results';
-                noResultsDiv.textContent = 'No doctors match your filters';
-                doctorList.appendChild(noResultsDiv);
+            const noResultsRow = document.getElementById('no-results-row');
+            const tbody = document.getElementById('doctor-table-body');
+            
+            // Remove dynamic no results row if it exists
+            const dynamicNoResults = document.getElementById('dynamic-no-results');
+            if (dynamicNoResults) {
+                dynamicNoResults.remove();
+            }
+            
+            // Add no results row if needed
+            if (visibleCount === 0 && doctorRows.length > 0) {
+                const newNoResultsRow = document.createElement('tr');
+                newNoResultsRow.id = 'dynamic-no-results';
+                newNoResultsRow.innerHTML = `
+                    <td colspan="7" class="text-center py-4">
+                        <div class="alert-no-results">
+                            <i class="fas fa-filter me-2"></i> No doctors match your filters
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(newNoResultsRow);
             }
             
             // Update results count
@@ -602,8 +612,8 @@
         // Initialize with default values
         document.addEventListener('DOMContentLoaded', function() {
             // Count initial doctors
-            const doctorCards = document.querySelectorAll('.doctor-card');
-            updateResultsCount(doctorCards.length);
+            const doctorRows = document.querySelectorAll('.doctor-row');
+            updateResultsCount(doctorRows.length);
         });
     </script>
 </body>

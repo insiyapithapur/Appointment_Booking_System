@@ -12,40 +12,23 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 
-
-/**
- * Servlet implementation class VerifyOtpServlet
- */
 @WebServlet(name = "VerifyOtpServlet",urlPatterns= {"/VerifyOtp"} )
 public class VerifyOtpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
     public VerifyOtpServlet() {
         super();
         System.out.println("otp verification");
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Invalid ");
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
       SessionFactory sessionFactory = (SessionFactory) this.getServletContext().getAttribute("sessionFactory");
-
-		
 		try {
-			
-			
 			
 			String otp = request.getParameter("password");
 			request.setAttribute("password", otp);

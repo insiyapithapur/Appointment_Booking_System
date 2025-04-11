@@ -146,7 +146,16 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
 
 	        Query<Object[]> query = session.createQuery(hql, Object[].class);
 	        doctorDetails = query.getResultList();
-
+	        
+	        for (int i = 0; i < doctorDetails.size(); i++) {
+	            Object[] row = doctorDetails.get(i);
+	            System.out.println("Doctor #" + i + " data:");
+	            for (int j = 0; j < row.length; j++) {
+	                System.out.println("  Index " + j + ": " + (row[j] == null ? "null" : row[j]));
+	            }
+	            System.out.println("-------------------");
+	        }
+	        
 	        transaction.commit();
 	    } catch (Exception e) {
 	        if (transaction != null) {
@@ -154,6 +163,7 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
 	        }
 	        e.printStackTrace();
 	    }
+	    System.out.println("doctorDetails"+doctorDetails);
 	    return doctorDetails;
 	}
 	

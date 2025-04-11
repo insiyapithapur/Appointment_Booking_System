@@ -1,21 +1,20 @@
 package com.training.project.servlet;
-
 import java.io.IOException;
 import java.util.List;
-
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import com.training.project.service.AdminService;
 import com.training.project.service.PatientService;
 
 @WebServlet("/Patient/Doctors")
 public class PatientDoctorServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private PatientService patientService;
     
     @Override
@@ -39,26 +38,51 @@ public class PatientDoctorServlet extends HttpServlet {
             return;
         }
         
-//        // Get search parameter if any
-//        String searchSpecialization = request.getParameter("specialization");
-        List<String> doctorList;
-//        
-//        if (searchSpecialization != null && !searchSpecialization.trim().isEmpty()) {
-//            // If search parameter exists, filter doctors by specialization
-//            doctorList = patientService.getDoctorsBySpecialization(searchSpecialization);
-//            request.setAttribute("searchTerm", searchSpecialization);
-//        } else {
-//            // Otherwise get all active doctors
-            doctorList = patientService.getDoctorDetails();
-            System.out.println("doctorList "+doctorList);
-//        }
+        // Get filter parameters
+        String specializationFilter = request.getParameter("specialization");
+        String doctorNameFilter = request.getParameter("doctorName");
         
-        // Set doctors as request attribute
-        request.setAttribute("doctors", doctorList);
+        // Get all doctors
+        List<String> allDoctors = patientService.getDoctorDetails();
         
-        // Get all specializations for the filter dropdown
-//        List<String> specializations = patientService.getAllSpecializations();
-//        request.setAttribute("specializations", specializations);
+        // Filter doctors by specialization and/or name
+        List<String> filteredDoctors = new ArrayList<>();
+        
+        // Extract all available specializations for the dropdown
+        Set<String> specializations = new HashSet<>();
+        
+        for (String doctorInfo : allDoctors) {
+            String[] doctorParts = doctorInfo.split("\\|");
+            if (doctorParts.length >= 3) {
+                String doctorName = doctorParts[1].trim();
+                String specialty = doctorParts[2].trim();
+                
+                // Add to specializations list for dropdown
+                specializations.add(specialty);
+                
+                // Check if doctor matches both filters (if provided)
+                boolean matchesSpecialty = specializationFilter == null || specializationFilter.isEmpty() || 
+                                          specialty.equalsIgnoreCase(specializationFilter);
+                
+                boolean matchesName = doctorNameFilter == null || doctorNameFilter.isEmpty() || 
+                                     doctorName.toLowerCase().contains(doctorNameFilter.toLowerCase());
+                
+                if (matchesSpecialty && matchesName) {
+                    filteredDoctors.add(doctorInfo);
+                    System.out.println("doctorInfo "+doctorInfo);
+                }
+            }
+        }
+        
+        // Set attributes for JSP
+        request.setAttribute("doctors", filteredDoctors);
+        request.setAttribute("specializations", specializations);
+        request.setAttribute("selectedSpecialization", specializationFilter);
+        request.setAttribute("doctorNameFilter", doctorNameFilter);
+        
+        System.out.println("Filtered doctors count: " + filteredDoctors.size());
+        System.out.println("Available specializations: " + specializations);
+        System.out.println("Doctor name filter: " + (doctorNameFilter != null ? doctorNameFilter : "None"));
         
         // Forward to the find doctor JSP
         request.getRequestDispatcher("/PatientDoctor.jsp").forward(request, response);

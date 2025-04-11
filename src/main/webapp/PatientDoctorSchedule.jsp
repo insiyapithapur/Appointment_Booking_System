@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f95e9;
-            --primary-color: #4f95e9;
+            --sidebar-bg: #4f5e95;
+            --primary-color: #4f5e95;
             --light-bg: #f7f9fc;
             --text-color: #333;
         }
@@ -143,6 +143,11 @@
             display: inline-block;
         }
         
+        .btn
+        {
+        	background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
         .toggle-sidebar {
             display: none;
             position: fixed;
@@ -254,7 +259,7 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Book Appointment</h2>
-            <button class="btn btn-outline-primary" onclick="navigateTo('Patient/Doctors')">
+            <button class="btn btn-primary" onclick="navigateTo('Patient/Doctors')">
                 <i class="fas fa-arrow-left me-2"></i> Back to Doctors
             </button>
         </div>
@@ -289,7 +294,6 @@
                         <c:set var="doctorId" value="${fn:trim(fn:substringAfter(scheduleParts[1], 'Doctor ID:'))}" />
                         <c:set var="day" value="${fn:trim(fn:substringAfter(scheduleParts[2], 'Day:'))}" />
                         <c:set var="time" value="${fn:trim(fn:substringAfter(scheduleParts[3], 'Time:'))}" />
-                        <c:set var="maxTokens" value="${fn:trim(fn:substringAfter(scheduleParts[4], 'Max Tokens:'))}" />
                         <c:set var="isAvailable" value="${fn:trim(fn:substringAfter(scheduleParts[5], 'Available:'))}" />
                         
                         <div class="col-md-6 col-lg-4">
@@ -299,22 +303,13 @@
                                     <span class="time-badge"><i class="far fa-clock me-1"></i> ${time}</span>
                                 </div>
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div>
-                                            <small class="text-muted">Max patients: ${maxTokens}</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge ${isAvailable eq 'Yes' ? 'bg-success' : 'bg-secondary'}">
-                                                ${isAvailable eq 'Yes' ? 'Available' : 'Unavailable'}
-                                            </span>
-                                        </div>
-                                    </div>
+                                   
                                     <c:choose>
                                         <c:when test="${isAvailable eq 'Yes'}">
-                                            <a href="${pageContext.request.contextPath}/Patient/ConfirmAppointment?scheduleId=${scheduleId}" 
-                                               class="btn btn-primary w-100">
-                                                Select Slot
-                                            </a>
+                                            <a href="${pageContext.request.contextPath}/Patient/ConfirmAppointment?scheduleId=${scheduleId}&day=${day}" 
+										       class="btn btn-primary w-100">
+										        Select Slot
+										    </a>
                                         </c:when>
                                         <c:otherwise>
                                             <button class="btn btn-secondary w-100" disabled>

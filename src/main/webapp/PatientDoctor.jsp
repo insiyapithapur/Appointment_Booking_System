@@ -258,26 +258,6 @@
         <h2>Doctors</h2>
         <p class="text-muted">Find the right specialist for your healthcare needs</p>
         
-        <!-- Search & Filter -->
-        <div class="search-container">
-            <form action="${pageContext.request.contextPath}/Patient/Doctors" method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label for="specialization" class="form-label">Filter by Specialty</label>
-                    <select name="specialization" id="specialization" class="form-select">
-                        <option value="">All Specialties</option>
-                        <c:forEach items="${specializations}" var="specialty">
-                            <option value="${specialty}" ${param.specialization eq specialty ? 'selected' : ''}>${specialty}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
-                </div>
-            </form>
-        </div>
-        
         <!-- Doctors Table -->
         <div class="doctors-container">
             <div class="doctors-header">
@@ -336,7 +316,7 @@
                             <td>${contact}</td>
                             <td>
                                 <button class="btn btn-success" onclick="bookAppointment(${doctorId})">
-                                     Book Appointment
+                                     Take Appointment
                                 </button>
                             </td>
                         </tr>
