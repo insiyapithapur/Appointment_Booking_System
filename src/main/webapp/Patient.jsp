@@ -1,8 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.List" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,146 +11,429 @@
     <title>Patient List</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f5e95;
-            --primary-color: #4f5e95;
-            --light-bg: #f7f9fc;
-            --confirmed-color: #e8f5e9;
-            --pending-color: #e3f2fd;
-            --text-color: #333;
+            /* Sky blue theme colors */
+            --primary-color: #4dabf7;
+            --primary-light: #e7f5ff;
+            --primary-dark: #339af0;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --sidebar-bg: #f8fafc;
+            --text-primary: #2b3d4f;
+            --text-secondary: #6c757d;
+            --border-color: #dbe4ff;
+            
+            /* Status colors */
+            --confirmed-color: #219653;
+            --pending-color: #f2994a;
+            --cancelled-color: #eb5757;
+            --completed-color: #2f80ed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
-        }
-        
-        .sidebar {
-            background-color: var(--sidebar-bg);
-            color: white;
-            min-height: 100vh;
-            position: fixed;
-            width: 250px;
-            padding: 20px 0;
-            text-align: center;
-            transition: all 0.3s;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-        
-        .avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #96c8fb;
-            color: white;
-            font-size: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .avatar:hover {
-            transform: scale(1.05);
-        }
-        
-        .nav-item {
-            padding: 15px 24px;
-            margin: 5px 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
-            border-radius: 5px;
-        }
-        
-        .nav-item.active {
-            background-color: #81c784;
-            font-weight: bold;
-        }
-        
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
-        }
-        
-        .patient-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
             font-size: 14px;
-            margin-right: 10px;
         }
         
-        .patient-info {
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            width: 220px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 0 0 30px 0;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        /* Updated profile section - LinkedIn style */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 20px;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-background {
+            width: 100%;
+            height: 80px;
+            background-color: var(--primary-color);
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBvcGFjaXR5PSIwLjIiIGZpbGw9IiNmZmZmZmYiPgogICAgPHBhdGggZD0iTTI1LDUwIEE4LDggMCAwLDEgMzMsNTggTDMzLDY1IEE4LDggMCAwLDEgMjUsNzMgTC0xNSw3MyBBOCw4IDAgMCwxIC0yMyw2NSBMLTI1LDYwIEE1LDUgMCAwLDEgLTIwLDU1IEwtNSw1NSBBNSw1IDAgMCwxIDAsNjAgTDAsNjUgQTIsIDIgMCAwLDAgMiw2NyBMMTAsNjcgQTIsIDIgMCAwLDAgMTIsNjUgTDEyLDYwIEE4LDggMCAwLDEgMjAsNTIgTDI1LDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxMHMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTkwLDUwIEE4LDggMCAwLDEgOTgsNTggTDk4LDY1IEE4LDggMCAwLDEgOTAsNzMgTDUwLDczIEE4LDggMCAwLDEgNDIsNjUgTDQwLDYwIEE1LDUgMCAwLDEgNDUsNTUgTDYwLDU1IEE1LDUgMCAwLDEgNjUsNjAgTDY1LDY1IEEyLCAyIDAgMCwwIDY3LDY3IEw3NSw2NyBBMiwgMiAwIDAsIDAgNzcsNjUgTDc3LDYwIEE4LDggMCAwLDEgODUsNTIgTDkwLDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTE1NSw1MCBBOCw4IDAgMCwxIDE2Myw1OCBMMTY1LDY1IEE4LDggMCAwLDEgMTU3LDczIEwxMTUsNzMgQTgsOCAwIDAsIDEgMTA3LDY1IEwxMDUsNjAgQTUsNSAwIDAsIDEgMTEwLDU1IEwxMjUsNTUgQTUsNSAwIDAsIDEgMTMwLDYwIEwxMzAsNjUgQTIsIDIgMCAwLDAgMTMyLDY3IEwxNDAsNjcgQTIsIDIgMCAwLDAgMTQyLDY1IEwxNDIsNjAgQTgsOCAwIDAsIDEgMTUwLDUyIEwxNTUsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjIwcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgICA8cGF0aCBkPSJNMjIwLDUwIEE4LDggMCAwLDEgMjI4LDU4IEwyMzAsNjUgQTgsOCAwIDAsIDEgMjIyLDczIEwxODAsNzMgQTgsOCAwIDAsIDEgMTcyLDY1IEwxNzAsNjAgQTUsNSAwIDAsIDEgMTc1LDU1IEwxOTAsNTUgQTUsNSAwIDAsIDEgMTk1LDYwIEwxOTUsNjUgQTIsIDIgMCAwLDAgMTk3LDY3IEwyMDUsNjcgQTIsIDIgMCAwLDAgMjA3LDY1IEwyMDcsNjAgQTgsOCAwIDAsIDEgMjE1LDUyIEwyMjAsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjI1cyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgPC9nPgo8L3N2Zz4=');
+            background-repeat: repeat;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            border: 4px solid white;
             display: flex;
             align-items: center;
-        }
-        
-        .patient-table {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            justify-content: center;
+            margin-top: -45px;
+            position: relative;
+            font-weight: 600;
+            font-size: 24px;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
         
-        .patient-table th {
-            background-color: var(--primary-color);
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-verification {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 22px;
+            height: 22px;
+            background-color: #4dabf7;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 12px 15px;
+            font-size: 10px;
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .profile-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .profile-specialty {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 10px;
             font-weight: 500;
         }
         
-        .patient-table td {
+        .profile-specialty i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+        
+        .nav-menu {
+            list-style-type: none;
+            padding: 0 20px;
+            margin-top: 20px;
+        }
+        
+        .nav-item {
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover:not(.active) {
+            background-color: var(--bg-secondary);
+            color: var(--primary-dark);
+        }
+        
+        /* Main Content */
+        .content {
+            margin-left: 220px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Card and Table Styles */
+        .card {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .card-body {
+            padding: 0;
+        }
+        
+        /* Patient Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 0;
+        }
+        
+        .table th {
             padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
         }
         
-        .patient-table tbody tr {
-            transition: all 0.3s;
-            border-bottom: 1px solid #f0f0f0;
+        .table tbody tr:last-child td {
+            border-bottom: none;
         }
         
-        .patient-table tbody tr:hover {
-            background-color: rgba(79, 94, 149, 0.05);
+        .table tbody tr {
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         
+        .table tbody tr:hover {
+            background-color: rgba(77, 171, 247, 0.03);
+        }
+        
+        /* Patient Avatar */
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .patient-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 12px;
+            color: #fff;
+        }
+        
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+            flex-grow: 1;
+            max-width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            padding-left: 35px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        
+        .filter-dropdown {
+            min-width: 150px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-reset {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-reset:hover {
+            background-color: var(--border-color);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 200px;
+            }
+            .content {
+                margin-left: 200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .toggle-sidebar {
+                display: flex;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+            
+            .content {
+                margin-left: 0;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+        }
+        
+        /* Toggle Sidebar Button */
         .toggle-sidebar {
             display: none;
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 1001;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            align-items: center;
+            justify-content: center;
         }
         
         .toggle-sidebar:hover {
-            background-color: #3d4a75;
+            background-color: var(--primary-light);
         }
         
         .sidebar-overlay {
@@ -160,249 +443,225 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
             z-index: 999;
-        }
-        
-        /* Pagination styles */
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        
-        /* Filter styles */
-        .filters-row {
-            background-color: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .search-box {
-            position: relative;
-        }
-        
-        .search-box .search-icon {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-        
-        .search-box input {
-            padding-left: 40px;
-            border-radius: 50px;
-            border: 1px solid #ddd;
-        }
-        
-        .btn-reset {
-            border-color: #ddd;
-            background-color: white;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-reset:hover {
-            background-color: #61CE70;
-            border-color: #61CE70;
-            color: white;
-        }
-        
-        /* Container for the reset button */
-        .reset-container {
-            display: flex;
-            justify-content: flex-end;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 991px) {
-            .sidebar {
-                width: 220px;
-            }
-            .content {
-                margin-left: 220px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .toggle-sidebar {
-                display: block;
-            }
-            .sidebar {
-                transform: translateX(-100%);
-                width: 250px;
-            }
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-            .content {
-                margin-left: 0;
-            }
-            .filters-row .col-md-3 {
-                margin-bottom: 10px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .content {
-                padding: 15px 10px;
-            }
-            .patient-table {
-                font-size: 14px;
-            }
+            backdrop-filter: blur(2px);
         }
     </style>
 </head>
 <body>
-    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div class="avatar" onclick="navigateTo('profile.jsp')">MD+</div>
-        <div class="doctor-name mb-4">${doctorName}</div>
+        <!-- Updated LinkedIn-style doctor profile section -->
+        <div class="profile-section">
+            <div class="profile-background"></div>
+            <div class="profile-avatar">
+                <c:choose>
+                    <c:when test="${empty doctorImage}">
+                        <!-- Show initials if no image is available -->
+                        ${fn:substring(doctorName, 0, 1)}
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Show doctor image if available -->
+                        <img src="${doctorImage}" alt="${doctorName}">
+                    </c:otherwise>
+                </c:choose>
+                <div class="profile-verification">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <div class="profile-name">${doctorName}</div>
+            <div class="profile-title">
+                <c:if test="${not empty doctorQualification}">
+                    ${doctorQualification} -
+                </c:if>
+                <c:if test="${not empty doctorSpecialty}">
+                    ${doctorSpecialty}
+                </c:if>
+                <c:if test="${empty doctorQualification and empty doctorSpecialty}">
+                    Medical Professional
+                </c:if>
+            </div>
+            <div class="profile-specialty">
+                <i class="fas fa-circle"></i> 
+                <c:choose>
+                    <c:when test="${not empty doctorRole}">
+                        ${doctorRole}
+                    </c:when>
+                    <c:otherwise>
+                        Dentist
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
         
-        <div class="nav-item" onclick="navigateTo('Doctor/Dashboard')">Dashboard</div>
-        <div class="nav-item active" onclick="navigateTo('Doctor/Patient')">Patients</div>
-        <div class="nav-item" onclick="navigateTo('Doctor/Appointment')">Appointments</div>
-        <div class="nav-item" onclick="navigateTo('Doctor/Profile')">Profile</div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Dashboard" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Patient" class="nav-link active">
+                    <i class="fas fa-user-injured"></i> Patients
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Appointment" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Profile" class="nav-link">
+                    <i class="fas fa-user-md"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/LogoutServlet" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
     </div>
-
+    
     <div class="content">
-        <h2>Patients</h2>
-        <p class="text-muted" id="current-datetime"></p>
+        <!-- Alert Container -->
+        <div class="alert-container">
+            <c:if test="${not empty errorMessage}">
+                <div class="alert alert-danger fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>${errorMessage}</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty successMessage}">
+                <div class="alert alert-success fade show" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    <div>${successMessage}</div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+        </div>
         
-        <div class="container-fluid px-0">
-          
-            <!-- Filters Row -->
-            <div class="filters-row mb-4">
-                <div class="row align-items-center">
-                    <div class="col-md-4 mb-2 mb-md-0">
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="form-control" id="searchInput" placeholder="Search patients..." oninput="filterPatients()">
-                        </div>
-                    </div>
-                    <div class="col-md-2 mb-2 mb-md-0">
-                        <select class="form-select" id="bloodTypeFilter" onchange="filterPatients()">
-                            <option value="">All Blood Types</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-2 mb-2 mb-md-0">
-                        <select class="form-select" id="sortBy" onchange="sortPatients()">
-                            <option value="nameAsc">Name (A-Z)</option>
-                            <option value="nameDesc">Name (Z-A)</option>
-                            <option value="idAsc">ID (Low-High)</option>
-                            <option value="idDesc">ID (High-Low)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 text-md-end">
-                        <div class="reset-container">
-                            <button class="btn btn-reset" onclick="resetFilters()">
-                                <i class="fas fa-redo me-1"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, ID, phone or email..." onkeyup="filterPatients()">
             </div>
             
-            <!-- Patients Table -->
-            <div class="card patient-table">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table mb-0" id="patientTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Patient Name</th>
-                                    <th>Blood Type</th>
-                                    <th>Age</th>
-                                    <th>Gender</th>
-                                    <th>Phone</th>
-                                    <th>Email</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%
-                                    List<Object[]> patients = (List<Object[]>) request.getAttribute("patients");
-                                    if (patients != null && !patients.isEmpty()) {
-                                        for (Object[] row : patients) {
-                                            String initials = row[1].toString().charAt(0) + "" + row[2].toString().charAt(0);
-                                            
-                                            // Use color based on blood type
-                                            String bloodType = row[0].toString();
-                                            String bgColor = "#64B5F6"; // Default color
-                                            
-                                            // Map blood types to different colors
-                                            if (bloodType.startsWith("A")) {
-                                                bgColor = "#4CAF50"; // Green
-                                            } else if (bloodType.startsWith("B")) {
-                                                bgColor = "#FF9800"; // Orange
-                                            } else if (bloodType.startsWith("AB")) {
-                                                bgColor = "#9C27B0"; // Purple
-                                            } else if (bloodType.startsWith("O")) {
-                                                bgColor = "#F44336"; // Red
-                                            }
-                                            
-                                            String fullName = row[1].toString() + " " + row[2].toString();
-                                            String patientId = row[3].toString();
-                                            String age = row[4].toString();
-                                            String gender = row[5].toString();
-                                            String phone = row[6].toString();
-                                            String email = row[7].toString();
-                                %>
-                                <tr data-id="<%= patientId %>" 
-                                    data-name="<%= fullName %>"
-                                    data-blood="<%= bloodType %>"
-                                    data-phone="<%= phone %>"
-                                    data-email="<%= email %>"
-                                    onclick="viewPatient(<%= patientId %>)">
-                                    <td><%= patientId %></td>
-                                    <td>
-                                        <div class="patient-info">
-                                            <div class="patient-avatar" style="background-color: <%= bgColor %>;">
-                                                <%= initials.toUpperCase() %>
-                                            </div>
-                                            <%= fullName %>
-                                        </div>
-                                    </td>
-                                    <td><%= bloodType %></td>
-                                    <td><%= age %></td>
-                                    <td><%= gender %></td>
-                                    <td><%= phone %></td>
-                                    <td><%= email %></td>
-                                </tr>
-                                <%
+            <select class="filter-dropdown" id="bloodTypeFilter" onchange="filterPatients()">
+                <option value="">All Blood Types</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+            
+            <select class="filter-dropdown" id="sortBy" onchange="sortPatients()">
+                <option value="nameAsc">Name (A-Z)</option>
+                <option value="nameDesc">Name (Z-A)</option>
+                <option value="idAsc">ID (Low-High)</option>
+                <option value="idDesc">ID (High-Low)</option>
+            </select>
+            
+            <button class="btn-filter btn-reset" onclick="resetFilters()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+        
+        <!-- Patients Table Card -->
+        <div class="card patient-table">
+            <div class="card-header">
+                <div>Patient Records</div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0" id="patientTable">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Blood Type</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                List<Object[]> patients = (List<Object[]>) request.getAttribute("patients");
+                                if (patients != null && !patients.isEmpty()) {
+                                    for (Object[] row : patients) {
+                                        String bloodType = row[0].toString();
+                                        String firstName = row[1].toString();
+                                        String lastName = row[2].toString();
+                                        String initials = firstName.charAt(0) + "" + lastName.charAt(0);
+                                        
+                                        // Use color based on blood type
+                                        String bgColor = "#64B5F6"; // Default color
+                                        
+                                        // Map blood types to different colors
+                                        if (bloodType.startsWith("A")) {
+                                            bgColor = "#4CAF50"; // Green
+                                        } else if (bloodType.startsWith("B")) {
+                                            bgColor = "#FF9800"; // Orange
+                                        } else if (bloodType.startsWith("AB")) {
+                                            bgColor = "#9C27B0"; // Purple
+                                        } else if (bloodType.startsWith("O")) {
+                                            bgColor = "#F44336"; // Red
                                         }
-                                    } else {
-                                %>
-                                <tr>
-                                    <td colspan="7" class="text-center text-danger" id="noResults">No patients found</td>
-                                </tr>
-                                <%
+                                        
+                                        String fullName = firstName + " " + lastName;
+                                        String patientId = row[3].toString();
+                                        String age = row[4].toString();
+                                        String gender = row[5].toString();
+                                        String phone = row[6].toString();
+                                        String email = row[7].toString();
+                            %>
+                            <tr data-id="<%= patientId %>" 
+                                data-name="<%= fullName %>"
+                                data-blood="<%= bloodType %>"
+                                data-phone="<%= phone %>"
+                                data-email="<%= email %>"
+                                onclick="viewPatient(<%= patientId %>)">
+                                <td>
+                                    <div class="patient-info">
+                                        <div class="patient-avatar" style="background-color: <%= bgColor %>;">
+                                            <%= initials.toUpperCase() %>
+                                        </div>
+                                        <%= fullName %>
+                                    </div>
+                                </td>
+                                <td><%= bloodType %></td>
+                                <td><%= age %></td>
+                                <td><%= gender %></td>
+                                <td><%= phone %></td>
+                                <td><%= email %></td>
+                            </tr>
+                            <%
                                     }
-                                %>
-                            </tbody>
-                        </table>
-                    </div>
+                                } else {
+                            %>
+                            <tr>
+                                <td colspan="7" class="text-center text-danger" id="noResults">No patients found</td>
+                            </tr>
+                            <%
+                                }
+                            %>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            
         </div>
     </div>
     

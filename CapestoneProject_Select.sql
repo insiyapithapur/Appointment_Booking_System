@@ -8,6 +8,8 @@ SELECT * FROM appointments_status;
 SELECT * FROM  APPOINTMENTS; 
 SELECT * FROM  MEDICAL_RECORDS;
 
+DESC APPOINTMENTS;
+
 UPDATE MEDICAL_RECORDS
 SET appointment_id = 1
 WHERE record_id = 1;
@@ -26,6 +28,8 @@ INSERT INTO users (
 );
 
 INSERT INTO appointments_status (status_name) VALUES ('Cancelled');
+INSERT INTO appointments_status (status_name) VALUES ('Confirmed');
+INSERT INTO appointments_status (status_name) VALUES ('Rejected');
 
 INSERT INTO appointments (patient_id, schedule_id, appointment_date, apt_time, token_no, reason, status_id)
 VALUES 
@@ -53,6 +57,9 @@ drop table SCHEDULES;
 drop table APPOINTMENTS; 
 drop table MEDICAL_RECORDS;
 drop table appointments_status;
+
+DESC appointments_status;
+DELETE FROM appointments_status WHERE STATUS_ID = 22;
 
 TRUNCATE  table USERS;
 TRUNCATE  table user_details;

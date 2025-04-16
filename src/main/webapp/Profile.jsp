@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,98 +10,285 @@
     <title>Doctor Profile</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f5e95;
-            --primary-color: #4f5e95;
-            --light-bg: #f7f9fc;
-            --confirmed-color: #e8f5e9;
-            --pending-color: #e3f2fd;
-            --text-color: #333;
+            /* Sky blue theme colors */
+            --primary-color: #4dabf7;
+            --primary-light: #e7f5ff;
+            --primary-dark: #339af0;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --sidebar-bg: #f8fafc;
+            --text-primary: #2b3d4f;
+            --text-secondary: #6c757d;
+            --border-color: #dbe4ff;
+            
+            /* Status colors */
+            --confirmed-color: #219653;
+            --pending-color: #f2994a;
+            --cancelled-color: #eb5757;
+            --completed-color: #2f80ed;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
         }
         
+        /* Sidebar */
         .sidebar {
-            background-color: var(--sidebar-bg);
-            color: white;
-            min-height: 100vh;
             position: fixed;
-            width: 250px;
-            padding: 20px 0;
-            text-align: center;
-            transition: all 0.3s;
+            width: 220px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 0 0 30px 0;
             z-index: 1000;
-        }
-        
-        .content {
-            margin-left: 250px;
-            padding: 20px;
             transition: all 0.3s;
         }
         
-        .avatar {
-            width: 100px;
-            height: 100px;
+        /* Updated profile section - LinkedIn style */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 20px;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-background {
+            width: 100%;
+            height: 80px;
+            background-color: var(--primary-color);
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBvcGFjaXR5PSIwLjIiIGZpbGw9IiNmZmZmZmYiPgogICAgPHBhdGggZD0iTTI1LDUwIEE4LDggMCAwLDEgMzMsNTggTDMzLDY1IEE4LDggMCAwLDEgMjUsNzMgTC0xNSw3MyBBOCw4IDAgMCwxIC0yMyw2NSBMLTI1LDYwIEE1LDUgMCAwLDEgLTIwLDU1IEwtNSw1NSBBNSw1IDAgMCwxIDAsNjAgTDAsNjUgQTIsIDIgMCAwLDAgMiw2NyBMMTAsNjcgQTIsIDIgMCAwLDAgMTIsNjUgTDEyLDYwIEE4LDggMCAwLDEgMjAsNTIgTDI1LDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxMHMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTkwLDUwIEE4LDggMCAwLDEgOTgsNTggTDk4LDY1IEE4LDggMCAwLDEgOTAsNzMgTDUwLDczIEE4LDggMCAwLDEgNDIsNjUgTDQwLDYwIEE1LDUgMCAwLDEgNDUsNTUgTDYwLDU1IEE1LDUgMCAwLDEgNjUsNjAgTDY1LDY1IEEyLCAyIDAgMCwwIDY3LDY3IEw3NSw2NyBBMiwgMiAwIDAsIDAgNzcsNjUgTDc3LDYwIEE4LDggMCAwLDEgODUsNTIgTDkwLDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTE1NSw1MCBBOCw4IDAgMCwxIDE2Myw1OCBMMTY1LDY1IEE4LDggMCAwLDEgMTU3LDczIEwxMTUsNzMgQTgsOCAwIDAsIDEgMTA3LDY1IEwxMDUsNjAgQTUsNSAwIDAsIDEgMTEwLDU1IEwxMjUsNTUgQTUsNSAwIDAsIDEgMTMwLDYwIEwxMzAsNjUgQTIsIDIgMCAwLDAgMTMyLDY3IEwxNDAsNjcgQTIsIDIgMCAwLDAgMTQyLDY1IEwxNDIsNjAgQTgsOCAwIDAsIDEgMTUwLDUyIEwxNTUsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjIwcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgICA8cGF0aCBkPSJNMjIwLDUwIEE4LDggMCAwLDEgMjI4LDU4IEwyMzAsNjUgQTgsOCAwIDAsIDEgMjIyLDczIEwxODAsNzMgQTgsOCAwIDAsIDEgMTcyLDY1IEwxNzAsNjAgQTUsNSAwIDAsIDEgMTc1LDU1IEwxOTAsNTUgQTUsNSAwIDAsIDEgMTk1LDYwIEwxOTUsNjUgQTIsIDIgMCAwLDAgMTk3LDY3IEwyMDUsNjcgQTIsIDIgMCAwLDAgMjA3LDY1IEwyMDcsNjAgQTgsOCAwIDAsIDEgMjE1LDUyIEwyMjAsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjI1cyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgPC9nPgo8L3N2Zz4=');
+            background-repeat: repeat;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            background-color: #96c8fb;
-            color: white;
-            font-size: 25px;
+            background-color: var(--primary-light);
+            border: 4px solid white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
+            margin-top: -45px;
+            position: relative;
+            font-weight: 600;
+            font-size: 24px;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
-        .avatar:hover {
-            transform: scale(1.05);
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-verification {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 22px;
+            height: 22px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .profile-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .profile-specialty {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .profile-specialty i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+        
+        .nav-menu {
+            list-style-type: none;
+            padding: 0 20px;
+            margin-top: 20px;
         }
         
         .nav-item {
-            padding: 15px 24px;
-            margin: 5px 15px;
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
             cursor: pointer;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover:not(.active) {
+            background-color: var(--bg-secondary);
+            color: var(--primary-dark);
+        }
+        
+        /* Main Content */
+        .content {
+            margin-left: 220px;
+            padding: 30px;
             transition: all 0.3s;
-            text-align: left;
-            border-radius: 5px;
         }
         
-        .nav-item.active {
-            background-color: #81c784;
-            font-weight: bold;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
         
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
         }
         
+        .date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Profile Info Cards */
+        .card {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header i {
+            margin-right: 10px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .info-label {
+            width: 150px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding-right: 20px;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: var(--text-primary);
+        }
+        
+        /* Toggle Sidebar Button */
         .toggle-sidebar {
             display: none;
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 1001;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            align-items: center;
+            justify-content: center;
         }
         
         .toggle-sidebar:hover {
-            background-color: #3d4a75;
+            background-color: var(--primary-light);
         }
         
         .sidebar-overlay {
@@ -110,231 +298,196 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
             z-index: 999;
+            backdrop-filter: blur(2px);
         }
         
-        /* Profile specific styles */
-        .profile-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            margin-bottom: 30px;
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .info-row {
+                flex-direction: column;
+            }
+            
+            .info-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
         }
         
-        .profile-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 30px;
-            position: relative;
-        }
-        
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: #81c784;
-            color: white;
-            font-size: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .profile-name {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-align: center;
-        }
-        
-        .profile-role {
-            font-size: 16px;
-            opacity: 0.8;
-            text-align: center;
-        }
-        
-        .profile-section {
-            padding: 30px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .profile-section:last-child {
-            border-bottom: none;
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .section-title i {
-            margin-right: 10px;
-        }
-        
-        .profile-info-row {
-            display: flex;
-            margin-bottom: 15px;
-        }
-        
-        .profile-info-label {
-            width: 150px;
-            font-weight: 500;
-            color: #666;
-        }
-        
-        .profile-info-value {
-            flex: 1;
-            color: var(--text-color);
-        }
-        
-        .edit-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .edit-button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-        
-        /* Responsive styles */
         @media (max-width: 991px) {
             .sidebar {
-                width: 220px;
+                width: 200px;
             }
             .content {
-                margin-left: 220px;
+                margin-left: 200px;
             }
         }
         
         @media (max-width: 768px) {
             .toggle-sidebar {
-                display: block;
+                display: flex;
             }
+            
             .sidebar {
                 transform: translateX(-100%);
-                width: 250px;
             }
+            
             .sidebar.active {
                 transform: translateX(0);
             }
+            
             .sidebar-overlay.active {
                 display: block;
             }
+            
             .content {
                 margin-left: 0;
             }
-            .profile-info-row {
+            
+            .header {
                 flex-direction: column;
-            }
-            .profile-info-label {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-            .profile-info-value {
-                width: 100%;
+                align-items: flex-start;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div class="avatar">MD+</div>
-        <div class="doctor-name mb-3">Dr. ${doctorName}</div>
-        
-        <div class="nav-item" onclick="navigateTo('Doctor/Dashboard')">Dashboard</div>
-        <div class="nav-item" onclick="navigateTo('Doctor/Patient')">Patients</div>
-        <div class="nav-item" onclick="navigateTo('Doctor/Appointment')">Appointments</div>
-        <div class="nav-item active" onclick="navigateTo('Doctor/Profile')">Profile</div>
-        <div class="nav-item" onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'">
-    Logout
-</div>
-    </div>
-    
-    <div class="content">
-        <h2>Profile</h2>
-        <p class="text-muted" id="current-datetime"></p>
-        
-        <div class="profile-container">
-           
-            
-            <div class="profile-section">
-                <div class="section-title">
-                    <i class="fas fa-user"></i> Basic Information
-                </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Full Name</div>
-                    <div class="profile-info-value">${userFullName}</div>
-                </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">User Name</div>
-                    <div class="profile-info-value">${userName}</div>
-                </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Email</div>
-                    <div class="profile-info-value">${userEmail}</div>
-                </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Date of Birth</div>
-                    <div class="profile-info-value">${userDOB}</div>
-                </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Phone</div>
-                    <div class="profile-info-value">${userPhone}</div>
-                </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Gender</div>
-                    <div class="profile-info-value">${userGender}</div>
+        <!-- Updated LinkedIn-style doctor profile section -->
+        <div class="profile-section">
+            <div class="profile-background"></div>
+            <div class="profile-avatar">
+                <c:choose>
+                    <c:when test="${empty doctorImage}">
+                        <!-- Show initials if no image is available -->
+                        ${fn:substring(doctorName, 0, 1)}
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Show doctor image if available -->
+                        <img src="${doctorImage}" alt="${doctorName}">
+                    </c:otherwise>
+                </c:choose>
+                <div class="profile-verification">
+                    <i class="fas fa-check"></i>
                 </div>
             </div>
-            
-            <div class="profile-section">
-                <div class="section-title">
-                    <i class="fas fa-stethoscope"></i> Doctor Information
+            <div class="profile-name">${doctorName}</div>
+            <div class="profile-title">
+                <c:if test="${not empty doctorQualification}">
+                    ${doctorQualification} -
+                </c:if>
+                <c:if test="${not empty doctorSpecialty}">
+                    ${doctorSpecialty}
+                </c:if>
+                <c:if test="${empty doctorQualification and empty doctorSpecialty}">
+                    Medical Professional
+                </c:if>
+            </div>
+            <div class="profile-specialty">
+                <i class="fas fa-circle"></i> 
+                <c:choose>
+                    <c:when test="${not empty doctorRole}">
+                        ${doctorRole}
+                    </c:when>
+                    <c:otherwise>
+                        Dentist
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Dashboard" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Patient" class="nav-link">
+                    <i class="fas fa-user-injured"></i> Patients
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Appointment" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/Doctor/Profile" class="nav-link active">
+                    <i class="fas fa-user-md"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="${pageContext.request.contextPath}/LogoutServlet" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        
+        <!-- Basic Information Card -->
+        <div class="card">
+            <div class="card-header">
+                <div><i class="fas fa-user"></i> Basic Information</div>
+                <button class="btn btn-sm btn-outline-primary" onclick="editProfile()">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">${userFullName}</div>
                 </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Specialization</div>
-                    <div class="profile-info-value">${doctorSpecialization}</div>
+                <div class="info-row">
+                    <div class="info-label">User Name</div>
+                    <div class="info-value">${userName}</div>
                 </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">License Number</div>
-                    <div class="profile-info-value">${doctorLicenseNumber}</div>
+                <div class="info-row">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">${userEmail}</div>
                 </div>
-                
-                <div class="profile-info-row">
-                    <div class="profile-info-label">Degree</div>
-                    <div class="profile-info-value">${doctorDegree}</div>
+                <div class="info-row">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value">${userDOB}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">${userPhone}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Gender</div>
+                    <div class="info-value">${userGender}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Doctor Information Card -->
+        <div class="card">
+            <div class="card-header">
+                <div><i class="fas fa-stethoscope"></i> Doctor Information</div>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-label">Specialization</div>
+                    <div class="info-value">${doctorSpecialization}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">License Number</div>
+                    <div class="info-value">${doctorLicenseNumber}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Degree</div>
+                    <div class="info-value">${doctorDegree}</div>
                 </div>
             </div>
         </div>
@@ -378,7 +531,12 @@
         
         function editProfile() {
             // Here you would typically navigate to an edit profile page or show a modal
-            alert("Edit profile functionality would be implemented here.");
+            alert("Edit basic information functionality would be implemented here.");
+        }
+        
+        function editDoctorInfo() {
+            // Here you would typically navigate to an edit doctor info page or show a modal
+            alert("Edit doctor information functionality would be implemented here.");
         }
         
         // Handle responsive behavior
