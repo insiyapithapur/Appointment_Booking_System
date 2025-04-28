@@ -10,176 +10,212 @@
     <title>Book Appointment</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f95e9;
-            --primary-color: #4f95e9;
-            --light-bg: #f7f9fc;
-            --text-color: #333;
+            /* Sky blue theme colors */
+            --primary-color: #4dabf7;
+            --primary-light: #e7f5ff;
+            --primary-dark: #339af0;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --sidebar-bg: #f8fafc;
+            --text-primary: #2b3d4f;
+            --text-secondary: #6c757d;
+            --border-color: #dbe4ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
         }
         
+        /* Sidebar */
         .sidebar {
-            background-color: var(--sidebar-bg);
-            color: white;
-            min-height: 100vh;
             position: fixed;
-            width: 250px;
-            padding: 20px 0;
-            text-align: center;
-            transition: all 0.3s;
+            width: 220px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 0 0 30px 0;
             z-index: 1000;
-        }
-        
-        .content {
-            margin-left: 250px;
-            padding: 20px;
             transition: all 0.3s;
         }
         
-        .avatar {
-            width: 100px;
-            height: 100px;
+        /* Updated profile section - LinkedIn style */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 20px;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-background {
+            width: 100%;
+            height: 80px;
+            background-color: var(--primary-color);
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBvcGFjaXR5PSIwLjIiIGZpbGw9IiNmZmZmZmYiPgogICAgPHBhdGggZD0iTTI1LDUwIEE4LDggMCAwLDEgMzMsNTggTDMzLDY1IEE4LDggMCAwLDEgMjUsNzMgTC0xNSw3MyBBOCw4IDAgMCwxIC0yMyw2NSBMLTI1LDYwIEE1LDUgMCAwLDEgLTIwLDU1IEwtNSw1NSBBNSw1IDAgMCwxIDAsNjAgTDAsNjUgQTIsIDIgMCAwLDAgMiw2NyBMMTAsNjcgQTIsIDIgMCAwLDAgMTIsNjUgTDEyLDYwIEE4LDggMCAwLDEgMjAsNTIgTDI1LDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxMHMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTkwLDUwIEE4LDggMCAwLDEgOTgsNTggTDk4LDY1IEE4LDggMCAwLDEgOTAsNzMgTDUwLDczIEE4LDggMCAwLDEgNDIsNjUgTDQwLDYwIEE1LDUgMCAwLDEgNDUsNTUgTDYwLDU1IEE1LDUgMCAwLDEgNjUsNjAgTDY1LDY1IEEyLCAyIDAgMCwwIDY3LDY3IEw3NSw2NyBBMiwgMiAwIDAsIDAgNzcsNjUgTDc3LDYwIEE4LDggMCAwLDEgODUsNTIgTDkwLDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTE1NSw1MCBBOCw4IDAgMCwxIDE2Myw1OCBMMTY1LDY1IEE4LDggMCAwLDEgMTU3LDczIEwxMTUsNzMgQTgsOCAwIDAsIDEgMTA3LDY1IEwxMDUsNjAgQTUsNSAwIDAsIDEgMTEwLDU1IEwxMjUsNTUgQTUsNSAwIDAsIDEgMTMwLDYwIEwxMzAsNjUgQTIsIDIgMCAwLDAgMTMyLDY3IEwxNDAsNjcgQTIsIDIgMCAwLDAgMTQyLDY1IEwxNDIsNjAgQTgsOCAwIDAsIDEgMTUwLDUyIEwxNTUsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjIwcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgICA8cGF0aCBkPSJNMjIwLDUwIEE4LDggMCAwLDEgMjI4LDU4IEwyMzAsNjUgQTgsOCAwIDAsIDEgMjIyLDczIEwxODAsNzMgQTgsOCAwIDAsIDEgMTcyLDY1IEwxNzAsNjAgQTUsNSAwIDAsIDEgMTc1LDU1IEwxOTAsNTUgQTUsNSAwIDAsIDEgMTk1LDYwIEwxOTUsNjUgQTIsIDIgMCAwLDAgMTk3LDY3IEwyMDUsNjcgQTIsIDIgMCAwLDAgMjA3LDY1IEwyMDcsNjAgQTgsOCAwIDAsIDEgMjE1LDUyIEwyMjAsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjI1cyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgPC9nPgo8L3N2Zz4=');
+            background-repeat: repeat;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            background-color: #96c8fb;
-            color: white;
-            font-size: 25px;
+            background-color: var(--primary-light);
+            border: 4px solid white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            cursor: pointer;
-            transition: transform 0.2s;
+            margin-top: -45px;
+            position: relative;
+            font-weight: 600;
+            font-size: 24px;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
-        .avatar:hover {
-            transform: scale(1.05);
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .profile-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .profile-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .profile-badge i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+        
+        .nav-menu {
+            list-style-type: none;
+            padding: 0 20px;
+            margin-top: 20px;
         }
         
         .nav-item {
-            padding: 15px 24px;
-            margin: 5px 15px;
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
             cursor: pointer;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover:not(.active) {
+            background-color: var(--bg-secondary);
+            color: var(--primary-dark);
+        }
+        
+        /* Main Content */
+        .content {
+            margin-left: 220px;
+            padding: 30px;
             transition: all 0.3s;
-            text-align: left;
-            border-radius: 5px;
         }
         
-        .nav-item.active {
-            background-color: #81c784;
-            font-weight: bold;
+        /* Page header */
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
         }
         
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
         }
         
-        .schedule-container {
-            background: white;
-            border-radius: 10px;
-            padding: 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Card styles */
+        .card {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             overflow: hidden;
             margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
         }
         
-        .schedule-header {
-            background-color: var(--primary-color);
-            color: white;
+        .card-header {
             padding: 15px 20px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .schedule-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .schedule-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .schedule-card.unavailable {
-            opacity: 0.6;
-        }
-        
-        .schedule-card-header {
-            background-color: #f5f5f5;
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--primary-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .day-badge {
-            background-color: #e3f2fd;
-            color: #1565c0;
-            font-weight: 500;
-            padding: 6px 12px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-        
-        .time-badge {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            font-weight: 500;
-            padding: 6px 12px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-        
-        .toggle-sidebar {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .toggle-sidebar:hover {
-            background-color: #3d75a4;
-        }
-        
-        /* Overlay for mobile when sidebar is active */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        
-        .doctor-info-card {
+        /* Doctor info card */
+        .doctor-card {
             background-color: white;
-            border-radius: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
         }
         
         .doctor-avatar-large {
@@ -190,132 +226,367 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 24px;
             margin-right: 20px;
         }
         
-        .badge-specialty {
-            background-color: #e3f2fd;
-            color: #1565c0;
-            font-weight: 500;
-            padding: 6px 12px;
-            border-radius: 4px;
+        .doctor-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
         }
         
-        /* Responsive styles */
+        .doctor-specialty {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .badge-specialty {
+            background-color: rgba(47, 128, 237, 0.1);
+            color: #2f80ed;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        /* Schedule styles */
+        .schedule-container {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
+        }
+        
+        .schedule-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+        }
+        
+        .schedule-header i {
+            margin-right: 10px;
+        }
+        
+        .schedule-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            height: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+        
+        .schedule-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(77, 171, 247, 0.1);
+        }
+        
+        .schedule-card.unavailable {
+            opacity: 0.7;
+            background-color: #f8f9fa;
+        }
+        
+        .schedule-card-header {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-secondary);
+        }
+        
+        .day-badge {
+            background-color: rgba(47, 128, 237, 0.1);
+            color: #2f80ed;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .day-badge i {
+            margin-right: 5px;
+        }
+        
+        .time-badge {
+            background-color: rgba(46, 125, 50, 0.1);
+            color: #2e7d32;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .time-badge i {
+            margin-right: 5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+        
+        .back-button {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            background-color: var(--primary-dark);
+            color: white;
+        }
+        
+        /* Toggle Sidebar Button */
+        .toggle-sidebar {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-sidebar:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .card-columns {
+                column-count: 2;
+            }
+        }
+        
         @media (max-width: 991px) {
             .sidebar {
-                width: 220px;
+                width: 200px;
             }
             .content {
-                margin-left: 220px;
+                margin-left: 200px;
+            }
+            .card-columns {
+                column-count: 1;
             }
         }
         
         @media (max-width: 768px) {
             .toggle-sidebar {
-                display: block;
+                display: flex;
             }
+            
             .sidebar {
                 transform: translateX(-100%);
-                width: 250px;
-                z-index: 1000;
             }
+            
             .sidebar.active {
                 transform: translateX(0);
             }
+            
             .sidebar-overlay.active {
                 display: block;
             }
+            
             .content {
                 margin-left: 0;
+                padding: 20px;
+            }
+            
+            .doctor-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .doctor-avatar-large {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .schedule-card-header {
+                flex-direction: column;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
-    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div class="avatar">P+</div>
-        <div class="patient-name mb-3">${sessionScope.username}</div>
-        
-        <div class="nav-item" onclick="navigateTo('Patient/Dashboard')">Dashboard</div>
-        <div class="nav-item" onclick="navigateTo('Patient/Appointments')">Appointments</div>
-        <div class="nav-item active" onclick="navigateTo('Patient/Doctors')">Doctors</div>
-        <div class="nav-item" onclick="navigateTo('Patient/Profile')">Profile</div>
-    </div>
-    
-    <div class="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Book Appointment</h2>
-            <button class="btn btn-outline-primary" onclick="navigateTo('Patient/Doctors')">
-                <i class="fas fa-arrow-left me-2"></i> Back to Doctors
-            </button>
-        </div>
-        
-        <!-- Doctor Information -->
-        <div class="doctor-info-card">
-            <div class="d-flex">
-                <div class="doctor-avatar-large" style="background-color: hsl(${doctorId * 40 % 360}, 70%, 60%)">
-                    ${fn:substring(doctorName, 4, 5)}
-                </div>
-                <div>
-                    <h3>${doctorName}</h3>
-                    <p class="mb-1"><span class="badge-specialty">${doctorSpecialty}</span></p>
-                    <p class="mb-1">${doctorExperience} | ${doctorDegree}</p>
-                    <p class="text-muted">${doctorContact}</p>
-                </div>
+        <!-- Updated LinkedIn-style profile section -->
+        <div class="profile-section">
+            <div class="profile-background"></div>
+            <div class="profile-avatar">
+                ${fn:substring(sessionScope.username, 0, 1)}
+            </div>
+            <div class="profile-name">${sessionScope.username}</div>
+            <div class="profile-title">Patient</div>
+            <div class="profile-badge">
+                <i class="fas fa-circle"></i> Active Member
             </div>
         </div>
         
-        <p class="text-muted">Select a schedule from the doctor's available time slots</p>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a onclick="navigateTo('Patient/Dashboard')" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="navigateTo('Patient/Appointments')" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="navigateTo('Patient/Doctors')" class="nav-link active">
+                    <i class="fas fa-user-md"></i> Doctors
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="navigateTo('Patient/Profile')" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center mb-2 page-header-row">
+                <h1 class="page-title">Book Appointment</h1>
+                <button class="back-button" onclick="navigateTo('Patient/Doctors')">
+                    <i class="fas fa-arrow-left"></i> Back to Doctors
+                </button>
+            </div>
+        </div>
+        
+        <!-- Doctor Information -->
+        <div class="doctor-card mb-4">
+            <div class="d-flex">
+                <div class="doctor-avatar-large" style="background-color: hsl(${doctorId * 40 % 360}, 70%, 60%)">
+                    ${fn:substring(doctorName, 0, 1)}
+                </div>
+                <div>
+                    <div class="doctor-name">${doctorName}</div>
+                    <div class="mb-2"><span class="badge-specialty">${doctorSpecialty}</span></div>
+                    <div class="doctor-specialty mb-1">${doctorExperience} • ${doctorDegree}</div>
+                    <div class="text-secondary"><i class="fas fa-phone-alt me-2"></i>${doctorContact}</div>
+                </div>
+            </div>
+        </div>
         
         <!-- Schedule Container -->
         <div class="schedule-container">
             <div class="schedule-header">
-                <i class="far fa-calendar-alt me-2"></i> Available Schedules
+                <i class="far fa-calendar-alt"></i> Available Time Slots
             </div>
-            <div class="p-3">
-                <div class="row">
+            <div class="p-4">
+                <div class="row g-3">
                     <c:forEach items="${schedules}" var="scheduleInfo" varStatus="status">
                         <c:set var="scheduleParts" value="${fn:split(scheduleInfo, '|')}" />
                         <c:set var="scheduleId" value="${fn:trim(fn:substringAfter(scheduleParts[0], 'Schedule ID:'))}" />
                         <c:set var="doctorId" value="${fn:trim(fn:substringAfter(scheduleParts[1], 'Doctor ID:'))}" />
                         <c:set var="day" value="${fn:trim(fn:substringAfter(scheduleParts[2], 'Day:'))}" />
                         <c:set var="time" value="${fn:trim(fn:substringAfter(scheduleParts[3], 'Time:'))}" />
-                        <c:set var="maxTokens" value="${fn:trim(fn:substringAfter(scheduleParts[4], 'Max Tokens:'))}" />
                         <c:set var="isAvailable" value="${fn:trim(fn:substringAfter(scheduleParts[5], 'Available:'))}" />
                         
                         <div class="col-md-6 col-lg-4">
-                            <div class="schedule-card ${isAvailable eq 'Yes' ? '' : 'unavailable'} mb-3">
+                            <div class="schedule-card ${isAvailable eq 'Yes' ? '' : 'unavailable'}">
                                 <div class="schedule-card-header">
-                                    <span class="day-badge"><i class="far fa-calendar me-1"></i> ${day}</span>
-                                    <span class="time-badge"><i class="far fa-clock me-1"></i> ${time}</span>
+                                    <span class="day-badge"><i class="far fa-calendar"></i> ${day}</span>
+                                    <span class="time-badge"><i class="far fa-clock"></i> ${time}</span>
                                 </div>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div>
-                                            <small class="text-muted">Max patients: ${maxTokens}</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge ${isAvailable eq 'Yes' ? 'bg-success' : 'bg-secondary'}">
-                                                ${isAvailable eq 'Yes' ? 'Available' : 'Unavailable'}
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div class="card-body p-3">
                                     <c:choose>
                                         <c:when test="${isAvailable eq 'Yes'}">
-                                            <a href="${pageContext.request.contextPath}/Patient/ConfirmAppointment?scheduleId=${scheduleId}" 
+                                            <a href="${pageContext.request.contextPath}/Patient/ConfirmAppointment?scheduleId=${scheduleId}&day=${day}" 
                                                class="btn btn-primary w-100">
-                                                Select Slot
+                                                <i class="fas fa-check-circle me-2"></i> Select This Slot
                                             </a>
                                         </c:when>
                                         <c:otherwise>
                                             <button class="btn btn-secondary w-100" disabled>
-                                                Not Available
+                                                <i class="fas fa-times-circle me-2"></i> Not Available
                                             </button>
                                         </c:otherwise>
                                     </c:choose>

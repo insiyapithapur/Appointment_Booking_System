@@ -1,16 +1,6 @@
+<%@page import="org.hibernate.internal.build.AllowSysOut"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-
-<%
-    HttpSession sessionObj = request.getSession(false);
-    //String role = (sessionObj != null) ? (String) sessionObj.getAttribute("roleName") : null;
-
-    if (sessionObj == null || sessionObj.getAttribute("email") == null) {
-        response.sendRedirect(request.getContextPath() + "/Login.jsp?error=Unauthorized");
-        return; 
-    }
-%>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -187,7 +177,7 @@
 <body>
   <div class="main-container">
     <div class="image-container">
-      <img src="./asset/imgLandingPage.png" alt="Login" class="responsive-image">
+      <img src="imgLandingPage.png" alt="Login" class="responsive-image">
     </div>
     <div class="login-container">
       <h1>Verify OTP</h1>

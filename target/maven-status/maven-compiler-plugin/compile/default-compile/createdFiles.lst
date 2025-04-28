@@ -14,6 +14,7 @@ com\training\project\servlet\AppointmentServlet$AppointmentDisplayDTO.class
 com\training\project\App.class
 com\training\project\model\Doctor.class
 com\training\project\service\RoleService.class
+com\training\project\servlet\AdminCompleteAppointment.class
 com\training\project\servlet\DashboardServlet.class
 com\training\project\model\Appointment.class
 com\training\project\servlet\AdminAppointmentServlet.class
@@ -33,6 +34,7 @@ com\training\project\servlet\LoginServlet.class
 com\training\project\servlet\AdminDashboardServlet.class
 com\training\project\servlet\AdminDoctorServlet.class
 com\training\project\service\DoctorService.class
+com\training\project\servlet\AdminMedicalRecordViewServlet.class
 com\training\project\servlet\ResetPasswordServlet.class
 com\training\project\dao\Imp\PatientDaoImp.class
 com\training\project\servlet\LogoutServlet.class

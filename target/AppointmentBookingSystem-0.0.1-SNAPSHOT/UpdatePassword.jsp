@@ -1,14 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%
-    HttpSession sessionObj = request.getSession(false);
-    //String role = (sessionObj != null) ? (String) sessionObj.getAttribute("roleName") : null;
-
-    if (sessionObj == null || sessionObj.getAttribute("email") == null) {
-        response.sendRedirect(request.getContextPath() + "/Login.jsp?error=Unauthorized");
-        return; 
-    }
-%>
 <html lang="en">
 <head>
   <meta charset="UTF-8">

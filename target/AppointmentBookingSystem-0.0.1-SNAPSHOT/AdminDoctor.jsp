@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Arrays" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,160 +11,381 @@
     <title>Doctor List</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <style>
         :root {
-            --sidebar-bg: #4f5e95;
-            --primary-color: #4f5e95;
-            --light-bg: #f7f9fc;
-            --confirmed-color: #e8f5e9;
-            --pending-color: #e3f2fd;
-            --text-color: #333;
+            /* Sky blue theme colors */
+            --primary-color: #4dabf7;
+            --primary-light: #e7f5ff;
+            --primary-dark: #339af0;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8fafc;
+            --sidebar-bg: #f8fafc;
+            --text-primary: #2b3d4f;
+            --text-secondary: #6c757d;
+            --border-color: #dbe4ff;
+            
+            /* Status colors */
+            --confirmed-color: #219653;
+            --pending-color: #f2994a;
+            --cancelled-color: #eb5757;
+            --completed-color: #2f80ed;
+            --active-color: #81C784;
+            --inactive-color: #E57373;
+            --new-color: #FFD54F;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
         }
         
+        /* Sidebar */
         .sidebar {
-            background-color: var(--sidebar-bg);
-            color: white;
-            height: 100vh;
             position: fixed;
-            width: 250px;
-            padding: 20px 0;
-            text-align: center;
-            transition: all 0.3s;
+            width: 220px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 0 0 30px 0;
             z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .content {
-            margin-left: 250px;
-            padding: 20px;
             transition: all 0.3s;
         }
         
-        .avatar {
-            width: 70px;
-            height: 70px;
+        /* Updated profile section - LinkedIn style */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 20px;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-background {
+            width: 100%;
+            height: 80px;
+            background-color: var(--primary-color);
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBvcGFjaXR5PSIwLjIiIGZpbGw9IiNmZmZmZmYiPgogICAgPHBhdGggZD0iTTI1LDUwIEE4LDggMCAwLDEgMzMsNTggTDMzLDY1IEE4LDggMCAwLDEgMjUsNzMgTC0xNSw3MyBBOCw4IDAgMCwxIC0yMyw2NSBMLTI1LDYwIEE1LDUgMCAwLDEgLTIwLDU1IEwtNSw1NSBBNSw1IDAgMCwxIDAsNjAgTDAsNjUgQTIsIDIgMCAwLDAgMiw2NyBMMTAsNjcgQTIsIDIgMCAwLDAgMTIsNjUgTDEyLDYwIEE4LDggMCAwLDEgMjAsNTIgTDI1LDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxMHMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTkwLDUwIEE4LDggMCAwLDEgOTgsNTggTDk4LDY1IEE4LDggMCAwLDEgOTAsNzMgTDUwLDczIEE4LDggMCAwLDEgNDIsNjUgTDQwLDYwIEE1LDUgMCAwLDEgNDUsNTUgTDYwLDU1IEE1LDUgMCAwLDEgNjUsNjAgTDY1LDY1IEEyLCAyIDAgMCwwIDY3LDY3IEw3NSw2NyBBMiwgMiAwIDAsIDAgNzcsNjUgTDc3LDYwIEE4LDggMCAwLDEgODUsNTIgTDkwLDUwIFoiPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIgZnJvbT0iMCA1MCA1MCIgdG89IjM2MCA1MCA1MCIgZHVyPSIxNXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTE1NSw1MCBBOCw4IDAgMCwxIDE2Myw1OCBMMTY1LDY1IEE4LDggMCAwLDEgMTU3LDczIEwxMTUsNzMgQTgsOCAwIDAsIDEgMTA3LDY1IEwxMDUsNjAgQTUsNSAwIDAsIDEgMTEwLDU1IEwxMjUsNTUgQTUsNSAwIDAsIDEgMTMwLDYwIEwxMzAsNjUgQTIsIDIgMCAwLDAgMTMyLDY3IEwxNDAsNjcgQTIsIDIgMCAwLDAgMTQyLDY1IEwxNDIsNjAgQTgsOCAwIDAsIDEgMTUwLDUyIEwxNTUsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjIwcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgICA8cGF0aCBkPSJNMjIwLDUwIEE4LDggMCAwLDEgMjI4LDU4IEwyMzAsNjUgQTgsOCAwIDAsIDEgMjIyLDczIEwxODAsNzMgQTgsOCAwIDAsIDEgMTcyLDY1IEwxNzAsNjAgQTUsNSAwIDAsIDEgMTc1LDU1IEwxOTAsNTUgQTUsNSAwIDAsIDEgMTk1LDYwIEwxOTUsNjUgQTIsIDIgMCAwLDAgMTk3LDY3IEwyMDUsNjcgQTIsIDIgMCAwLDAgMjA3LDY1IEwyMDcsNjAgQTgsOCAwIDAsIDEgMjE1LDUyIEwyMjAsNTAgWiI+CiAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjI1cyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L3BhdGg+CiAgPC9nPgo8L3N2Zz4=');
+            background-repeat: repeat;
+        }
+        
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            background-color: #96c8fb;
-            color: white;
-            font-size: 20px;
+            background-color: var(--primary-light);
+            border: 4px solid white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 10px;
-            cursor: pointer;
-            transition: transform 0.2s;
+            margin-top: -45px;
+            position: relative;
+            font-weight: 600;
+            font-size: 24px;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
         
-        .avatar:hover {
-            transform: scale(1.05);
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 12px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .profile-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .profile-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .profile-badge i {
+            margin-right: 4px;
+            font-size: 10px;
+        }
+        
+        .nav-menu {
+            list-style-type: none;
+            padding: 0 20px;
+            margin-top: 20px;
         }
         
         .nav-item {
-            padding: 12px 24px;
-            margin: 5px 0;
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s;
             cursor: pointer;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-link:hover:not(.active) {
+            background-color: var(--bg-secondary);
+            color: var(--primary-dark);
+        }
+        
+        /* Main Content */
+        .content {
+            margin-left: 220px;
+            padding: 30px;
             transition: all 0.3s;
-            text-align: left;
         }
         
-        .nav-item.active {
-            background-color: #4CAF50;
-            border-radius: 5px;
+        /* Page header */
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 24px;
         }
         
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(5px);
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
         }
         
-        .doctor-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+        .page-subtitle {
+            color: var(--text-secondary);
+        }
+        
+        /* Card styles */
+        .card {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
             margin-bottom: 30px;
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
         }
         
-        .doctor-card {
-            background-color: white;
-            border-radius: 10px;
+        .card-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Doctor Stats */
+        .doctor-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 240px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-            height: 100%;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
+            display: flex;
+            align-items: center;
         }
         
-        .doctor-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .doctor-avatar {
+        .stat-icon {
             width: 50px;
             height: 50px;
-            border-radius: 50%;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
+            font-size: 20px;
             margin-right: 15px;
             flex-shrink: 0;
         }
         
-        .doctor-info {
-            flex-grow: 1;
-        }
-        
-        .doctor-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--text-color);
+        .stat-info h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
             margin-bottom: 5px;
         }
         
-        .doctor-details {
-            color: #777;
+        .stat-info p {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0;
+        }
+        
+        /* Filter section */
+        .filter-section {
+            padding: 15px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
             font-size: 14px;
-            margin-bottom: 3px;
+            height: 38px;
         }
         
-        .doctor-specialization {
-            padding: 5px 15px;
-            border-radius: 20px;
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            height: 38px;
+        }
+        
+        /* Doctor Table */
+        .table-container {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
+            border: 1px solid var(--border-color);
+        }
+        
+        .doctor-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        
+        .doctor-table th {
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            background-color: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+        
+        .doctor-table td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .doctor-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .doctor-table tbody tr {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .doctor-table tbody tr:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Doctor Avatar */
+        .doctor-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        /* Specialization Badge */
+        .specialization-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
             font-size: 12px;
-            text-align: center;
-            margin-top: 10px;
+            font-weight: 500;
             display: inline-block;
-            background-color: #81C784;
-            color: white;
+            text-align: center;
+            background-color: rgba(33, 150, 83, 0.1);
+            color: var(--confirmed-color);
         }
         
+        /* Toggle Sidebar Button */
         .toggle-sidebar {
             display: none;
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 1001;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 12px;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            align-items: center;
+            justify-content: center;
         }
         
         .toggle-sidebar:hover {
-            background-color: #3d4a75;
+            background-color: var(--primary-light);
         }
         
         .sidebar-overlay {
@@ -172,44 +395,54 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
             z-index: 999;
+            backdrop-filter: blur(2px);
         }
         
-        /* Pagination styles */
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        
-        /* Filter section styles */
-        .filter-section {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-        }
-        
-        .filter-title {
-            font-size: 18px;
+        /* No Results Message */
+        .alert-no-results {
+            background-color: rgba(77, 171, 247, 0.05);
             color: var(--primary-color);
-            margin-bottom: 15px;
-            font-weight: 600;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            width: 100%;
+            font-size: 14px;
+            border: 1px solid rgba(77, 171, 247, 0.1);
         }
         
-        .filter-group {
-            margin-bottom: 15px;
-        }
-        
-        .filter-label {
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: 500;
-            color: var(--text-color);
-            margin-bottom: 8px;
-            display: block;
+            transition: all 0.2s;
         }
         
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-outline-secondary {
+            color: var(--text-secondary);
+            border-color: var(--border-color);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Filter badges */
         .filter-badges {
             display: flex;
             flex-wrap: wrap;
@@ -225,13 +458,13 @@
             font-size: 12px;
             display: inline-flex;
             align-items: center;
-            margin-right: 8px;
             cursor: pointer;
         }
         
         .filter-badge span {
             margin-left: 5px;
             font-weight: bold;
+            cursor: pointer;
         }
         
         .clear-filters {
@@ -248,373 +481,510 @@
             text-decoration: underline;
         }
         
-        /* Responsive styles */
-        @media (max-width: 1200px) {
-            .doctor-list {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-        }
-        
-        @media (max-width: 992px) {
+        /* Responsive Styles */
+        @media (max-width: 991px) {
             .sidebar {
-                width: 220px;
+                width: 200px;
             }
             .content {
-                margin-left: 220px;
-            }
-            .doctor-list {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                margin-left: 200px;
             }
         }
         
         @media (max-width: 768px) {
             .toggle-sidebar {
-                display: block;
+                display: flex;
             }
+            
             .sidebar {
                 transform: translateX(-100%);
-                width: 250px;
             }
+            
             .sidebar.active {
                 transform: translateX(0);
             }
+            
             .sidebar-overlay.active {
                 display: block;
             }
+            
             .content {
                 margin-left: 0;
+                padding: 20px;
             }
-            .doctor-list {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-            .filter-row {
+            
+            .doctor-stats {
                 flex-direction: column;
             }
-            .filter-row > div {
-                margin-bottom: 15px;
-                width: 100%;
+            
+            .filters-row .col-md-2, 
+            .filters-row .col-md-4 {
+                margin-bottom: 10px;
+            }
+            
+            .table-container {
+                overflow-x: auto;
             }
         }
         
         @media (max-width: 576px) {
-            .doctor-list {
-                grid-template-columns: 1fr;
-            }
-            .doctor-card {
-                max-width: 100%;
-            }
             .content {
-                padding: 15px 10px;
+                padding: 15px;
+            }
+            
+            .hide-xs {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <div class="sidebar" id="sidebar">
-	<div class="avatar" >Admin</div>
-        <div class="doctor-name mb-4"></div>        
-        <div class="nav-item" onclick="navigateTo('Admin/Dashboard')">Dashboard</div>
-		<div class="nav-item" onclick="navigateTo('Admin/Patients')">Patients</div>
-		<div class="nav-item " onclick="navigateTo('Admin/Doctors')">Doctors</div>
-        <div class="nav-item" onclick="navigateTo('Admin/Appointments')">Appointments</div>
+        <!-- Updated LinkedIn-style profile section -->
+        <div class="profile-section">
+            <div class="profile-background"></div>
+            <div class="profile-avatar">
+                A
+            </div>
+            <div class="profile-name">Admin</div>
+            <div class="profile-title">System Administrator</div>
+            <div class="profile-badge">
+                <i class="fas fa-circle"></i> Admin Portal
+            </div>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a onclick="navigateTo('Admin/Dashboard')" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="navigateTo('Admin/Patients')" class="nav-link">
+                    <i class="fas fa-user-injured"></i> Patients
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="navigateTo('Admin/Doctors')" class="nav-link active">
+                    <i class="fas fa-user-md"></i> Doctors
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="navigateTo('Admin/Appointments')" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a onclick="window.location.href='${pageContext.request.contextPath}/LogoutServlet'" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div class="content">
-        <h2>Doctors</h2>
-        <p class="text-muted" id="current-datetime"></p>
-        
-        <div class="container-fluid px-0">
-            <div class="d-flex justify-content-end align-items-center mb-4">
-			    <button class="btn btn-primary" onclick="navigateTo('AdminAddDoctor.jsp')">
-			        <i class="bi bi-plus-circle me-2"></i> Add New Doctor
-			    </button>
-			</div>
-            
-            <!-- Filter Section - Simplified to only include search and specialization -->
-            <div class="filter-section mb-2 pb-0">
-			    <div class="d-flex justify-content-between align-items-center">
-			        <!-- Search Filter -->
-			        <div class="me-2" style="width: 40%;">
-			            <input type="text" id="search-filter" class="form-control" placeholder="Search by name or license..." oninput="applyFilters()">
-			        </div>
-			        
-			        <!-- Specialization Filter -->
-			        <div class="me-2" style="width: 40%;">
-			            <select id="specialization-filter" class="form-select" onchange="applyFilters()">
-			                <option value="">All Specializations</option>
-			                <option value="Cardiology">Cardiology</option>
-			                <option value="Neurology">Neurology</option>
-			                <option value="Orthopedics">Orthopedics</option>
-			                <option value="Pediatrics">Pediatrics</option>
-			                <option value="Dermatology">Dermatology</option>
-			                <option value="Oncology">Oncology</option>
-			                <option value="Gynecology">Gynecology</option>
-			                <option value="Ophthalmology">Ophthalmology</option>
-			            </select>
-			        </div>
-			        
-			        <!-- Clear Filters Button -->
-			        <button class="clear-filters" onclick="clearAllFilters()">Clear All Filters</button>
-			    </div>
-			    
-			    <!-- Active Filters Display -->
-			    <div class="mt-3">
-			        <div class="filter-badges" id="active-filters">
-			            <!-- Active filters will be displayed here -->
-			        </div>
-			    </div>
-			</div>
-            
-            <!-- Results count -->
-            <div class="mb-3" id="results-count">
-                Showing all doctors
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Doctor Management</h1>
+            <!-- Add Doctor Button -->
+	        <div class="d-flex justify-content-end">
+	            <button class="btn btn-primary" onclick="navigateTo('AdminAddDoctor.jsp')">
+	                <i class="fas fa-plus-circle me-2"></i> Add New Doctor
+	            </button>
+	        </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div><i class="fas fa-filter me-2"></i> Filter Doctors</div>
+                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
             </div>
-            
-            <!-- Doctor List -->
-            <div class="doctor-list" id="doctor-list">
-                <%
-                    List<Object[]> doctors = (List<Object[]>) request.getAttribute("doctors");
-                    if (doctors != null && !doctors.isEmpty()) {
-                        for (Object[] row : doctors) {
-                            String[] specializations = {"Cardiology", "Neurology", "Orthopedics", "Pediatrics", "Dermatology"};
-                            String[] colors = {"#42A5F5", "#66BB6A", "#FFA726", "#EC407A", "#AB47BC"};
-                            int colorIndex = Math.abs(row[0].toString().hashCode()) % colors.length;
-                            String bgColor = colors[colorIndex];
-                            
-                            // Get initials from first and last name
-                            String initials = row[4].toString().charAt(0) + "" + row[5].toString().charAt(0);
-                %>
-                <div class="doctor-card" 
-                     onclick="viewDoctor('<%= row[6] %>')" 
-                     data-name="<%= row[4] %> <%= row[5] %>" 
-                     data-license="<%= row[1] %>"
-                     data-specialization="<%= row[0] %>">
-                    <div class="d-flex align-items-center">
-                        <div class="doctor-avatar" style="background-color: <%= bgColor %>;"><%= initials.toUpperCase() %></div>
-                        <div class="doctor-info">
-                            <div class="doctor-name">Dr. <%= row[4] %> <%= row[5] %></div>
-                            <div class="doctor-details"><%= row[3] %> | <b>Licence:</b>  <%= row[2] %> years</div>
-                            <div class="doctor-details"><b>Specialization:</b> <%= row[1] %></div>
-                            <div class="doctor-details"><b>Username:</b> <%= row[7] %></div>
-                            <div class="doctor-details"><b>Gender:</b>  <%= row[9] %></div>
-                            <div class="doctor-details"><b>Email: </b> <%= row[8] %></div>
-                            <div class="doctor-details"><b>Contact: </b> <%= row[10] %></div>
+            <div class="collapse show" id="filterCollapse">
+                <div class="filter-section">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <div class="search-box">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="search-filter" class="form-control" placeholder="Search by name or license..." oninput="applyFilters()">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            <select id="specialization-filter" class="form-select" onchange="applyFilters()">
+                                <option value="">All Specializations</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Oncology">Oncology</option>
+                                <option value="Gynecology">Gynecology</option>
+                                <option value="Ophthalmology">Ophthalmology</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 mb-2 mb-md-0">
+                            <select id="sort-by" class="form-select">
+                                <option value="nameAsc">Name (A-Z)</option>
+                                <option value="nameDesc">Name (Z-A)</option>
+                                <option value="expDesc">Experience (High-Low)</option>
+                                <option value="expAsc">Experience (Low-High)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-1 text-md-end">
+                            <button class="btn btn-outline-secondary" onclick="clearAllFilters()">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Filters Display -->
+                    <div class="mt-3">
+                        <div class="filter-badges" id="active-filters">
+                            <!-- Active filters will be displayed here -->
                         </div>
                     </div>
                 </div>
-                <%
-                        }
-                    } else {
-                %>
-                <div class="text-center text-danger w-100" id="no-results">No doctors found</div>
-                <%
-                    }
-                %>
-            </div>
-
-            <div class="pagination-container">
-                <ul class="pagination">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
             </div>
         </div>
+        
+        <!-- Doctor Table -->
+        <div class="table-container mb-4">
+            <table class="table doctor-table" id="doctor-table">
+                <thead>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>License</th>
+                        <th>Specialization</th>
+                        <th class="hide-xs">Experience</th>
+                        <th class="hide-xs">Contact</th>
+                        <th class="hide-xs">Email</th>
+                    </tr>
+                </thead>
+                <tbody id="doctor-table-body">
+                    <%
+                        List<Object[]> doctors = (List<Object[]>) request.getAttribute("doctors");
+                        if (doctors != null && !doctors.isEmpty()) {
+                            for (Object[] row : doctors) {
+                                // Get initials from first and last name
+                                String initials = row[4].toString().charAt(0) + "" + row[5].toString().charAt(0);
+                    %>
+                    <tr class="doctor-row"
+                        data-name="<%= row[4] %> <%= row[5] %>" 
+                        data-license="<%= row[1] %>"
+                        data-specialization="<%= row[1] %>">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="doctor-avatar"><%= initials %></div>
+                                <div>Dr. <%= row[5] %> <%= row[6] %></div>
+                            </div>
+                        </td>
+                        <td><%= row[2] %></td>
+                        <td><span class="specialization-badge"><%= row[1] %></span></td>
+                        <td class="hide-xs"><%= row[3] %> years</td>
+                        <td class="hide-xs"><%= row[10] %></td>
+                        <td class="hide-xs"><%= row[8] %></td>
+                    </tr>
+                    <%
+                            }
+                        } else {
+                    %>
+                    <tr id="no-results-row">
+                        <td colspan="7" class="text-center py-4">
+                            <div class="alert-no-results">
+                                <i class="fas fa-user-md-slash me-2"></i> No doctors found
+                            </div>
+                        </td>
+                    </tr>
+                    <%
+                        }
+                    %>
+                </tbody>
+            </table>
+        </div>
+        
     </div>
     
     <!-- Bootstrap & jQuery JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to update date and time
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Format the date: Weekday, Month Day, Year
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            
-            const formattedDateTime = now.toLocaleDateString('en-US', options);
-            document.getElementById('current-datetime').textContent = formattedDateTime;
-        }
-        
-        // Update date and time when page loads
-        updateDateTime();
-        
-        // Update date and time every second
-        setInterval(updateDateTime, 1000);
-        
-        function toggleSidebar() {
-            document.getElementById("sidebar").classList.toggle("active");
-            document.getElementById("sidebar-overlay").classList.toggle("active");
-        }
-        
-        function navigateTo(page) {
-        	const contextPath = '${pageContext.request.contextPath}';
-            window.location.href = contextPath + '/' + page;
-        }
-        
-        function viewDoctor(username) {
-            // In a real application, this would navigate to the doctor details page
-            console.log("Viewing doctor: " + username);
-            window.location.href = 'doctor-details.jsp?username=' + username;
-        }
-        
-        // Handle responsive behavior
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                document.getElementById("sidebar").classList.remove("active");
-                document.getElementById("sidebar-overlay").classList.remove("active");
-            }
-        });
-        
-        // Filter functionality - Simplified for search and specialization only
-        let activeFilters = {
-            search: '',
-            specialization: ''
-        };
-        
-        function applyFilters() {
-            // Get filter values
-            const searchValue = document.getElementById('search-filter').value.toLowerCase();
-            const specializationValue = document.getElementById('specialization-filter').value;
-            
-            // Update active filters
-            activeFilters.search = searchValue;
-            activeFilters.specialization = specializationValue;
-            
-            // Display active filters
-            updateActiveFiltersDisplay();
-            
-            // Get all doctor cards
-            const doctorCards = document.querySelectorAll('.doctor-card');
-            let visibleCount = 0;
-            
-            // Filter the cards
-            Array.from(doctorCards).forEach(card => {
-                const name = card.getAttribute('data-name').toLowerCase();
-                const license = card.getAttribute('data-license').toLowerCase();
-                const specialization = card.getAttribute('data-specialization');
-                
-                // Apply search filter
-                const matchesSearch = searchValue === '' || 
-                                     name.includes(searchValue) || 
-                                     license.includes(searchValue);
-                
-                // Apply specialization filter
-                const matchesSpecialization = specializationValue === '' || 
-                                             specialization === specializationValue;
-                
-                // Show or hide based on all filters
-                const isVisible = matchesSearch && matchesSpecialization;
-                
-                if (isVisible) {
-                    card.style.display = '';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            
-            // Show or hide no results message
-            const noResults = document.getElementById('no-results');
-            if (noResults) {
-                if (visibleCount === 0) {
-                    noResults.style.display = '';
-                } else {
-                    noResults.style.display = 'none';
-                }
-            } else if (visibleCount === 0) {
-                const doctorList = document.getElementById('doctor-list');
-                const noResultsDiv = document.createElement('div');
-                noResultsDiv.className = 'text-center text-danger w-100';
-                noResultsDiv.id = 'no-results';
-                noResultsDiv.textContent = 'No doctors match your filters';
-                doctorList.appendChild(noResultsDiv);
-            }
-            
-            // Update results count
-            updateResultsCount(visibleCount);
-        }
-        
-        function updateResultsCount(count) {
-            const resultsCountElement = document.getElementById('results-count');
-            if (count === 0) {
-                resultsCountElement.textContent = 'No doctors match your filters';
-            } else if (count === 1) {
-                resultsCountElement.textContent = 'Showing 1 doctor';
-            } else {
-                resultsCountElement.textContent = `Showing ${count} doctors`;
-            }
-        }
-        
-        function updateActiveFiltersDisplay() {
-            const activeFiltersContainer = document.getElementById('active-filters');
-            activeFiltersContainer.innerHTML = '';
-            
-            // Add search filter badge
-            if (activeFilters.search) {
-                const badge = document.createElement('div');
-                badge.className = 'filter-badge';
-                badge.innerHTML = `Search: ${activeFilters.search} <span onclick="clearFilter('search')">×</span>`;
-                activeFiltersContainer.appendChild(badge);
-            }
-            
-            // Add specialization filter badge
-            if (activeFilters.specialization) {
-                const badge = document.createElement('div');
-                badge.className = 'filter-badge';
-                badge.innerHTML = `Specialization: ${activeFilters.specialization} <span onclick="clearFilter('specialization')">×</span>`;
-                activeFiltersContainer.appendChild(badge);
-            }
-        }
-        
-        function clearFilter(filterType) {
-            if (filterType === 'search') {
-                document.getElementById('search-filter').value = '';
-                activeFilters.search = '';
-            } else if (filterType === 'specialization') {
-                document.getElementById('specialization-filter').value = '';
-                activeFilters.specialization = '';
-            }
-            
-            applyFilters();
-        }
-        
-        function clearAllFilters() {
-            document.getElementById('search-filter').value = '';
-            document.getElementById('specialization-filter').value = '';
-            
-            activeFilters = {
-                search: '',
-                specialization: ''
-            };
-            
-            applyFilters();
-        }
-        
-        // Initialize with default values
-        document.addEventListener('DOMContentLoaded', function() {
-            // Count initial doctors
-            const doctorCards = document.querySelectorAll('.doctor-card');
-            updateResultsCount(doctorCards.length);
-        });
-    </script>
+		 // Replace the entire JavaScript section at the bottom of your file
+		
+		 // Function to update date and time
+		 function updateDateTime() {
+		     const now = new Date();
+		     
+		     // Format the date: Weekday, Month Day, Year
+		     const options = { 
+		         weekday: 'long', 
+		         year: 'numeric', 
+		         month: 'long', 
+		         day: 'numeric',
+		         hour: '2-digit',
+		         minute: '2-digit',
+		         second: '2-digit'
+		     };
+		     
+		     const formattedDateTime = now.toLocaleDateString('en-US', options);
+		     if (document.getElementById('current-datetime')) {
+		         document.getElementById('current-datetime').textContent = formattedDateTime;
+		     }
+		 }
+		
+		 // Update date and time when page loads
+		 updateDateTime();
+		
+		 // Update date and time every second
+		 setInterval(updateDateTime, 1000);
+		
+		 function toggleSidebar() {
+		     document.getElementById("sidebar").classList.toggle("active");
+		     document.getElementById("sidebar-overlay").classList.toggle("active");
+		 }
+		
+		 function navigateTo(page) {
+		     const contextPath = '${pageContext.request.contextPath}';
+		     window.location.href = contextPath + '/' + page;
+		 }
+		
+		 function viewDoctor(username) {
+		     // In a real application, this would navigate to the doctor details page
+		     console.log("Viewing doctor: " + username);
+		     window.location.href = '${pageContext.request.contextPath}/Admin/DoctorDetails?id=' + username;
+		 }
+		
+		 function editDoctor(username) {
+		     // In a real application, this would navigate to the doctor edit page
+		     console.log("Editing doctor: " + username);
+		     window.location.href = '${pageContext.request.contextPath}/Admin/EditDoctor?id=' + username;
+		 }
+		
+		 // Filter functionality
+		 let activeFilters = {
+		     search: '',
+		     specialization: ''
+		 };
+		
+		 // Debounce function to limit how often a function can run
+		 function debounce(func, wait) {
+		     let timeout;
+		     return function(...args) {
+		         clearTimeout(timeout);
+		         timeout = setTimeout(() => func.apply(this, args), wait);
+		     };
+		 }
+		
+		 // Real-time filtering implementation
+		 function applyFilters() {
+		     console.log("Applying filters...");
+		     
+		     // Get filter values
+		     const searchValue = document.getElementById('search-filter').value.toLowerCase();
+		     const specializationValue = document.getElementById('specialization-filter').value;
+		     
+		     // Display active filters
+		     updateActiveFiltersDisplay();
+		     
+		     // Get all doctor rows
+		     const doctorRows = document.querySelectorAll('.doctor-row');
+		     let visibleCount = 0;
+		     
+		     // Filter the rows
+		     Array.from(doctorRows).forEach(row => {
+		         const name = row.getAttribute('data-name').toLowerCase();
+		         const license = row.getAttribute('data-license').toLowerCase();
+		         const specialization = row.getAttribute('data-specialization');
+		         
+		         // Apply search filter
+		         const matchesSearch = searchValue === '' || 
+		                              name.includes(searchValue) || 
+		                              license.includes(searchValue);
+		         
+		         // Apply specialization filter
+		         const matchesSpecialization = specializationValue === '' || 
+		                                      specialization === specializationValue;
+		         
+		         // Show or hide based on all filters
+		         const isVisible = matchesSearch && matchesSpecialization;
+		         
+		         if (isVisible) {
+		             row.style.display = '';
+		             visibleCount++;
+		         } else {
+		             row.style.display = 'none';
+		         }
+		     });
+		     
+		     // Show or hide no results message
+		     const tbody = document.getElementById('doctor-table-body');
+		     
+		     // Remove dynamic no results row if it exists
+		     const dynamicNoResults = document.getElementById('dynamic-no-results');
+		     if (dynamicNoResults) {
+		         dynamicNoResults.remove();
+		     }
+		     
+		     // Add no results row if needed
+		     if (visibleCount === 0 && doctorRows.length > 0) {
+		         const newNoResultsRow = document.createElement('tr');
+		         newNoResultsRow.id = 'dynamic-no-results';
+		         newNoResultsRow.innerHTML = `
+		             <td colspan="6" class="text-center py-4">
+		                 <div class="alert-no-results">
+		                     <i class="fas fa-filter me-2"></i> No doctors match your filters
+		                 </div>
+		             </td>
+		         `;
+		         tbody.appendChild(newNoResultsRow);
+		     }
+		     
+		     // Update counter if it exists
+		     //const counterElement = document.getElementById('doctors-counter');
+		     //if (counterElement) {
+		         //counterElement.textContent = visibleCount;
+		     //}
+		     
+		     //console.log(`Filter applied: ${visibleCount} doctors visible`);
+		 }
+		
+		 function updateActiveFiltersDisplay() {
+		     const activeFiltersContainer = document.getElementById('active-filters');
+		     activeFiltersContainer.innerHTML = '';
+		     
+		     // Add search filter badge
+		     if (activeFilters.search) {
+		         const badge = document.createElement('div');
+		         badge.className = 'filter-badge';
+		         badge.innerHTML = `Search: ${activeFilters.search} <span onclick="clearFilter('search')">×</span>`;
+		         activeFiltersContainer.appendChild(badge);
+		     }
+		     
+		     // Add specialization filter badge
+		     if (activeFilters.specialization) {
+		         const badge = document.createElement('div');
+		         badge.className = 'filter-badge';
+		         badge.innerHTML = `Specialization: ${activeFilters.specialization} <span onclick="clearFilter('specialization')">×</span>`;
+		         activeFiltersContainer.appendChild(badge);
+		     }
+		 }
+		
+		 function clearFilter(filterType) {
+		     if (filterType === 'search') {
+		         document.getElementById('search-filter').value = '';
+		         activeFilters.search = '';
+		     } else if (filterType === 'specialization') {
+		         document.getElementById('specialization-filter').value = '';
+		         activeFilters.specialization = '';
+		     }
+		     
+		     applyFilters();
+		 }
+		
+		 function clearAllFilters() {
+		     document.getElementById('search-filter').value = '';
+		     document.getElementById('specialization-filter').value = '';
+		     document.getElementById('sort-by').value = 'nameAsc';
+		     
+		     activeFilters = {
+		         search: '',
+		         specialization: ''
+		     };
+		     
+		     applyFilters();
+		     sortDoctors();
+		 }
+		
+		 function sortDoctors() {
+		     const sortBy = document.getElementById('sort-by').value;
+		     const tbody = document.getElementById('doctor-table-body');
+		     const rows = Array.from(document.querySelectorAll('.doctor-row'));
+		     
+		     // Remove any existing "no results" row before sorting
+		     const noResultsRow = document.getElementById('dynamic-no-results');
+		     if (noResultsRow) {
+		         noResultsRow.remove();
+		     }
+		     
+		     // Sort doctors based on selected criteria
+		     rows.sort((a, b) => {
+		         const nameA = a.getAttribute('data-name');
+		         const nameB = b.getAttribute('data-name');
+		         const expA = parseInt(a.querySelector('td:nth-child(4)').textContent);
+		         const expB = parseInt(b.querySelector('td:nth-child(4)').textContent);
+		         
+		         switch(sortBy) {
+		             case 'nameAsc':
+		                 return nameA.localeCompare(nameB);
+		             case 'nameDesc':
+		                 return nameB.localeCompare(nameA);
+		             case 'expDesc':
+		                 return expB - expA;
+		             case 'expAsc':
+		                 return expA - expB;
+		             default:
+		                 return 0;
+		         }
+		     });
+		     
+		     // Reappend sorted rows
+		     rows.forEach(row => {
+		         if (row.style.display !== 'none') {
+		             tbody.appendChild(row);
+		         }
+		     });
+		 }
+		
+		 // Initialize event listeners when the DOM is fully loaded
+		 document.addEventListener('DOMContentLoaded', function() {
+		     console.log("Document loaded, initializing event listeners");
+		     
+		     
+		     // Set up search input for real-time filtering with debounce
+		     const searchInput = document.getElementById('search-filter');
+		     if (searchInput) {
+		         const debouncedFilter = debounce(applyFilters, 300);
+		         searchInput.addEventListener('input', debouncedFilter);
+		         
+		         // Add Escape key functionality to clear search
+		         searchInput.addEventListener('keyup', function(e) {
+		             if (e.key === 'Escape') {
+		                 this.value = '';
+		                 applyFilters();
+		             }
+		         });
+		     }
+		     
+		     // Set up specialization filter
+		     const specializationFilter = document.getElementById('specialization-filter');
+		     if (specializationFilter) {
+		         specializationFilter.addEventListener('change', applyFilters);
+		     }
+		     
+		     // Set up sort by dropdown
+		     const sortBySelect = document.getElementById('sort-by');
+		     if (sortBySelect) {
+		         sortBySelect.addEventListener('change', sortDoctors);
+		     }
+		     
+		     // Handle responsive behavior
+		     window.addEventListener('resize', function() {
+		         if (window.innerWidth > 768) {
+		             document.getElementById("sidebar").classList.remove("active");
+		             document.getElementById("sidebar-overlay").classList.remove("active");
+		         }
+		     });
+		 });
+	</script>
 </body>
 </html>
