@@ -610,10 +610,7 @@
 		        <div class="analytics-info">
 		            <div style="font-size: 16px; font-weight: 500; color: #2b3d4f; margin-bottom: 10px;">Total Patient</div>
 		            <div style="font-size: 32px; font-weight: 700; color: #2b3d4f; margin-bottom: 10px;">
-		                <c:out value="${totalPatients != null ? totalPatients : '978'}" />
-		            </div>
-		            <div style="display: flex; align-items: center; font-size: 13px; font-weight: 500; color: #34c759;">
-		                <i class="fas fa-arrow-up" style="margin-right: 5px;"></i> 15% From Last Week
+		                <c:out value="${totalPatients != null ? totalPatients : '1'}" />
 		            </div>
 		        </div>
 		        <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: #f0f4fd; border-radius: 10px; color: #4a5687;">
@@ -626,10 +623,7 @@
 		        <div class="analytics-info">
 		            <div style="font-size: 16px; font-weight: 500; color: #2b3d4f; margin-bottom: 10px;">Patients Today</div>
 		            <div style="font-size: 32px; font-weight: 700; color: #2b3d4f; margin-bottom: 10px;">
-		                <c:out value="${patientsToday != null ? patientsToday : '80'}" />
-		            </div>
-		            <div style="display: flex; align-items: center; font-size: 13px; font-weight: 500; color: #ff3b30;">
-		                <i class="fas fa-arrow-up" style="margin-right: 5px;"></i> 15% From Yesterday
+		                <c:out value="${patientsToday != null ? patientsToday : '0'}" />
 		            </div>
 		        </div>
 		        <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: #f0f4fd; border-radius: 10px; color: #4a5687;">
@@ -642,10 +636,7 @@
 		        <div class="analytics-info">
 		            <div style="font-size: 16px; font-weight: 500; color: #2b3d4f; margin-bottom: 10px;">Appointments Today</div>
 		            <div style="font-size: 32px; font-weight: 700; color: #2b3d4f; margin-bottom: 10px;">
-		                <c:out value="${appointmentsToday != null ? appointmentsToday : '50'}" />
-		            </div>
-		            <div style="display: flex; align-items: center; font-size: 13px; font-weight: 500; color: #34c759;">
-		                <i class="fas fa-arrow-up" style="margin-right: 5px;"></i> 20% From Yesterday
+		                <c:out value="${appointmentsToday != null ? appointmentsToday : '0'}" />
 		            </div>
 		        </div>
 		        <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: #f0f4fd; border-radius: 10px; color: #4a5687;">

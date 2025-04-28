@@ -821,51 +821,107 @@
             </c:if>
         </div>
         
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Patient Dashboard</h1>
-            <p class="page-subtitle" id="current-datetime"></p>
-        </div>
-        
-        <!-- Statistics Cards -->
-        <div class="statistics-row">
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Upcoming Appointments</h3>
-                    <p>
-                        <c:choose>
-                            <c:when test="${not empty upcomingAppointments}">
-                                ${fn:length(upcomingAppointments)}
-                            </c:when>
-                            <c:otherwise>0</c:otherwise>
-                        </c:choose>
-                    </p>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-calendar-alt"></i>
+        <!-- Upcoming Statistics Cards -->
+        <div class="card">
+            <div class="card-header">
+                <div><i class="fas fa-chart-line me-2"></i>Upcoming Appointment Overview</div>
+                <div class="total-appointments">
+                	<c:out value="2" default="0" /> TOTAL
+                    <!--<c:out value="${activeDoctorCount}" default="0" /> TOTAL-->
                 </div>
             </div>
-            
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Completed Visits</h3>
-                    <p>12</p>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-check-circle"></i>
+            <div class="p-3">
+            	<div class="statistics-row">
+
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Pending Appointment</h3>
+		                    <p>
+		                        <c:out value="${totalPatients}" default="2" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon">
+		                    <i class="fas fa-user-injured"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Completed Appointment</h3>
+		                    <p>
+		                        <c:out value="${doctorCount}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon">
+		                    <i class="fas fa-user-md"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Cancelled Appointment</h3>
+		                    <p>
+		                        <c:out value="${totalAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon">
+		                    <i class="fas fa-calendar-check"></i>
+		                </div>
+		            </div>
+		        </div>
+            </div>
+         </div>
+         
+         <!-- Today Statistics Cards -->
+         <div class="card">
+            <div class="card-header">
+                <div><i class="fas fa-chart-line me-2"></i>Today's Appointment Overview</div>
+                <div class="total-appointments">
+                	<c:out value="0" default="0" /> TOTAL
+                    <!--<c:out value="${activeDoctorCount}" default="0" /> TOTAL-->
                 </div>
             </div>
-            
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Prescription Count</h3>
-                    <p>8</p>
-                </div>
-                <div class="stat-icon">
-                    <i class="fas fa-pills"></i>
-                </div>
+            <div class="p-3">
+            	<div class="statistics-row">
+
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Pending Appointment</h3>
+		                    <p>
+		                        <c:out value="${totalPatients}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon">
+		                    <i class="fas fa-user-injured"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Completed Appointment</h3>
+		                    <p>
+		                        <c:out value="${doctorCount}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon">
+		                    <i class="fas fa-user-md"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Cancelled Appointment</h3>
+		                    <p>
+		                        <c:out value="${totalAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon">
+		                    <i class="fas fa-calendar-check"></i>
+		                </div>
+		            </div>
+		        </div>
             </div>
-        </div>
+         </div>
         
         <!-- Appointments Card with Search and Filters -->
         <div class="card">
@@ -909,11 +965,11 @@
                     <table class="appointments-table" id="appointmentsTable">
                         <thead>
                             <tr>
-                                <th onclick="sortTable(0)">Doctor <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(1)">Date <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(2)">Token <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(3)">Reason <i class="fas fa-sort"></i></th>
-                                <th onclick="sortTable(4)">Status <i class="fas fa-sort"></i></th>
+                                <th onclick="sortTable(0)">Doctor</th>
+                                <th onclick="sortTable(1)">Date</th>
+                                <th onclick="sortTable(2)">Token</th>
+                                <th onclick="sortTable(3)">Reason</th>
+                                <th onclick="sortTable(4)">Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

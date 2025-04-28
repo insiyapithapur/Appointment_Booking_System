@@ -2,7 +2,10 @@ package com.training.project.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.hibernate.*;
 import org.hibernate.query.Query;
 import com.training.project.dao.Imp.*;
@@ -363,6 +366,36 @@ public class AdminService {
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return 0;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
+	/**
+	 * Dashboard content
+	 * @return analytics
+	 */
+	public Map<String, List<Map<String, Object>>> getDashboardSummary() {
+	    Map<String, List<Map<String, Object>>> summary = new HashMap<>();
+	    Session session = sessionFactory.openSession();
+	    try {
+	        patientDao = new PatientDaoImp(session);
+	        doctorDao = new DoctorDaoImp(session);
+	        appointmentDao = new AppointmentDaoImp(session);
+
+	        // Get all analytics in one go
+	        summary.put("patientAnalytics", patientDao.getPatientAnalytics());
+	        summary.put("doctorAnalytics", doctorDao.getDoctorAnalytics());
+	        summary.put("todayActiveDoctors", doctorDao.getTodayActiveDoctors());
+	        summary.put("todayAppointmentAnalytics", appointmentDao.getTodayAppointmentAnalytics());
+	        summary.put("overallAppointmentAnalytics", appointmentDao.getOverallAppointmentAnalytics());
+
+	        summary.forEach((key, value) -> System.out.println(key + ": " + value));
+	        
+	        return summary;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return new HashMap<>();
 	    } finally {
 	        session.close();
 	    }

@@ -1,0 +1,41 @@
+
+Common in All
+	Logout --> status --> InActive
+	Error and Succes message --> session delete after some time
+	sidebar content
+
+Admin 
+	/**
+			Dashboard --> All procedures integrate
+			Dashboard procedures :-
+				Patients analytics :- active, inactive, this week new patient, total patient
+				Doctor analytics :- active, total doctors
+				Today Active doctor Information :- name, Specialization, today's pending appointments
+				appointment analytics :- 
+					Today :- pending, completed, cancelled , total
+					Overall :- pending, completed, cancelled , total
+					
+			Add Doctor --> Add Schedule btn is not working
+			
+			Appointment --> unwanted extra I is coming before patient and doctor name
+			
+			Appointment --> View medical history and complete medical history can be made by admin
+	**/
+	
+	Doctor --> On clicking doctor admin can see doctor schedule 
+	
+
+Patient
+	Side bar --> All procedures integrate
+	Dashboard --> All procedure integrate, instead of Upcoming have total with past also
+	Confiemed Appointment --> Show only those days which has selected
+	Profile --> Edit and Change password
+	
+	
+Dotor
+	Dashboard --> All procedures integrate
+	Profile --> Edit and Change password
+	
+	
+1. Mostly it is integration of analysis function/ PL/SQL functions
+2. Deployment

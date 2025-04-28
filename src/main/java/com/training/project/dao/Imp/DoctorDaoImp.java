@@ -1,10 +1,18 @@
 package com.training.project.dao.Imp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.persistence.ParameterMode;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.procedure.ProcedureCall;
 import org.hibernate.query.Query;
+import org.hibernate.result.Output;
+import org.hibernate.result.ResultSetOutput;
 
 import com.training.project.dao.GenericDao;
 import com.training.project.model.Doctor;
@@ -242,4 +250,57 @@ public class DoctorDaoImp implements GenericDao<Doctor, Integer> {
         }
 
      }
+ 
+	 public List<Map<String, Object>> getDoctorAnalytics() {
+//	     Session session = sessionFactory.getCurrentSession();
+	     
+	     ProcedureCall call = session.createStoredProcedureCall("dashboard_analytics.get_doctor_analytics");
+	     
+	     // Register the OUT parameters
+	     call.registerParameter("p_active_count", Integer.class, ParameterMode.OUT);
+	     call.registerParameter("p_total_count", Integer.class, ParameterMode.OUT);
+	     
+	     // Execute the procedure
+	     call.execute();
+	     
+	     // Extract the results into a Map
+	     Map<String, Object> analyticsMap = new HashMap<>();
+	     analyticsMap.put("activeCount", ((Number) call.getOutputParameterValue("p_active_count")).intValue());
+	     analyticsMap.put("totalCount", ((Number) call.getOutputParameterValue("p_total_count")).intValue());
+	     
+	     // Add to list
+	     List<Map<String, Object>> result = new ArrayList<>();
+	     result.add(analyticsMap);
+	     result.forEach(System.out::println);
+	     return result;
+	 }
+	 
+	 public List<Map<String, Object>> getTodayActiveDoctors() {
+//	        Session session = sessionFactory.getCurrentSession();
+	        
+	        ProcedureCall call = session.createStoredProcedureCall("dashboard_analytics.get_today_active_doctors");
+	        
+	        // Register the OUT parameters (REF CURSOR)
+	        call.registerParameter("p_result", Class.class, ParameterMode.REF_CURSOR);
+	        
+	        // Execute the procedure
+	        Output output = call.getOutputs().getCurrent();
+	        
+	        List<Map<String, Object>> doctorsList = new ArrayList<>();
+	        
+	        if (output.isResultSet()) {
+	            ResultSetOutput resultSetOutput = (ResultSetOutput) output;
+	            List<Object[]> results = resultSetOutput.getResultList();
+	            
+	            for (Object[] row : results) {
+	                Map<String, Object> doctorMap = new HashMap<>();
+	                doctorMap.put("name", (String) row[0]);
+	                doctorMap.put("specialization", (String) row[1]);
+	                doctorMap.put("pendingAppointments", ((Number) row[2]).intValue());
+	                doctorsList.add(doctorMap);
+	            }
+	        }
+	        doctorsList.forEach(System.out::println);
+	        return doctorsList;
+	    }
 }

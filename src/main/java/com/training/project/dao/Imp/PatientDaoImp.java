@@ -1,9 +1,16 @@
 package com.training.project.dao.Imp;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.persistence.ParameterMode;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.procedure.ProcedureCall;
 import org.hibernate.query.Query;
 import com.training.project.dao.GenericDao;
 import com.training.project.model.Patient;
@@ -207,4 +214,33 @@ public class PatientDaoImp implements GenericDao<Patient, Integer> {
         
         return count;
     }
+    
+    public List<Map<String, Object>> getPatientAnalytics() {
+//        Session session = sessionFactory.getCurrentSession();
+        
+        ProcedureCall call = session.createStoredProcedureCall("dashboard_analytics.get_patient_analytics");
+        
+        // Register the OUT parameters
+        call.registerParameter("p_active_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_inactive_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_new_this_week", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_total_count", Integer.class, ParameterMode.OUT);
+        
+        // Execute the procedure
+        call.execute();
+        
+        // Extract the results into a Map
+        Map<String, Object> analyticsMap = new HashMap<>();
+        analyticsMap.put("activeCount", ((Number) call.getOutputParameterValue("p_active_count")).intValue());
+        analyticsMap.put("inactiveCount", ((Number) call.getOutputParameterValue("p_inactive_count")).intValue());
+        analyticsMap.put("newThisWeek", ((Number) call.getOutputParameterValue("p_new_this_week")).intValue());
+        analyticsMap.put("totalCount", ((Number) call.getOutputParameterValue("p_total_count")).intValue());
+        
+        // Add to list
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(analyticsMap);
+        result.forEach(System.out::println);
+        return result;
+    }
+    
 }

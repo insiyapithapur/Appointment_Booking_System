@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment</title>
+    <title>Medical Record Details</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Inter font from Google Fonts -->
@@ -187,8 +187,8 @@
             font-size: 14px;
         }
         
-        /* Card styles */
-        .card {
+        /* Medical Record styles */
+        .medical-record-container {
             background-color: var(--bg-color);
             border-radius: 8px;
             border: 1px solid var(--border-color);
@@ -197,74 +197,7 @@
             box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
         }
         
-        .card-header {
-            padding: 15px 20px;
-            font-weight: 600;
-            color: var(--primary-color);
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--primary-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        /* Doctor info card */
-        .doctor-card {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
-        }
-        
-        .doctor-avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 24px;
-            margin-right: 20px;
-        }
-        
-        .doctor-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-        
-        .doctor-specialty {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-        
-        .badge-specialty {
-            background-color: rgba(47, 128, 237, 0.1);
-            color: #2f80ed;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-block;
-        }
-        
-        /* Schedule styles */
-        .schedule-container {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
-        }
-        
-        .schedule-header {
+        .medical-record-header {
             padding: 15px 20px;
             font-weight: 600;
             color: var(--primary-color);
@@ -272,68 +205,96 @@
             background-color: var(--primary-light);
             display: flex;
             align-items: center;
+            font-size: 16px;
         }
         
-        .schedule-header i {
+        .medical-record-header i {
             margin-right: 10px;
         }
         
-        .schedule-card {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-            height: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        .medical-record-content {
+            padding: 25px;
         }
         
-        .schedule-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(77, 171, 247, 0.1);
-        }
-        
-        .schedule-card.unavailable {
-            opacity: 0.7;
-            background-color: #f8f9fa;
-        }
-        
-        .schedule-card-header {
-            padding: 12px 15px;
+        .medical-record-section {
+            margin-bottom: 25px;
             border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        
+        .medical-record-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            width: 18px;
+            text-align: center;
+        }
+        
+        .section-content {
+            padding-left: 10px;
+        }
+        
+        .metadata {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .metadata i {
+            width: 16px;
+            margin-right: 8px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .metadata-label {
+            font-weight: 500;
+            margin-right: 5px;
+            color: var(--text-primary);
+        }
+        
+        .medical-info {
             background-color: var(--bg-secondary);
+            border-left: 3px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 0 4px 4px 0;
+            color: var(--text-primary);
         }
         
-        .day-badge {
-            background-color: rgba(47, 128, 237, 0.1);
-            color: #2f80ed;
-            padding: 5px 10px;
-            border-radius: 4px;
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        /* Button styles */
+        .btn {
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: 500;
-            font-size: 12px;
             display: inline-flex;
             align-items: center;
-        }
-        
-        .day-badge i {
-            margin-right: 5px;
-        }
-        
-        .time-badge {
-            background-color: rgba(46, 125, 50, 0.1);
-            color: #2e7d32;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .time-badge i {
-            margin-right: 5px;
+            gap: 8px;
+            transition: all 0.2s;
         }
         
         .btn-primary {
@@ -346,31 +307,30 @@
             border-color: var(--primary-dark);
         }
         
-        .btn-secondary {
-            background-color: #e9ecef;
-            border-color: #dee2e6;
-            color: #6c757d;
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
         }
         
-        .back-button {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
-            border: none;
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* Alert styles */
+        .alert {
             border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            cursor: pointer;
-            text-decoration: none;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
-        .back-button:hover {
-            background-color: var(--primary-dark);
-            color: white;
+        .alert-danger {
+            background-color: rgba(255, 76, 81, 0.1);
+            color: #e03131;
+            border: 1px solid rgba(255, 76, 81, 0.2);
         }
         
         /* Toggle Sidebar Button */
@@ -409,21 +369,12 @@
         }
         
         /* Responsive Styles */
-        @media (max-width: 1200px) {
-            .card-columns {
-                column-count: 2;
-            }
-        }
-        
         @media (max-width: 991px) {
             .sidebar {
                 width: 200px;
             }
             .content {
                 margin-left: 200px;
-            }
-            .card-columns {
-                column-count: 1;
             }
         }
         
@@ -449,32 +400,41 @@
                 padding: 20px;
             }
             
-            .doctor-info {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            
-            .doctor-avatar-large {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-        }
-        
-        @media (max-width: 576px) {
             .page-header-row {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
             
+            .actions {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 576px) {
             .content {
                 padding: 15px;
             }
-            
-            .schedule-card-header {
-                flex-direction: column;
-                gap: 8px;
+        }
+        
+        /* Print styles */
+        @media print {
+            .sidebar, .toggle-sidebar, .sidebar-overlay, .actions {
+                display: none !important;
+            }
+            .content {
+                margin-left: 0;
+                padding: 0;
+            }
+            .medical-record-container {
+                box-shadow: none;
+                border: none;
+            }
+            .page-header-row {
+                margin-bottom: 20px;
+            }
+            .page-subtitle {
+                display: none;
             }
         }
     </style>
@@ -491,34 +451,34 @@
         <div class="profile-section">
             <div class="profile-background"></div>
             <div class="profile-avatar">
-                ${fn:substring(sessionScope.username, 0, 1)}
+                A
             </div>
-            <div class="profile-name">${sessionScope.username}</div>
-            <div class="profile-title">Patient</div>
+            <div class="profile-name">Admin</div>
+            <div class="profile-title">System Administrator</div>
             <div class="profile-badge">
-                <i class="fas fa-circle"></i> Active Member
+                <i class="fas fa-circle"></i> Admin Portal
             </div>
         </div>
         
         <ul class="nav-menu">
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Dashboard')" class="nav-link">
+                <a onclick="navigateTo('Admin/Dashboard')" class="nav-link">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Appointments')" class="nav-link">
-                    <i class="fas fa-calendar-check"></i> Appointments
+                <a onclick="navigateTo('Admin/Patients')" class="nav-link">
+                    <i class="fas fa-user-injured"></i> Patients
                 </a>
             </li>
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Doctors')" class="nav-link active">
+                <a onclick="navigateTo('Admin/Doctors')" class="nav-link">
                     <i class="fas fa-user-md"></i> Doctors
                 </a>
             </li>
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Profile')" class="nav-link">
-                    <i class="fas fa-user"></i> Profile
+                <a onclick="navigateTo('Admin/Appointments')" class="nav-link active">
+                    <i class="fas fa-calendar-check"></i> Appointments
                 </a>
             </li>
             <li class="nav-item">
@@ -533,78 +493,116 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="d-flex justify-content-between align-items-center mb-2 page-header-row">
-                <h1 class="page-title">Book Appointment</h1>
-                <button class="back-button" onclick="navigateTo('Patient/Doctors')">
-                    <i class="fas fa-arrow-left"></i> Back to Doctors
-                </button>
+                <h1 class="page-title">Medical Record</h1>
+                <a href="${pageContext.request.contextPath}/Admin/Appointments" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Appointments
+                </a>
             </div>
         </div>
         
-        <!-- Doctor Information -->
-        <div class="doctor-card mb-4">
-            <div class="d-flex">
-                <div class="doctor-avatar-large" style="background-color: hsl(${doctorId * 40 % 360}, 70%, 60%)">
-                    ${fn:substring(doctorName, 0, 1)}
+        <!-- Display any error messages -->
+        <c:if test="${not empty sessionScope.errorMessage}">
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>${sessionScope.errorMessage}</div>
+                <c:remove var="errorMessage" scope="session" />
+            </div>
+        </c:if>
+        
+        <!-- Medical Record Display -->
+        <div class="medical-record-container">
+            <div class="medical-record-header">
+                <i class="fas fa-clipboard-list"></i> Medical Record Details
+            </div>
+            <div class="medical-record-content">
+                <!-- Appointment Details -->
+                <div class="medical-record-section">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-alt"></i> Appointment Information
+                    </div>
+                    <div class="section-content">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="metadata">
+                                    <i class="fas fa-hashtag"></i>
+                                    <span class="metadata-label">Appointment ID:</span> ${appointmentId}
+                                </p>
+                                <p class="metadata">
+                                    <i class="far fa-calendar"></i>
+                                    <span class="metadata-label">Date:</span> 
+                                    <c:if test="${not empty medicalRecord.appointment.appointmentDate}">
+                                        <fmt:parseDate value="${medicalRecord.appointment.appointmentDate}" pattern="yyyy-MM-dd" var="parsedDate" type="date" />
+                                        <fmt:formatDate value="${parsedDate}" pattern="MMMM dd, yyyy" />
+                                    </c:if>
+                                </p>
+                                <p class="metadata">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span class="metadata-label">Token Number:</span> ${medicalRecord.appointment.tokenNo}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="metadata">
+                                    <i class="fas fa-user-md"></i>
+                                    <span class="metadata-label">Doctor:</span> Dr. ${medicalRecord.appointment.schedule.doctor.user.username}
+                                </p>
+                                <p class="metadata">
+                                    <i class="fas fa-stethoscope"></i>
+                                    <span class="metadata-label">Specialization:</span> ${medicalRecord.appointment.schedule.doctor.specialization}
+                                </p>
+                                <p class="metadata">
+                                    <i class="fas fa-comment-medical"></i>
+                                    <span class="metadata-label">Reason:</span> ${medicalRecord.appointment.reason}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div class="doctor-name">${doctorName}</div>
-                    <div class="mb-2"><span class="badge-specialty">${doctorSpecialty}</span></div>
-                    <div class="doctor-specialty mb-1">${doctorExperience} • ${doctorDegree}</div>
-                    <div class="text-secondary"><i class="fas fa-phone-alt me-2"></i>${doctorContact}</div>
+                
+                <!-- Diagnosis -->
+                <div class="medical-record-section">
+                    <div class="section-title">
+                        <i class="fas fa-diagnoses"></i> Diagnosis
+                    </div>
+                    <div class="section-content">
+                        <div class="medical-info">
+                            ${not empty medicalRecord.diagnosis ? medicalRecord.diagnosis : 'No diagnosis provided.'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Treatment -->
+                <div class="medical-record-section">
+                    <div class="section-title">
+                        <i class="fas fa-procedures"></i> Treatment
+                    </div>
+                    <div class="section-content">
+                        <div class="medical-info">
+                            ${not empty medicalRecord.treatment ? medicalRecord.treatment : 'No treatment information provided.'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notes -->
+                <div class="medical-record-section">
+                    <div class="section-title">
+                        <i class="fas fa-sticky-note"></i> Additional Notes
+                    </div>
+                    <div class="section-content">
+                        <div class="medical-info">
+                            ${not empty medicalRecord.notes ? medicalRecord.notes : 'No additional notes provided.'}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Schedule Container -->
-        <div class="schedule-container">
-            <div class="schedule-header">
-                <i class="far fa-calendar-alt"></i> Available Time Slots
-            </div>
-            <div class="p-4">
-                <div class="row g-3">
-                    <c:forEach items="${schedules}" var="scheduleInfo" varStatus="status">
-                        <c:set var="scheduleParts" value="${fn:split(scheduleInfo, '|')}" />
-                        <c:set var="scheduleId" value="${fn:trim(fn:substringAfter(scheduleParts[0], 'Schedule ID:'))}" />
-                        <c:set var="doctorId" value="${fn:trim(fn:substringAfter(scheduleParts[1], 'Doctor ID:'))}" />
-                        <c:set var="day" value="${fn:trim(fn:substringAfter(scheduleParts[2], 'Day:'))}" />
-                        <c:set var="time" value="${fn:trim(fn:substringAfter(scheduleParts[3], 'Time:'))}" />
-                        <c:set var="isAvailable" value="${fn:trim(fn:substringAfter(scheduleParts[5], 'Available:'))}" />
-                        
-                        <div class="col-md-6 col-lg-4">
-                            <div class="schedule-card ${isAvailable eq 'Yes' ? '' : 'unavailable'}">
-                                <div class="schedule-card-header">
-                                    <span class="day-badge"><i class="far fa-calendar"></i> ${day}</span>
-                                    <span class="time-badge"><i class="far fa-clock"></i> ${time}</span>
-                                </div>
-                                <div class="card-body p-3">
-                                    <c:choose>
-                                        <c:when test="${isAvailable eq 'Yes'}">
-                                            <a href="${pageContext.request.contextPath}/Patient/ConfirmAppointment?scheduleId=${scheduleId}&day=${day}" 
-                                               class="btn btn-primary w-100">
-                                                <i class="fas fa-check-circle me-2"></i> Select This Slot
-                                            </a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button class="btn btn-secondary w-100" disabled>
-                                                <i class="fas fa-times-circle me-2"></i> Not Available
-                                            </button>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
-                    
-                    <c:if test="${empty schedules}">
-                        <div class="col-12 py-4">
-                            <div class="alert alert-info text-center">
-                                <i class="fas fa-info-circle me-2"></i>
-                                No available schedules found for this doctor.
-                            </div>
-                        </div>
-                    </c:if>
-                </div>
-            </div>
+        <div class="actions">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Medical Record
+            </button>
+            <button class="btn btn-outline-primary" onclick="downloadPDF()">
+                <i class="fas fa-file-pdf"></i> Download as PDF
+            </button>
         </div>
     </div>
     
@@ -620,6 +618,13 @@
         function navigateTo(page) {
             const contextPath = '${pageContext.request.contextPath}';
             window.location.href = contextPath + '/' + page;
+        }
+        
+        // Simple PDF download simulation (would need a proper PDF library in production)
+        function downloadPDF() {
+            alert("PDF download functionality would be implemented with a server-side PDF generator.");
+            // In production, this would redirect to a servlet that generates a PDF
+            // window.location.href = "${pageContext.request.contextPath}/Patient/MedicalRecord/pdf?id=${appointmentId}";
         }
         
         // Handle responsive behavior

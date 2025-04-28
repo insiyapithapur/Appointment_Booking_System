@@ -2,10 +2,15 @@ package com.training.project.dao.Imp;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.persistence.ParameterMode;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.procedure.ProcedureCall;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
@@ -455,5 +460,61 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
             e.printStackTrace();
             return null;
         }
+    }
+    
+    public List<Map<String, Object>> getTodayAppointmentAnalytics() {
+//        Session session = sessionFactory.getCurrentSession();
+        
+        ProcedureCall call = session.createStoredProcedureCall("dashboard_analytics.get_today_appointment_analytics");
+        
+        // Register the OUT parameters
+        call.registerParameter("p_pending_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_completed_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_cancelled_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_total_count", Integer.class, ParameterMode.OUT);
+        
+        // Execute the procedure
+        call.execute();
+        
+        // Extract the results into a Map
+        Map<String, Object> analyticsMap = new HashMap<>();
+        analyticsMap.put("pendingCount", ((Number) call.getOutputParameterValue("p_pending_count")).intValue());
+        analyticsMap.put("completedCount", ((Number) call.getOutputParameterValue("p_completed_count")).intValue());
+        analyticsMap.put("cancelledCount", ((Number) call.getOutputParameterValue("p_cancelled_count")).intValue());
+        analyticsMap.put("totalCount", ((Number) call.getOutputParameterValue("p_total_count")).intValue());
+        
+        // Add to list
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(analyticsMap);
+        result.forEach(System.out::println);
+        return result;
+    }
+
+    public List<Map<String, Object>> getOverallAppointmentAnalytics() {
+//        Session session = sessionFactory.getCurrentSession();
+        
+        ProcedureCall call = session.createStoredProcedureCall("dashboard_analytics.get_overall_appointment_analytics");
+        
+        // Register the OUT parameters
+        call.registerParameter("p_pending_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_completed_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_cancelled_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_total_count", Integer.class, ParameterMode.OUT);
+        
+        // Execute the procedure
+        call.execute();
+        
+        // Extract the results into a Map
+        Map<String, Object> analyticsMap = new HashMap<>();
+        analyticsMap.put("pendingCount", ((Number) call.getOutputParameterValue("p_pending_count")).intValue());
+        analyticsMap.put("completedCount", ((Number) call.getOutputParameterValue("p_completed_count")).intValue());
+        analyticsMap.put("cancelledCount", ((Number) call.getOutputParameterValue("p_cancelled_count")).intValue());
+        analyticsMap.put("totalCount", ((Number) call.getOutputParameterValue("p_total_count")).intValue());
+        
+        // Add to list
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(analyticsMap);
+        result.forEach(System.out::println);
+        return result;
     }
 }

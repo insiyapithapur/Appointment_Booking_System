@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment</title>
+    <title>Complete Appointment</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Inter font from Google Fonts -->
@@ -26,6 +26,12 @@
             --text-primary: #2b3d4f;
             --text-secondary: #6c757d;
             --border-color: #dbe4ff;
+            
+            /* Status colors */
+            --confirmed-color: #219653;
+            --pending-color: #f2994a;
+            --cancelled-color: #eb5757;
+            --completed-color: #2f80ed;
         }
         
         * {
@@ -90,6 +96,28 @@
             overflow: hidden;
         }
         
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-verification {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 22px;
+            height: 22px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+        }
+        
         .profile-name {
             font-size: 18px;
             font-weight: 600;
@@ -107,7 +135,7 @@
             padding: 0 20px;
         }
         
-        .profile-badge {
+        .profile-specialty {
             display: inline-block;
             padding: 4px 10px;
             background-color: var(--primary-light);
@@ -118,7 +146,7 @@
             font-weight: 500;
         }
         
-        .profile-badge i {
+        .profile-specialty i {
             margin-right: 4px;
             font-size: 10px;
         }
@@ -168,32 +196,31 @@
             transition: all 0.3s;
         }
         
-        /* Page header */
-        .page-header {
+        .header {
             display: flex;
-            flex-direction: column;
-            margin-bottom: 24px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
         
-        .page-title {
+        .title {
             font-size: 24px;
-            font-weight: 600; 
-            color: var(--primary-color);
-            margin-bottom: 4px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
         
-        .page-subtitle {
+        .date {
             color: var(--text-secondary);
             font-size: 14px;
         }
         
-        /* Card styles */
+        /* Card Styles */
         .card {
             background-color: var(--bg-color);
             border-radius: 8px;
             border: 1px solid var(--border-color);
             overflow: hidden;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
         }
         
@@ -208,132 +235,62 @@
             align-items: center;
         }
         
-        /* Doctor info card */
-        .doctor-card {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
-        }
-        
-        .doctor-avatar-large {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 24px;
-            margin-right: 20px;
-        }
-        
-        .doctor-name {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-        
-        .doctor-specialty {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-        
-        .badge-specialty {
-            background-color: rgba(47, 128, 237, 0.1);
-            color: #2f80ed;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-block;
-        }
-        
-        /* Schedule styles */
-        .schedule-container {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
-        }
-        
-        .schedule-header {
-            padding: 15px 20px;
-            font-weight: 600;
-            color: var(--primary-color);
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-        }
-        
-        .schedule-header i {
+        .card-header i {
             margin-right: 10px;
         }
         
-        .schedule-card {
-            background-color: white;
-            border-radius: 8px;
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .form-control {
             border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-text {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .required::after {
+            content: "*";
+            color: #e53935;
+            margin-left: 4px;
+        }
+        
+        /* Button Styles */
+        .btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
             transition: all 0.2s;
-            height: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-        }
-        
-        .schedule-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(77, 171, 247, 0.1);
-        }
-        
-        .schedule-card.unavailable {
-            opacity: 0.7;
-            background-color: #f8f9fa;
-        }
-        
-        .schedule-card-header {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--bg-secondary);
-        }
-        
-        .day-badge {
-            background-color: rgba(47, 128, 237, 0.1);
-            color: #2f80ed;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .day-badge i {
-            margin-right: 5px;
-        }
-        
-        .time-badge {
-            background-color: rgba(46, 125, 50, 0.1);
-            color: #2e7d32;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: 500;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .time-badge i {
-            margin-right: 5px;
         }
         
         .btn-primary {
@@ -347,30 +304,42 @@
         }
         
         .btn-secondary {
-            background-color: #e9ecef;
-            border-color: #dee2e6;
-            color: #6c757d;
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
         }
         
-        .back-button {
-            background-color: var(--primary-light);
-            color: var(--primary-color);
+        .btn-secondary:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+        
+        .btn-success {
+            background-color: var(--confirmed-color);
+            border-color: var(--confirmed-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #1b7e44;
+            border-color: #1b7e44;
+        }
+        
+        /* Alert Styles */
+        .alert {
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
             border: none;
-            border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            cursor: pointer;
-            text-decoration: none;
         }
         
-        .back-button:hover {
-            background-color: var(--primary-dark);
-            color: white;
+        .alert-danger {
+            background-color: rgba(235, 87, 87, 0.1);
+            color: var(--cancelled-color);
+        }
+        
+        .alert-success {
+            background-color: rgba(33, 150, 83, 0.1);
+            color: var(--confirmed-color);
         }
         
         /* Toggle Sidebar Button */
@@ -408,22 +377,20 @@
             backdrop-filter: blur(2px);
         }
         
-        /* Responsive Styles */
-        @media (max-width: 1200px) {
-            .card-columns {
-                column-count: 2;
-            }
+        /* Button Container */
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
         }
         
+        /* Responsive Styles */
         @media (max-width: 991px) {
             .sidebar {
                 width: 200px;
             }
             .content {
                 margin-left: 200px;
-            }
-            .card-columns {
-                column-count: 1;
             }
         }
         
@@ -446,35 +413,21 @@
             
             .content {
                 margin-left: 0;
-                padding: 20px;
             }
             
-            .doctor-info {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            
-            .doctor-avatar-large {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .page-header-row {
+            .header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 15px;
+                gap: 10px;
             }
             
-            .content {
-                padding: 15px;
-            }
-            
-            .schedule-card-header {
+            .btn-container {
                 flex-direction: column;
-                gap: 8px;
+                gap: 10px;
+            }
+            
+            .btn-container .btn {
+                width: 100%;
             }
         }
     </style>
@@ -491,34 +444,34 @@
         <div class="profile-section">
             <div class="profile-background"></div>
             <div class="profile-avatar">
-                ${fn:substring(sessionScope.username, 0, 1)}
+                A
             </div>
-            <div class="profile-name">${sessionScope.username}</div>
-            <div class="profile-title">Patient</div>
+            <div class="profile-name">Admin</div>
+            <div class="profile-title">System Administrator</div>
             <div class="profile-badge">
-                <i class="fas fa-circle"></i> Active Member
+                <i class="fas fa-circle"></i> Admin Portal
             </div>
         </div>
         
         <ul class="nav-menu">
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Dashboard')" class="nav-link">
+                <a onclick="navigateTo('Admin/Dashboard')" class="nav-link">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Appointments')" class="nav-link">
-                    <i class="fas fa-calendar-check"></i> Appointments
+                <a onclick="navigateTo('Admin/Patients')" class="nav-link">
+                    <i class="fas fa-user-injured"></i> Patients
                 </a>
             </li>
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Doctors')" class="nav-link active">
+                <a onclick="navigateTo('Admin/Doctors')" class="nav-link">
                     <i class="fas fa-user-md"></i> Doctors
                 </a>
             </li>
             <li class="nav-item">
-                <a onclick="navigateTo('Patient/Profile')" class="nav-link">
-                    <i class="fas fa-user"></i> Profile
+                <a onclick="navigateTo('Admin/Appointments')" class="nav-link active">
+                    <i class="fas fa-calendar-check"></i> Appointments
                 </a>
             </li>
             <li class="nav-item">
@@ -528,82 +481,65 @@
             </li>
         </ul>
     </div>
-    
+
     <div class="content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="d-flex justify-content-between align-items-center mb-2 page-header-row">
-                <h1 class="page-title">Book Appointment</h1>
-                <button class="back-button" onclick="navigateTo('Patient/Doctors')">
-                    <i class="fas fa-arrow-left"></i> Back to Doctors
-                </button>
-            </div>
+        <!-- Header -->
+        <div class="header">
+            <div class="title">Complete Appointment</div>
         </div>
         
-        <!-- Doctor Information -->
-        <div class="doctor-card mb-4">
-            <div class="d-flex">
-                <div class="doctor-avatar-large" style="background-color: hsl(${doctorId * 40 % 360}, 70%, 60%)">
-                    ${fn:substring(doctorName, 0, 1)}
-                </div>
-                <div>
-                    <div class="doctor-name">${doctorName}</div>
-                    <div class="mb-2"><span class="badge-specialty">${doctorSpecialty}</span></div>
-                    <div class="doctor-specialty mb-1">${doctorExperience} • ${doctorDegree}</div>
-                    <div class="text-secondary"><i class="fas fa-phone-alt me-2"></i>${doctorContact}</div>
-                </div>
+        <!-- Display any error or success messages -->
+        <c:if test="${not empty errorMessage}">
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i> ${errorMessage}
             </div>
-        </div>
+        </c:if>
+        <c:if test="${not empty successMessage}">
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-check-circle me-2"></i> ${successMessage}
+            </div>
+        </c:if>
         
-        <!-- Schedule Container -->
-        <div class="schedule-container">
-            <div class="schedule-header">
-                <i class="far fa-calendar-alt"></i> Available Time Slots
+        <!-- Medical Record Form Card -->
+        <div class="card">
+            <div class="card-header">
+                <div><i class="fas fa-file-medical"></i> Medical Record Details</div>
             </div>
-            <div class="p-4">
-                <div class="row g-3">
-                    <c:forEach items="${schedules}" var="scheduleInfo" varStatus="status">
-                        <c:set var="scheduleParts" value="${fn:split(scheduleInfo, '|')}" />
-                        <c:set var="scheduleId" value="${fn:trim(fn:substringAfter(scheduleParts[0], 'Schedule ID:'))}" />
-                        <c:set var="doctorId" value="${fn:trim(fn:substringAfter(scheduleParts[1], 'Doctor ID:'))}" />
-                        <c:set var="day" value="${fn:trim(fn:substringAfter(scheduleParts[2], 'Day:'))}" />
-                        <c:set var="time" value="${fn:trim(fn:substringAfter(scheduleParts[3], 'Time:'))}" />
-                        <c:set var="isAvailable" value="${fn:trim(fn:substringAfter(scheduleParts[5], 'Available:'))}" />
-                        
-                        <div class="col-md-6 col-lg-4">
-                            <div class="schedule-card ${isAvailable eq 'Yes' ? '' : 'unavailable'}">
-                                <div class="schedule-card-header">
-                                    <span class="day-badge"><i class="far fa-calendar"></i> ${day}</span>
-                                    <span class="time-badge"><i class="far fa-clock"></i> ${time}</span>
-                                </div>
-                                <div class="card-body p-3">
-                                    <c:choose>
-                                        <c:when test="${isAvailable eq 'Yes'}">
-                                            <a href="${pageContext.request.contextPath}/Patient/ConfirmAppointment?scheduleId=${scheduleId}&day=${day}" 
-                                               class="btn btn-primary w-100">
-                                                <i class="fas fa-check-circle me-2"></i> Select This Slot
-                                            </a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <button class="btn btn-secondary w-100" disabled>
-                                                <i class="fas fa-times-circle me-2"></i> Not Available
-                                            </button>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </div>
-                        </div>
-                    </c:forEach>
+            <div class="card-body">
+                <form action="${pageContext.request.contextPath}/Admin/CompleteAppointment" method="post">
+                    <input type="hidden" name="appointmentId" value="${appointmentId}">
                     
-                    <c:if test="${empty schedules}">
-                        <div class="col-12 py-4">
-                            <div class="alert alert-info text-center">
-                                <i class="fas fa-info-circle me-2"></i>
-                                No available schedules found for this doctor.
-                            </div>
-                        </div>
-                    </c:if>
-                </div>
+                    <!-- Diagnosis Section -->
+                    <div class="form-group">
+                        <label for="diagnosis" class="form-label required">Diagnosis</label>
+                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="3" required>${medicalRecord.diagnosis}</textarea>
+                        <div class="form-text">Enter the detailed diagnosis for the patient's condition.</div>
+                    </div>
+                    
+                    <!-- Treatment Section -->
+                    <div class="form-group">
+                        <label for="treatment" class="form-label required">Treatment</label>
+                        <textarea class="form-control" id="treatment" name="treatment" rows="3" required>${medicalRecord.treatment}</textarea>
+                        <div class="form-text">Describe the treatment plan, medications, or procedures recommended.</div>
+                    </div>
+                    
+                    <!-- Notes Section -->
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3">${medicalRecord.notes}</textarea>
+                        <div class="form-text">Add any additional notes, instructions, or follow-up information.</div>
+                    </div>
+                    
+                    <!-- Form Buttons -->
+                    <div class="btn-container">
+                        <a href="${pageContext.request.contextPath}/Admin/Appointments" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check-circle"></i> Complete Appointment
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -612,6 +548,28 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Function to update date and time
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format the date: Weekday, Month Day, Year
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            
+            const formattedDateTime = now.toLocaleDateString('en-US', options);
+            document.getElementById('current-datetime').textContent = formattedDateTime;
+        }
+        
+        // Update date and time when page loads
+        updateDateTime();
+        
+        // Update date and time every minute
+        setInterval(updateDateTime, 60000);
+        
         function toggleSidebar() {
             document.getElementById("sidebar").classList.toggle("active");
             document.getElementById("sidebar-overlay").classList.toggle("active");
@@ -621,14 +579,6 @@
             const contextPath = '${pageContext.request.contextPath}';
             window.location.href = contextPath + '/' + page;
         }
-        
-        // Handle responsive behavior
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                document.getElementById("sidebar").classList.remove("active");
-                document.getElementById("sidebar-overlay").classList.remove("active");
-            }
-        });
     </script>
 </body>
 </html>
