@@ -9,6 +9,9 @@ public class HibernateUtil {
 	 
 	private static SessionFactory buildSessionFactory() {
 		try {
+			// ✅ Set the Oracle Wallet path before Hibernate config is loaded valid for local environment only
+						//System.setProperty("oracle.net.tns_admin", 
+						//	"C:/BTech CSD/8th semester/Mastek_Assignments/project/CapestoneProjectImplementation/AppointmentBookingSystem/src/main/resources/Wallet_ABS");
 			return new Configuration().configure("hibernate.cfg.xml")
 					.addAnnotatedClass(Role.class)
 					.addAnnotatedClass(User.class)

@@ -1,0 +1,12 @@
+abs_high = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ca-toronto-1.oraclecloud.com))(connect_data=(service_name=gd017942432fc4f_abs_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+abs_low = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ca-toronto-1.oraclecloud.com))(connect_data=(service_name=gd017942432fc4f_abs_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+abs_medium = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ca-toronto-1.oraclecloud.com))(connect_data=(service_name=gd017942432fc4f_abs_medium.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+abs_tp = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ca-toronto-1.oraclecloud.com))(connect_data=(service_name=gd017942432fc4f_abs_tp.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+abs_tpurgent = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ca-toronto-1.oraclecloud.com))(connect_data=(service_name=gd017942432fc4f_abs_tpurgent.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+
+

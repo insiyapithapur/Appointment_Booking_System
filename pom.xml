@@ -7,6 +7,20 @@
   <name>AppointmentBookingSystem</name>
   <description>Appointment Booking System</description>
   
+  <!-- Add Oracle Maven Repository -->
+	<repositories>
+	    <repository>
+	        <id>oracle-maven</id>
+	        <url>https://maven.oracle.com</url>
+	        <releases>
+	            <enabled>true</enabled>
+	        </releases>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+	    </repository>
+	</repositories>
+
   <dependencies>
 		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
 		<dependency>
@@ -33,6 +47,29 @@
 			<groupId>com.oracle.database.jdbc</groupId>
 			<artifactId>ojdbc10</artifactId>
 			<version>19.25.0.0</version>
+		</dependency>
+		<!-- Oracle UCP (Universal Connection Pool) -->
+		<dependency>
+		    <groupId>com.oracle.database.jdbc</groupId>
+		    <artifactId>ucp</artifactId>
+		    <version>19.25.0.0</version>
+		</dependency>
+		
+		<!-- Oracle Security (for Wallet support) -->
+		<dependency>
+		    <groupId>com.oracle.database.security</groupId>
+		    <artifactId>oraclepki</artifactId>
+		    <version>19.25.0.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.oracle.database.security</groupId>
+		    <artifactId>osdt_core</artifactId>
+		    <version>19.25.0.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.oracle.database.security</groupId>
+		    <artifactId>osdt_cert</artifactId>
+		    <version>19.25.0.0</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
 		<dependency>

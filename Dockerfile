@@ -24,6 +24,12 @@ RUN groupadd -r tomcat && \
 # Copy your WAR file
 COPY target/AppointmentBookingSystem-0.0.1-SNAPSHOT.war $CATALINA_HOME/webapps/ROOT.war
 
+# Copy the Oracle Wallet into container
+COPY Wallet_ABS /app/wallet/
+
+# Set TNS_ADMIN environment variable inside the container
+ENV TNS_ADMIN=/app/wallet
+
 # Oracle JDBC driver configuration
 RUN mkdir -p $CATALINA_HOME/lib
 
