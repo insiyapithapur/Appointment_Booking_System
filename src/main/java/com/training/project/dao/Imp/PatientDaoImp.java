@@ -215,6 +215,10 @@ public class PatientDaoImp implements GenericDao<Patient, Integer> {
         return count;
     }
     
+    /**
+     * Get Admin's patient analytics
+     * @return
+     */
     public List<Map<String, Object>> getPatientAnalytics() {
 //        Session session = sessionFactory.getCurrentSession();
         
@@ -243,4 +247,36 @@ public class PatientDaoImp implements GenericDao<Patient, Integer> {
         return result;
     }
     
+    /**
+     * Get doctor's patient analytics
+     * @param doctorId The ID of the doctor
+     * @return List containing a map with the patient analytics data
+     */
+    public List<Map<String, Object>> getDoctorPatientAnalytics(int doctorId) {
+        ProcedureCall call = session.createStoredProcedureCall("doctor_dashboard_analytics.get_doctor_patient_analytics");
+
+        // Register IN parameter
+        call.registerParameter("p_doctor_id", Integer.class, ParameterMode.IN);
+        call.setParameter("p_doctor_id", doctorId);
+
+        // Register OUT parameters
+        call.registerParameter("p_total_patients", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_new_patients_this_month", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_today_patients", Integer.class, ParameterMode.OUT);
+
+        // Execute the procedure
+        call.execute();
+
+        // Extract the results into a Map
+        Map<String, Object> analyticsMap = new HashMap<>();
+        analyticsMap.put("totalPatients", ((Number) call.getOutputParameterValue("p_total_patients")).intValue());
+        analyticsMap.put("newPatientsThisMonth", ((Number) call.getOutputParameterValue("p_new_patients_this_month")).intValue());
+        analyticsMap.put("todayPatients", ((Number) call.getOutputParameterValue("p_today_patients")).intValue());
+
+        // Add to list
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(analyticsMap);
+        result.forEach(System.out::println);
+        return result;
+    }
 }

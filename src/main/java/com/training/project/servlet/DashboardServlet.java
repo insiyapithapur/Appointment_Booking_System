@@ -3,7 +3,9 @@ package com.training.project.servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.ServletException;
@@ -43,9 +45,6 @@ public class DashboardServlet extends HttpServlet {
         Integer doctorId = (Integer) session.getAttribute("roleSpecificId");
         String doctorName = "Dr. "+(String) session.getAttribute("username");
         
-//        Integer doctorId = 1;
-//        String doctorName = "Insiya_Doc1";
-        
         System.out.println("Processing dashboard for doctor ID: " + doctorId);
         if (doctorId == null) {
             // If not logged in, redirect to login page
@@ -62,12 +61,102 @@ public class DashboardServlet extends HttpServlet {
         // Process appointments for display
         List<AppointmentDisplayData> displayAppointments = processAppointmentStringsForDisplay(appointmentStrings);
         
+        // Get dashboard analytics for the doctor
+        Map<String, List<Map<String, Object>>> dashboardAnalytics = doctorService.getDashboardSummary(doctorId);
+        
+        // Process analytics data for easy access in JSP
+        Map<String, Object> processedAnalytics = processAnalyticsForDisplay(dashboardAnalytics);
+        
         // Set attributes for the JSP
         request.setAttribute("doctorName", doctorName);
         request.setAttribute("appointments", displayAppointments);
+        request.setAttribute("analytics", processedAnalytics);
         
         // Forward to the dashboard JSP
         request.getRequestDispatcher("/Dashboard.jsp").forward(request, response);
+    }
+    
+    /**
+     * Process the analytics data for easier use in JSP
+     * @param dashboardAnalytics The raw analytics data from the service
+     * @return Processed analytics map
+     */
+    private Map<String, Object> processAnalyticsForDisplay(Map<String, List<Map<String, Object>>> dashboardAnalytics) {
+        Map<String, Object> processed = new HashMap<>();
+        
+        try {
+            // Process patient analytics
+            if (dashboardAnalytics.containsKey("patientAnalytics") && !dashboardAnalytics.get("patientAnalytics").isEmpty()) {
+                Map<String, Object> patientData = dashboardAnalytics.get("patientAnalytics").get(0);
+                
+                // Match the JSP variable names exactly
+                processed.put("totalPatients", patientData.get("totalPatients"));
+                processed.put("newPatientsThisMonth", patientData.get("newPatientsThisMonth"));
+                processed.put("todayPatients", patientData.get("todayPatients"));
+            } else {
+                // Set defaults if no data available
+                processed.put("totalPatients", 0);
+                processed.put("newPatientsThisMonth", 0);
+                processed.put("todayPatients", 0);
+            }
+            
+            // Process today's appointment analytics
+            if (dashboardAnalytics.containsKey("todayAppointmentAnalytics") && !dashboardAnalytics.get("todayAppointmentAnalytics").isEmpty()) {
+                Map<String, Object> todayData = dashboardAnalytics.get("todayAppointmentAnalytics").get(0);
+                
+                // These variable names match what's used in your JSP
+                processed.put("todayPendingAppointments", todayData.get("pendingCount"));
+                processed.put("todayCompletedAppointments", todayData.get("completedCount"));
+                processed.put("todayCancelledAppointments", todayData.get("cancelledCount"));
+                processed.put("todayTotalAppointments", todayData.get("totalCount"));
+            } else {
+                // Set defaults if no data available
+                processed.put("todayPendingAppointments", 0);
+                processed.put("todayCompletedAppointments", 0);
+                processed.put("todayCancelledAppointments", 0);
+                processed.put("todayTotalAppointments", 0);
+            }
+            
+            // Process overall appointment analytics
+            if (dashboardAnalytics.containsKey("overallAppointmentAnalytics") && !dashboardAnalytics.get("overallAppointmentAnalytics").isEmpty()) {
+                Map<String, Object> overallData = dashboardAnalytics.get("overallAppointmentAnalytics").get(0);
+                
+                // These variable names match what's used in your JSP
+                processed.put("overallPendingAppointments", overallData.get("pendingCount"));
+                processed.put("overallCompletedAppointments", overallData.get("completedCount"));
+                processed.put("overallCancelledAppointments", overallData.get("cancelledCount"));
+                processed.put("overallTotalAppointments", overallData.get("totalCount"));
+            } else {
+                // Set defaults if no data available
+                processed.put("overallPendingAppointments", 0);
+                processed.put("overallCompletedAppointments", 0);
+                processed.put("overallCancelledAppointments", 0);
+                processed.put("overallTotalAppointments", 0);
+            }
+            
+            // For debugging purposes
+            System.out.println("Processed analytics for JSP:");
+            processed.forEach((key, value) -> System.out.println(key + " = " + value));
+            
+        } catch (Exception e) {
+            System.out.println("Error processing analytics data: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Set all values to 0 to prevent null pointer exceptions in JSP
+            processed.put("totalPatients", 0);
+            processed.put("newPatientsThisMonth", 0);
+            processed.put("todayPatients", 0);
+            processed.put("todayPendingAppointments", 0);
+            processed.put("todayCompletedAppointments", 0);
+            processed.put("todayCancelledAppointments", 0);
+            processed.put("todayTotalAppointments", 0);
+            processed.put("overallPendingAppointments", 0);
+            processed.put("overallCompletedAppointments", 0);
+            processed.put("overallCancelledAppointments", 0);
+            processed.put("overallTotalAppointments", 0);
+        }
+        
+        return processed;
     }
     
     private List<AppointmentDisplayData> processAppointmentStringsForDisplay(List<String> appointmentStrings) {

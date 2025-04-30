@@ -196,11 +196,23 @@
             transition: all 0.3s;
         }
         
-        .header {
+         /* Page header */
+        .page-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .title {
@@ -481,17 +493,7 @@
                     Medical Professional
                 </c:if>
             </div>
-            <div class="profile-specialty">
-                <i class="fas fa-circle"></i> 
-                <c:choose>
-                    <c:when test="${not empty doctorRole}">
-                        ${doctorRole}
-                    </c:when>
-                    <c:otherwise>
-                        Doctor
-                    </c:otherwise>
-                </c:choose>
-            </div>
+           
         </div>
         
         <ul class="nav-menu">
@@ -525,13 +527,10 @@
 
     <div class="content">
         <!-- Header -->
-        <div class="header">
-            <div class="title">Medical Record</div>
-            <a href="${pageContext.request.contextPath}/Doctor/Appointment" class="btn btn-sm btn-outline-secondary">
-             	<i class="fas fa-arrow-left"></i> Back
-            </a>
+        <div class="page-header">
+            <h1 class="page-title">Medical Record</h1>
+            
         </div>
-        
         <!-- Display any error messages -->
         <c:if test="${not empty sessionScope.errorMessage}">
             <div class="alert alert-danger" role="alert">
@@ -584,9 +583,6 @@
         <div class="card">
             <div class="card-header">
                 <div><i class="fas fa-file-medical"></i> Medical Details</div>
-                <button class="btn btn-sm btn-outline-primary" onclick="">
-                    <i class="fas fa-edit"></i> 
-                </button>
             </div>
             <div class="card-body">
                 <!-- Diagnosis Section -->

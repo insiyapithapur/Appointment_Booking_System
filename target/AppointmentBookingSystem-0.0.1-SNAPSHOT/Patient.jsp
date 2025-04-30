@@ -49,7 +49,7 @@
             font-size: 14px;
         }
         
-        /* Sidebar */
+       /* Sidebar */
         .sidebar {
             position: fixed;
             width: 220px;
@@ -109,7 +109,7 @@
             right: 0;
             width: 22px;
             height: 22px;
-            background-color: #4dabf7;
+            background-color: var(--primary-color);
             border-radius: 50%;
             border: 2px solid white;
             display: flex;
@@ -196,11 +196,23 @@
             transition: all 0.3s;
         }
         
-        .header {
+        /* Page header */
+        .page-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .title {
@@ -283,34 +295,36 @@
             align-items: center;
             gap: 10px;
         }
-        
-        .patient-avatar {
+
+        .doctor-avatar {
             width: 36px;
             height: 36px;
+            margin-right: 5px;
             border-radius: 50%;
+            background-color: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 500;
             font-size: 12px;
-            color: #fff;
+            color: var(--primary-color);
         }
         
         /* Filter Bar */
         .filter-bar {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
             flex-wrap: wrap;
+            gap: 10px;
             align-items: center;
+            margin-bottom: 15px;
         }
         
         .search-box {
             position: relative;
             flex-grow: 1;
-            max-width: 300px;
+            max-width: 500px;
         }
-        
+
         .search-box input {
             width: 100%;
             padding: 8px 12px;
@@ -330,7 +344,7 @@
         
         .filter-dropdown {
             min-width: 150px;
-            padding: 8px 12px;
+            padding: 12px 12px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             font-size: 14px;
@@ -487,17 +501,7 @@
                     Medical Professional
                 </c:if>
             </div>
-            <div class="profile-specialty">
-                <i class="fas fa-circle"></i> 
-                <c:choose>
-                    <c:when test="${not empty doctorRole}">
-                        ${doctorRole}
-                    </c:when>
-                    <c:otherwise>
-                        Dentist
-                    </c:otherwise>
-                </c:choose>
-            </div>
+            
         </div>
         
         <ul class="nav-menu">
@@ -530,6 +534,12 @@
     </div>
     
     <div class="content">
+    	
+    	<!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Patients</h1>
+        </div>
+        
         <!-- Alert Container -->
         <div class="alert-container">
             <c:if test="${not empty errorMessage}">
@@ -548,42 +558,46 @@
             </c:if>
         </div>
         
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by name, ID, phone or email..." onkeyup="filterPatients()">
-            </div>
-            
-            <select class="filter-dropdown" id="bloodTypeFilter" onchange="filterPatients()">
-                <option value="">All Blood Types</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-            </select>
-            
-            <select class="filter-dropdown" id="sortBy" onchange="sortPatients()">
-                <option value="nameAsc">Name (A-Z)</option>
-                <option value="nameDesc">Name (Z-A)</option>
-                <option value="idAsc">ID (Low-High)</option>
-                <option value="idDesc">ID (High-Low)</option>
-            </select>
-            
-            <button class="btn-filter btn-reset" onclick="resetFilters()">
-                <i class="fas fa-sync-alt"></i>
-            </button>
-        </div>
+
+
         
         <!-- Patients Table Card -->
-        <div class="card patient-table">
+        <div class="card ">
             <div class="card-header">
-                <div>Patient Records</div>
+
+                <div><i class="fas fa-user-alt me-2"></i> Patient Records</div>
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by name, ID, phone ..." onkeyup="filterPatients()">
+                    </div>
+
+                    <select class="filter-dropdown" id="bloodTypeFilter" onchange="filterPatients()">
+                        <option value="">All Blood Types</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+
+                    <select class="filter-dropdown" id="sortBy" onchange="sortPatients()">
+                        <option value="nameAsc">Name (A-Z)</option>
+                        <option value="nameDesc">Name (Z-A)</option>
+                        <option value="idAsc">ID (Low-High)</option>
+                        <option value="idDesc">ID (High-Low)</option>
+                    </select>
+
+                    <button class="btn-filter btn-reset" onclick="resetFilters()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
             </div>
+
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table mb-0" id="patientTable">
@@ -636,7 +650,7 @@
                                 onclick="viewPatient(<%= patientId %>)">
                                 <td>
                                     <div class="patient-info">
-                                        <div class="patient-avatar" style="background-color: <%= bgColor %>;">
+                                        <div class="doctor-avatar">
                                             <%= initials.toUpperCase() %>
                                         </div>
                                         <%= fullName %>

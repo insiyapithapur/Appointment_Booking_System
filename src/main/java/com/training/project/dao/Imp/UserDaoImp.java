@@ -287,6 +287,27 @@ public class UserDaoImp implements GenericDao<User, Integer> {
 	    return true;
 	}
     
+    public boolean updateLoginStatus(Integer userId, boolean isLoggedIn) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            
+            // Using HQL to update the login status
+            String hql = "UPDATE User SET isLogin = :loginStatus WHERE userId = :userId";
+            int updatedEntities = session.createQuery(hql)
+                    .setParameter("loginStatus", isLoggedIn)
+                    .setParameter("userId", userId)
+                    .executeUpdate();
+            
+            tx.commit();
+            return updatedEntities > 0;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
 	@Override
 	public boolean create(User entity) {
 		// TODO Auto-generated method stub

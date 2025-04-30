@@ -126,6 +126,18 @@
             font-size: 14px;
         }
         
+        .warning-alert {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ff9800;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
         .error-alert {
             background-color: rgba(235, 87, 87, 0.1);
             color: var(--error-color);
@@ -283,16 +295,38 @@
                     <p class="form-subtitle">Sign in to your healthcare account</p>
                 </div>
                 
+                <!-- Error message display section with enhancements -->
                 <% 
                     String msg = (String)getServletContext().getAttribute("invalid");
-                    if(msg!=null) {
+                    String errorType = (String)getServletContext().getAttribute("errorType");
+                    
+                    if(msg != null) {
+                        // Choose different icons and colors based on error type
+                        String iconClass = "fas fa-exclamation-circle";
+                        String alertClass = "error-alert";
+                        
+                        if("INVALID_USERNAME".equals(errorType)) {
+                            iconClass = "fas fa-user-slash";
+                        } 
+                        else if("INVALID_PASSWORD".equals(errorType)) {
+                            iconClass = "fas fa-lock";
+                        }
+                        else if("LOGIN_STATUS_UPDATE_FAILED".equals(errorType)) {
+                            iconClass = "fas fa-sync-alt";
+                            alertClass = "warning-alert"; // Different styling for warnings
+                        }
+                        else if("SYSTEM_ERROR".equals(errorType)) {
+                            iconClass = "fas fa-exclamation-triangle";
+                        }
                 %>
-                <div class="error-alert">
-                    <i class="fas fa-exclamation-circle"></i>
+                <div class="<%= alertClass %>">
+                    <i class="<%= iconClass %>"></i>
                     <span><%= msg %></span>
                 </div>
                 <% 
-                    getServletContext().removeAttribute("invalid");
+                        // Clean up after showing the message
+                        getServletContext().removeAttribute("invalid");
+                        getServletContext().removeAttribute("errorType");
                     }
                 %>
                 

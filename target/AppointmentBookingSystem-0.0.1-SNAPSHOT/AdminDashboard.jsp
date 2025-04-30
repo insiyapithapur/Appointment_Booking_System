@@ -692,72 +692,72 @@
 		                    </p>
 		                </div>
 		                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
-    <i class="fas fa-check-circle"></i>
-</div>
-</div>
+						    <i class="fas fa-check-circle"></i>
+						</div>
+					</div>
 
-<div class="stat-card">
-    <div class="stat-info">
-        <h3>Cancelled Appointments</h3>
-        <p>
-            <c:out value="${cancelledAppointments}" default="0" />
-        </p>
-    </div>
-    <div class="stat-icon" style="background-color: rgba(235, 87, 87, 0.1); color: var(--cancelled-color);">
-        <i class="fas fa-calendar-times"></i>
-    </div>
-</div>
+					<div class="stat-card">
+					    <div class="stat-info">
+					        <h3>Cancelled Appointments</h3>
+					        <p>
+					            <c:out value="${cancelledAppointments}" default="0" />
+					        </p>
+					    </div>
+					    <div class="stat-icon" style="background-color: rgba(235, 87, 87, 0.1); color: var(--cancelled-color);">
+					        <i class="fas fa-calendar-times"></i>
+					    </div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
 
-</div>
-</div>
-</div>
-
-<!-- Patient Stats Card -->
-<div class="card">
-    <div class="card-header">
-        <div><i class="fas fa-user-injured me-2"></i> Patient Statistics</div>
-        <div class="total-appointments">
-                    <c:out value="${totalPatients}" default="0" /> TOTAL
-                </div>
-    </div>
-    
-    <div class="p-3">
-        <div class="statistics-row">
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Inactive Patients</h3>
-                    <p><c:out value="${inactivePatients}" default="0" /></p>
-                </div>
-                <div class="stat-icon" style="background-color: var(--primary-light); color: var(--primary-color);">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>Active Patients</h3>
-                    <p><c:out value="${activePatients}" default="0" /></p>
-                </div>
-                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
-                    <i class="fas fa-user-check"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-info">
-                    <h3>New Patients (Week)</h3>
-                    <p><c:out value="${newPatientsThisWeek}" default="0" /></p>
-                </div>
-                <div class="stat-icon" style="background-color: rgba(242, 153, 74, 0.1); color: var(--pending-color);">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-            </div>
-            
-        </div>
-    </div>
-</div>
-
-</div>
+		<!-- Patient Stats Card -->
+		<div class="card">
+		    <div class="card-header">
+		        <div><i class="fas fa-user-injured me-2"></i> Patient Statistics</div>
+		        <div class="total-appointments">
+		                    <c:out value="${totalPatients}" default="0" /> TOTAL
+		                </div>
+		    </div>
+		    
+		    <div class="p-3">
+		        <div class="statistics-row">
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Inactive Patients</h3>
+		                    <p><c:out value="${inactivePatients}" default="0" /></p>
+		                </div>
+		                <div class="stat-icon" style="background-color: var(--primary-light); color: var(--primary-color);">
+		                    <i class="fas fa-users"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Active Patients</h3>
+		                    <p><c:out value="${activePatients}" default="0" /></p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
+		                    <i class="fas fa-user-check"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>New Patients (Week)</h3>
+		                    <p><c:out value="${newPatientsThisWeek}" default="0" /></p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(242, 153, 74, 0.1); color: var(--pending-color);">
+		                    <i class="fas fa-user-plus"></i>
+		                </div>
+		            </div>
+		            
+		        </div>
+		    </div>
+		</div>
+		
+		</div>
     
 <!-- Bootstrap & jQuery JS -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

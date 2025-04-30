@@ -108,7 +108,7 @@
             right: 0;
             width: 22px;
             height: 22px;
-            background-color: #4dabf7;
+            background-color: var(--primary-color);
             border-radius: 50%;
             border: 2px solid white;
             display: flex;
@@ -195,11 +195,23 @@
             transition: all 0.3s;
         }
         
-        .header {
+        /* Page header */
+        .page-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .title {
@@ -214,6 +226,54 @@
         }
         
         /* Appointment Table */
+        /* Statistics Cards */
+        .statistics-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 240px;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-info h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-info p {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+        
+        ./* Card */
         .card {
             background-color: var(--bg-color);
             border-radius: 8px;
@@ -229,6 +289,9 @@
             color: var(--primary-color);
             border-bottom: 1px solid var(--border-color);
             background-color: var(--primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .appointments-table {
@@ -262,17 +325,19 @@
             align-items: center;
             gap: 10px;
         }
-        
-        .patient-avatar {
+
+        .doctor-avatar {
             width: 36px;
             height: 36px;
+            margin-right: 5px;
             border-radius: 50%;
+            background-color: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 500;
             font-size: 12px;
-            color: #fff;
+            color: var(--primary-color);
         }
         
         /* Status Badge */
@@ -541,17 +606,7 @@
                     Medical Professional
                 </c:if>
             </div>
-            <div class="profile-specialty">
-                <i class="fas fa-circle"></i> 
-                <c:choose>
-                    <c:when test="${not empty doctorRole}">
-                        ${doctorRole}
-                    </c:when>
-                    <c:otherwise>
-                        Dentist
-                    </c:otherwise>
-                </c:choose>
-            </div>
+            
         </div>
         
         <ul class="nav-menu">
@@ -584,6 +639,10 @@
     </div>
     
     <div class="content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+        </div>
         
         <!-- Alert Container -->
         <div class="alert-container">
@@ -603,48 +662,145 @@
             </c:if>
         </div>
         
-        <!-- Analytics Section -->
-		<div class="analytics-section" style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
-		    <!-- Total Patients Card -->
-		    <div class="analytics-card" style="flex: 1; min-width: 240px; background-color: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); border: 1px solid #dbe4ff; display: flex; justify-content: space-between; transition: all 0.3s ease;">
-		        <div class="analytics-info">
-		            <div style="font-size: 16px; font-weight: 500; color: #2b3d4f; margin-bottom: 10px;">Total Patient</div>
-		            <div style="font-size: 32px; font-weight: 700; color: #2b3d4f; margin-bottom: 10px;">
-		                <c:out value="${totalPatients != null ? totalPatients : '1'}" />
+        <!-- Today Appointment Overview Card -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <div><i class="fas fa-chart-line me-2"></i> Today's Appointment Overview</div>
+                <div class="total-appointments">
+                    <c:out value="${analytics.todayTotalAppointments}" default="0" /> TOTAL
+                </div>
+            </div>
+            
+            <div class="p-3">
+                <div class="statistics-row">
+                    
+                    <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Pending Appointments</h3>
+		                    <p>
+		                        <c:out value="${analytics.todayPendingAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(242, 153, 74, 0.1); color: var(--pending-color);">
+		                    <i class="fas fa-hourglass-half"></i>
+		                </div>
 		            </div>
-		        </div>
-		        <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: #f0f4fd; border-radius: 10px; color: #4a5687;">
-		            <i class="fas fa-user-injured"></i>
-		        </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Completed Appointments</h3>
+		                    <p>
+		                        <c:out value="${analytics.todayCompletedAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
+		                    <i class="fas fa-check-circle"></i>
+		                </div>
+		            </div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Cancelled Appointments</h3>
+		                    <p>
+		                        <c:out value="${analytics.todayCancelledAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(235, 87, 87, 0.1); color: var(--cancelled-color);">
+		                    <i class="fas fa-calendar-times"></i>
+		                </div>
+		            </div>
+		            
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overall Appointment Statistics -->
+		<div class="card mb-3">
+		    <div class="card-header">
+		        <div><i class="fas fa-clipboard-list me-2"></i> Overall Appointment Statistics</div>
+		        <div class="total-appointments">
+                    <c:out value="${analytics.overallTotalAppointments}" default="0" /> TOTAL
+                </div>
 		    </div>
 		    
-		    <!-- Patients Today Card -->
-		    <div class="analytics-card" style="flex: 1; min-width: 240px; background-color: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); border: 1px solid #dbe4ff; display: flex; justify-content: space-between; transition: all 0.3s ease;">
-		        <div class="analytics-info">
-		            <div style="font-size: 16px; font-weight: 500; color: #2b3d4f; margin-bottom: 10px;">Patients Today</div>
-		            <div style="font-size: 32px; font-weight: 700; color: #2b3d4f; margin-bottom: 10px;">
-		                <c:out value="${patientsToday != null ? patientsToday : '0'}" />
+		    <div class="p-3">
+		        <div class="statistics-row">
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Pending Appointments</h3>
+		                    <p>
+		                        <c:out value="${analytics.overallPendingAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(242, 153, 74, 0.1); color: var(--pending-color);">
+		                    <i class="fas fa-hourglass-half"></i>
+		                </div>
 		            </div>
-		        </div>
-		        <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: #f0f4fd; border-radius: 10px; color: #4a5687;">
-		            <i class="fas fa-user-clock"></i>
-		        </div>
-		    </div>
-		    
-		    <!-- Appointments Today Card -->
-		    <div class="analytics-card" style="flex: 1; min-width: 240px; background-color: #ffffff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); border: 1px solid #dbe4ff; display: flex; justify-content: space-between; transition: all 0.3s ease;">
-		        <div class="analytics-info">
-		            <div style="font-size: 16px; font-weight: 500; color: #2b3d4f; margin-bottom: 10px;">Appointments Today</div>
-		            <div style="font-size: 32px; font-weight: 700; color: #2b3d4f; margin-bottom: 10px;">
-		                <c:out value="${appointmentsToday != null ? appointmentsToday : '0'}" />
-		            </div>
-		        </div>
-		        <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: #f0f4fd; border-radius: 10px; color: #4a5687;">
-		            <i class="fas fa-calendar-check"></i>
-		        </div>
-		    </div>
-		</div>
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Completed Appointments</h3>
+		                    <p>
+		                        <c:out value="${analytics.overallCompletedAppointments}" default="0" />
+		                    </p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
+						    <i class="fas fa-check-circle"></i>
+						</div>
+					</div>
 
+					<div class="stat-card">
+					    <div class="stat-info">
+					        <h3>Cancelled Appointments</h3>
+					        <p>
+					            <c:out value="${analytics.overallCancelledAppointments}" default="0" />
+					        </p>
+					    </div>
+					    <div class="stat-icon" style="background-color: rgba(235, 87, 87, 0.1); color: var(--cancelled-color);">
+					        <i class="fas fa-calendar-times"></i>
+					    </div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+		<!-- Patient Stats Card -->
+		<div class="card mb-3">
+		    <div class="card-header">
+		        <div><i class="fas fa-user-injured me-2"></i>Patient Statistics</div>
+		        <div class="total-appointments">
+		             <c:out value="${analytics.totalPatients}" default="0" /> TOTAL
+		        </div>
+		    </div>
+		    
+		    <div class="p-3">
+		        <div class="statistics-row">
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>New Patients(Month)</h3>
+		                    <p><c:out value="${analytics.newPatientsThisMonth}" default="0" /></p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
+		                    <i class="fas fa-user-check"></i>
+		                </div>
+		            </div>    
+		            
+		            <div class="stat-card">
+		                <div class="stat-info">
+		                    <h3>Today Patients</h3>
+		                    <p><c:out value="${analytics.todayPatients}" default="0" /></p>
+		                </div>
+		                <div class="stat-icon" style="background-color: rgba(33, 150, 83, 0.1); color: var(--confirmed-color);">
+		                    <i class="fas fa-user-check"></i>
+		                </div>
+		            </div>       
+		            
+		        </div>
+		    </div>
+		</div>		
+		
         <!-- Appointments Table -->
         <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
@@ -692,7 +848,7 @@
                         <tr>
                             <td>
                                 <div class="patient-info">
-                                    <div class="patient-avatar" style="background-color: ${appointment.avatarColor}">${appointment.initials}</div>
+                                    <div class="doctor-avatar">${appointment.initials}</div>
                                     ${appointment.patientName}
                                 </div>
                             </td>
@@ -703,6 +859,7 @@
                                     ${fn:length(appointment.reason) > 25 ? fn:substring(appointment.reason, 0, 25).concat('...') : appointment.reason}
                                     <span class="reason-text">${appointment.reason}</span>
                                 </div>
+
                             </td>
                             <td>${appointment.contactNumber}</td>
                             <td>

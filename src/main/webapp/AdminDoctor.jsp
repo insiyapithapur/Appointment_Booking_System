@@ -669,6 +669,7 @@
                         <th class="hide-xs">Experience</th>
                         <th class="hide-xs">Contact</th>
                         <th class="hide-xs">Email</th>
+                        <th>Schedule</th>
                     </tr>
                 </thead>
                 <tbody id="doctor-table-body">
@@ -694,6 +695,12 @@
                         <td class="hide-xs"><%= row[3] %> years</td>
                         <td class="hide-xs"><%= row[10] %></td>
                         <td class="hide-xs"><%= row[8] %></td>
+                        <td>
+						    <a href="${pageContext.request.contextPath}/Admin/DoctorSchedules?id=<%= row[0] %>" 
+						       class="btn btn-sm btn-outline-primary">
+						        <i class="fas fa-calendar-alt"></i>
+						    </a>
+						</td>
                     </tr>
                     <%
                             }

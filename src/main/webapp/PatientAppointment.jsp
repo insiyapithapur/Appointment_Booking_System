@@ -829,7 +829,7 @@
                                         <c:when test="${fn:containsIgnoreCase(status, 'Completed')}">
                                             <!-- View medical record button for completed appointments -->
                                             <a href="${pageContext.request.contextPath}/Patient/Appointments?action=viewMedicalRecord&appointmentId=${appointmentId}" 
-                                               class="btn btn-sm btn-primary">
+                                               class="btn-action btn-view">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </c:when>

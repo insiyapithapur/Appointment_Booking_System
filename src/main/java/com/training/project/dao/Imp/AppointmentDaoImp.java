@@ -462,6 +462,10 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
         }
     }
     
+    /**
+     * Admin's Today Appointment Analysis
+     * @return
+     */
     public List<Map<String, Object>> getTodayAppointmentAnalytics() {
 //        Session session = sessionFactory.getCurrentSession();
         
@@ -489,7 +493,11 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
         result.forEach(System.out::println);
         return result;
     }
-
+    
+    /**
+     * Admin's Overall Appointment Analysis
+     * @return
+     */
     public List<Map<String, Object>> getOverallAppointmentAnalytics() {
 //        Session session = sessionFactory.getCurrentSession();
         
@@ -515,6 +523,74 @@ public class AppointmentDaoImp implements GenericDao<Appointment, Integer> {
         List<Map<String, Object>> result = new ArrayList<>();
         result.add(analyticsMap);
         result.forEach(System.out::println);
+        return result;
+    }
+    
+    /**
+     * Get doctor's today appointment analytics
+     * @param doctorId The ID of the doctor
+     * @return List containing a map with today's appointment analytics data
+     */
+    public List<Map<String, Object>> getDoctorTodayAppointmentAnalytics(int doctorId) {
+        ProcedureCall call = session.createStoredProcedureCall("doctor_dashboard_analytics.get_doctor_today_appointment_analytics");
+
+        // Register IN parameter
+        call.registerParameter("p_doctor_id", Integer.class, ParameterMode.IN);
+        call.setParameter("p_doctor_id", doctorId);
+
+        // Register OUT parameters
+        call.registerParameter("p_pending_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_completed_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_cancelled_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_total_count", Integer.class, ParameterMode.OUT);
+
+        // Execute the procedure
+        call.execute();
+
+        // Extract the results into a Map
+        Map<String, Object> analyticsMap = new HashMap<>();
+        analyticsMap.put("pendingCount", ((Number) call.getOutputParameterValue("p_pending_count")).intValue());
+        analyticsMap.put("completedCount", ((Number) call.getOutputParameterValue("p_completed_count")).intValue());
+        analyticsMap.put("cancelledCount", ((Number) call.getOutputParameterValue("p_cancelled_count")).intValue());
+        analyticsMap.put("totalCount", ((Number) call.getOutputParameterValue("p_total_count")).intValue());
+
+        // Add to list
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(analyticsMap);
+        return result;
+    }
+
+    /**
+     * Get doctor's overall appointment analytics
+     * @param doctorId The ID of the doctor
+     * @return List containing a map with the overall appointment analytics data
+     */
+    public List<Map<String, Object>> getDoctorOverallAppointmentAnalytics(int doctorId) {
+        ProcedureCall call = session.createStoredProcedureCall("doctor_dashboard_analytics.get_doctor_overall_appointment_analytics");
+
+        // Register IN parameter
+        call.registerParameter("p_doctor_id", Integer.class, ParameterMode.IN);
+        call.setParameter("p_doctor_id", doctorId);
+
+        // Register OUT parameters
+        call.registerParameter("p_pending_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_completed_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_cancelled_count", Integer.class, ParameterMode.OUT);
+        call.registerParameter("p_total_count", Integer.class, ParameterMode.OUT);
+
+        // Execute the procedure
+        call.execute();
+
+        // Extract the results into a Map
+        Map<String, Object> analyticsMap = new HashMap<>();
+        analyticsMap.put("pendingCount", ((Number) call.getOutputParameterValue("p_pending_count")).intValue());
+        analyticsMap.put("completedCount", ((Number) call.getOutputParameterValue("p_completed_count")).intValue());
+        analyticsMap.put("cancelledCount", ((Number) call.getOutputParameterValue("p_cancelled_count")).intValue());
+        analyticsMap.put("totalCount", ((Number) call.getOutputParameterValue("p_total_count")).intValue());
+
+        // Add to list
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(analyticsMap);
         return result;
     }
 }

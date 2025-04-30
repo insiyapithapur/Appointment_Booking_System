@@ -140,26 +140,63 @@ public class UserService {
 	    return profileDetails;
 	}
 	
-	/*
-	 * Login for all Users
+	/**
+	 * Combined login function that checks username, verifies password,
+	 * and updates login status if credentials are valid
+	 * 
+	 * @param username The username to check
+	 * @param password The password to verify
+	 * @return Map containing userDetails (if successful) or errorType (if failed)
 	 */
-	public boolean checkUser(String username) {
-		Session session = sessionFactory.openSession();
-		userDao = new UserDaoImp(session);
-		User user =  userDao.checkUsername(username);
-		return user != null;
-	}
-	public List<Object> checkPassword(String username,String password) {
-		Session session = sessionFactory.openSession();
-		userDao = new UserDaoImp(session);
-		
-		List<Object> sessionContent =  userDao.findIdsByUsername(username,password);
-		System.out.println("sessionContent "+sessionContent.get(0));
-		System.out.println("sessionContent "+sessionContent.get(1));
-		if(sessionContent == null) {
-			return null;
-		}
-		return sessionContent;
+	public Map<String, Object> loginUser(String username, String password) {
+	    Map<String, Object> result = new HashMap<>();
+	    Session session = sessionFactory.openSession();
+	    try {
+	        userDao = new UserDaoImp(session);
+	        
+	        // First check if user exists
+	        User user = userDao.checkUsername(username);
+	        if (user == null) {
+	            System.out.println("User doesn't exist: " + username);
+	            result.put("errorType", "INVALID_USERNAME");
+	            result.put("errorMessage", "User doesn't exist.");
+	            return result;
+	        }
+	        
+	        // Then verify password and get user details
+	        List<Object> sessionContent = userDao.findIdsByUsername(username, password);
+	        if (sessionContent == null) {
+	            System.out.println("Invalid password for user: " + username);
+	            result.put("errorType", "INVALID_PASSWORD");
+	            result.put("errorMessage", "Password is incorrect.");
+	            return result;
+	        }
+	        
+	        // If we got here, both username and password are correct
+	        // Update is_login status to 1 (true)
+	        Integer userId = (Integer) sessionContent.get(0);
+	        boolean updateSuccess = userDao.updateLoginStatus(userId, true);
+	        
+	        if (!updateSuccess) {
+	            System.out.println("Failed to update login status for user: " + username);
+	            result.put("errorType", "LOGIN_STATUS_UPDATE_FAILED");
+	            result.put("errorMessage", "Failed to update login status. Please try again.");
+	            result.put("userDetails", sessionContent); // Include session content anyway
+	            return result;
+	        }
+	        
+	        System.out.println("Login status updated for user: " + username);
+	        result.put("success", true);
+	        result.put("userDetails", sessionContent);
+	        return result;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        result.put("errorType", "SYSTEM_ERROR");
+	        result.put("errorMessage", "System error occurred. Please try again later.");
+	        return result;
+	    } finally {
+	        session.close();
+	    }
 	}
 	
 	/*
@@ -305,7 +342,19 @@ public class UserService {
 			}
 	}
 	
-    
+	public boolean updateUserLoginStatus(Integer userId) {
+	    Session session = sessionFactory.openSession();
+	    try {
+	        userDao = new UserDaoImp(session);
+	        return userDao.updateLoginStatus(userId, false);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    } finally {
+	        session.close();
+	    }
+	}
+	
 	 private boolean isAdminRole(Role role) {
 	        return role.getRoleId() == 1;
 	    }

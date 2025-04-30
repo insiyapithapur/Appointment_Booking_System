@@ -197,11 +197,23 @@
             transition: all 0.3s;
         }
         
-        .header {
+        /* Page header */
+        .page-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .title {
@@ -279,31 +291,33 @@
         }
         
         /* Patient/Appointment Avatar */
-        .appointment-avatar {
+        .doctor-avatar {
             width: 36px;
             height: 36px;
+            margin-right: 5px;
             border-radius: 50%;
+            background-color: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 500;
             font-size: 12px;
-            color: #fff;
+            color: var(--primary-color);
         }
         
         /* Filter Bar */
         .filter-bar {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
             flex-wrap: wrap;
+            gap: 10px;
             align-items: center;
+            margin-bottom: 15px;
         }
         
         .search-box {
             position: relative;
             flex-grow: 1;
-            max-width: 300px;
+            max-width: 800px;
         }
         
         .search-box input {
@@ -565,17 +579,7 @@
                     Medical Professional
                 </c:if>
             </div>
-            <div class="profile-specialty">
-                <i class="fas fa-circle"></i> 
-                <c:choose>
-                    <c:when test="${not empty doctorRole}">
-                        ${doctorRole}
-                    </c:when>
-                    <c:otherwise>
-                        Dentist
-                    </c:otherwise>
-                </c:choose>
-            </div>
+            
         </div>
         
         <ul class="nav-menu">
@@ -608,6 +612,11 @@
     </div>
 
     <div class="content">
+    	<!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Appointment History</h1>
+        </div>
+        
         <!-- Alert Container -->
         <div class="alert-container">
             <c:if test="${not empty errorMessage}">
@@ -626,36 +635,38 @@
             </c:if>
         </div>
         
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by patient name, contact or reason..." onkeyup="filterAppointments()">
-            </div>
-            
-            <select class="filter-dropdown" id="statusFilter" onchange="filterAppointments()">
-                <option value="">All Statuses</option>
-                <option value="Pending">Pending</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-            </select>
-            
-            <select class="filter-dropdown" id="sortBy" onchange="sortAppointments()">
-                <option value="dateAsc">Date (Oldest First)</option>
-                <option value="dateDesc">Date (Newest First)</option>
-                <option value="nameAsc">Patient Name (A-Z)</option>
-                <option value="nameDesc">Patient Name (Z-A)</option>
-            </select>
-            
-            <button class="btn-filter btn-reset" onclick="resetFilters()">
-                <i class="fas fa-sync-alt"></i> 
-            </button>
-        </div>
-        
+
         <!-- Appointments Table Card -->
-        <div class="card appointment-table">
+        <div class="card ">
             <div class="card-header">
-                <div>Appointment Records</div>
+
+                <div><i class="fas fa-user-alt me-2"></i> Appointment Records</div>
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search by patient name.. " onkeyup="filterAppointments()">
+                    </div>
+
+                    <select class="filter-dropdown" id="statusFilter" onchange="filterAppointments()">
+                        <option value="">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+
+                    <select class="filter-dropdown" id="sortBy" onchange="sortAppointments()">
+                        <option value="dateAsc">Date (Oldest First)</option>
+                        <option value="dateDesc">Date (Newest First)</option>
+                        <option value="nameAsc">Patient Name (A-Z)</option>
+                        <option value="nameDesc">Patient Name (Z-A)</option>
+                    </select>
+
+                    <button class="btn-filter btn-reset" onclick="resetFilters()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+
             </div>
             <div class="card-body p-0">
                 <c:choose>
@@ -664,7 +675,6 @@
                             <table class="table mb-0" id="appointmentTable">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Patient</th>
                                         <th>Contact</th>
                                         <th>Date</th>
@@ -749,10 +759,9 @@
                                             data-status="${statusValue}"
                                             data-token="${tokenNo}"
                                             data-reason="${reasonText}">
-                                            <td>${appointmentId}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="appointment-avatar me-2" style="background-color: ${avatarColor};">
+                                                    <div class="doctor-avatar" >
                                                         ${initials}
                                                     </div>
                                                     ${patientName}

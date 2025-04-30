@@ -1,8 +1,14 @@
 
 Common in All
-	Logout --> status --> InActive
+	/**
+		Logout --> status --> InActive
+	**/
+	
 	Error and Succes message --> session delete after some time
-	sidebar content
+	
+	/**
+		sidebar content
+	**/
 
 Admin 
 	/**
@@ -26,14 +32,24 @@ Admin
 	
 
 Patient
-	Confiemed Appointment --> Show only those days which has selected
+	/**
+		Confiemed Appointment --> Show only those days which has selected
+	**/
 	Profile --> Edit and Change password
 	
 	
 Dotor
-	Dashboard --> All procedures integrate
+	/**
+		Dashboard --> All procedures integrate
+		Dashboard procedures :-
+					Patients analytics :- total patient, new patient of this month, today total patients
+					appointment analytics :- 
+						Today :- pending, completed, cancelled , total
+						Overall :- pending, completed, cancelled , total
+	**/
+				
 	Profile --> Edit and Change password
 	
 	
 1. Mostly it is integration of analysis function/ PL/SQL functions
-2. Deployment
+2. Deployment  DONE

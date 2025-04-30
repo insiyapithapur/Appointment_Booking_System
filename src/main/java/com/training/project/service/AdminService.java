@@ -2,6 +2,7 @@ package com.training.project.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -368,6 +369,51 @@ public class AdminService {
 	        return 0;
 	    } finally {
 	        session.close();
+	    }
+	}
+	
+	/**
+	 * To Get schedules for that doctor
+	 * @param doctorId
+	 * @return
+	 */
+	public List<Object[]> getDoctorSchedules(int doctorId) {
+		Session session = sessionFactory.openSession();
+	    try {
+	    	scheduleDao = new ScheduleDaoImp(session);
+	        return scheduleDao.findSchedulesByDoctorId(doctorId);
+	    } catch (Exception e) {
+	        return new ArrayList<>(); // Return empty list instead of null
+	    }
+	}
+	
+	/**
+	 * Service method to get doctor details by doctor ID
+	 * @param doctorId The ID of the doctor to retrieve
+	 * @return List of Object arrays containing doctor details or an empty list if not found
+	 */
+	public List<Object[]> getDoctorDetailsById(Integer doctorId) {
+		Session session = sessionFactory.openSession();
+		doctorDao = new DoctorDaoImp(session);
+	    try {
+	        // Call the DAO method to get doctor details
+	        List<Object[]> doctorDetails = doctorDao.findDoctorDetailsById(doctorId);
+	        
+	        // Return the result, which might be null if an exception occurred in the DAO
+	        return doctorDetails != null ? doctorDetails : new ArrayList<>();
+	    } catch (Exception e) {
+	        
+	        return new ArrayList<>();
+	    }
+	}
+	
+	public boolean updateScheduleAvailability(int scheduleId, boolean isAvailable) {
+		Session session = sessionFactory.openSession();
+		scheduleDao = new ScheduleDaoImp(session);
+	    try {
+	        return scheduleDao.updateScheduleAvailability(scheduleId, isAvailable);
+	    } catch (Exception e) {
+	        return false;
 	    }
 	}
 	

@@ -3,7 +3,9 @@ package com.training.project.service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -186,4 +188,31 @@ public class DoctorService {
 			session.close();
 		}
 	 }
+	 
+	 /**
+		 * Dashboard content
+		 * @return analytics
+	*/
+	 public Map<String, List<Map<String, Object>>> getDashboardSummary(int doctorId) {
+		 Map<String, List<Map<String, Object>>> summary = new HashMap<>();
+		 Session session = sessionFactory.openSession();
+		 try {
+		        patientDao = new PatientDaoImp(session);
+		        appointmentDao = new AppointmentDaoImp(session);
+
+		        // Get all analytics in one go
+		        summary.put("patientAnalytics", patientDao.getDoctorPatientAnalytics(doctorId));
+		        summary.put("todayAppointmentAnalytics", appointmentDao.getDoctorTodayAppointmentAnalytics(doctorId));
+		        summary.put("overallAppointmentAnalytics", appointmentDao.getDoctorOverallAppointmentAnalytics(doctorId));
+
+		        summary.forEach((key, value) -> System.out.println(key + ": " + value));
+		        
+		  return summary;
+		  } catch (Exception e) {
+		        e.printStackTrace();
+		        return new HashMap<>();
+		  } finally {
+		        session.close();
+		}
+	}
 }

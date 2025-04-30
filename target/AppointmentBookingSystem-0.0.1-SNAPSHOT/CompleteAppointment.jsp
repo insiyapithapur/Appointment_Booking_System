@@ -196,11 +196,23 @@
             transition: all 0.3s;
         }
         
-        .header {
+        /* Page header */
+        .page-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600; 
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
         }
         
         .title {
@@ -470,17 +482,7 @@
                     Medical Professional
                 </c:if>
             </div>
-            <div class="profile-specialty">
-                <i class="fas fa-circle"></i> 
-                <c:choose>
-                    <c:when test="${not empty doctorRole}">
-                        ${doctorRole}
-                    </c:when>
-                    <c:otherwise>
-                        Doctor
-                    </c:otherwise>
-                </c:choose>
-            </div>
+           
         </div>
         
         <ul class="nav-menu">
@@ -513,9 +515,9 @@
     </div>
 
     <div class="content">
-        <!-- Header -->
-        <div class="header">
-            <div class="title">Complete Appointment</div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Complete Appointment</h1>
         </div>
         
         <!-- Display any error or success messages -->

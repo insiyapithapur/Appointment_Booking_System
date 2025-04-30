@@ -100,4 +100,24 @@ public class ScheduleDaoImp implements GenericDao<Schedule, Integer> {
 	    }
 	    return scheduleDetails;
 	}
+	
+	public boolean updateScheduleAvailability(int scheduleId, boolean isAvailable) {
+	    boolean success = false;
+	    try {
+	        Transaction transaction = session.beginTransaction();
+	        
+	        String hql = "UPDATE Schedule s SET s.isAvailable = :isAvailable WHERE s.scheduleId = :scheduleId";
+	        Query query = session.createQuery(hql);
+	        query.setParameter("isAvailable", isAvailable);
+	        query.setParameter("scheduleId", scheduleId);
+	        
+	        int result = query.executeUpdate();
+	        transaction.commit();
+	        
+	        success = (result > 0);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return success;
+	}
 }

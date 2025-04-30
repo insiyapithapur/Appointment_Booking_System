@@ -15,6 +15,7 @@ C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementat
 C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\App.java
 C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\servlet\AdminMedicalRecordViewServlet.java
 C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\dao\GenericDao.java
+C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\servlet\AdminDoctorSchedulesServlet.java
 C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\model\Appointment.java
 C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\servlet\UserDetailsServlet.java
 C:\BTech CSD\8th semester\Mastek_Assignments\project\CapestoneProjectImplementation\AppointmentBookingSystem\src\main\java\com\training\project\servlet\PatientProfileServlet.java

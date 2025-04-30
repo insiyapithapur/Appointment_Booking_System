@@ -830,6 +830,7 @@
         
         <!-- Appointments Card with Search and Filters -->
         <div class="card">
+
             <div class="card-header">
                 <div><i class="fas fa-calendar-alt me-2"></i> Upcoming Appointments</div>
                 <div class="filter-bar">
@@ -917,7 +918,7 @@
                                             <c:when test="${fn:containsIgnoreCase(status, 'Completed')}">
                                                 <a href="${pageContext.request.contextPath}/Patient/Appointments?action=viewMedicalRecord&appointmentId=${appointmentId}" 
                                                   class="btn-action btn-view">
-                                                    <i class="fas fa-file-medical"></i>
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                             </c:when>
                                             <c:when test="${fn:containsIgnoreCase(status, 'Pending') || fn:containsIgnoreCase(status, 'Confirmed')}">

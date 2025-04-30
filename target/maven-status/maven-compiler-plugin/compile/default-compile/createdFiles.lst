@@ -8,6 +8,7 @@ com\training\project\servlet\AppointmentServlet.class
 com\training\project\dao\Imp\ScheduleDaoImp.class
 com\training\project\dao\Imp\UserDaoImp.class
 com\training\project\servlet\AdminAddDoctorServlet.class
+com\training\project\servlet\AdminDoctorSchedulesServlet.class
 com\training\project\servlet\AdminPatientServlet.class
 com\training\project\model\User.class
 com\training\project\servlet\AppointmentServlet$AppointmentDisplayDTO.class

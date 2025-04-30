@@ -209,49 +209,91 @@
         }
         
         /* Filter section */
-        .filter-container {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--bg-secondary);
+        /* Search and Filter styles */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
         }
-        
-        .filter-item {
-            margin-bottom: 0;
-        }
-        
-        .filter-label {
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-        
-        .search-box {
+
+        .search-container {
             position: relative;
+            flex-grow: 1;
+            max-width: 500px;
         }
-        
-        .search-box .search-icon {
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-primary);
+            background-color: white;
+        }
+
+        .search-icon {
             position: absolute;
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-secondary);
-            z-index: 2;
         }
-        
-        .search-box input {
-            padding-left: 35px;
+
+        .date-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 8px 12px 8px 35px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             font-size: 13px;
-            height: 38px;
+            color: var(--text-primary);
+            background-color: white;
+            width: 180px;
         }
-        
-        .form-control, .form-select {
-            border: 1px solid var(--border-color);
+
+        .date-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .filter-dropdown {
+            padding: 8px 12px;
             border-radius: 6px;
+            border: 1px solid var(--border-color);
             font-size: 13px;
-            height: 38px;
+            color: var(--text-primary);
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .filter-button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .filter-button:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
         }
         
         /* Table styles */
@@ -299,17 +341,18 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .doctor-avatar {
             width: 36px;
             height: 36px;
             border-radius: 50%;
+            background-color: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 500;
             font-size: 12px;
-            color: white;
+            color: var(--primary-color);
         }
         
         /* Badge for specialty */
@@ -516,57 +559,82 @@
         </div>
         
         <!-- Doctors Table Card -->
-        <div class="card mb-4">
-            
+        <div class="card">
             <!-- Filter Controls -->
-            <div class="filter-container">
-                <div class="row align-items-end">
-                    <!-- Text filter for doctor name or specialty -->
-                    <div class="col-md-6">
-                        <div class="filter-item">
-                            <div class="filter-label">
-                                <i class="fas fa-search me-1"></i> Search Doctors
-                            </div>
-                            <div class="search-box">
-                                <i class="fas fa-search search-icon"></i>
-                                <input type="text" id="doctorSearch" class="form-control" 
-                                       placeholder="Search by name, specialty or qualifications..." 
-                                       onkeyup="searchDoctors()">
-                            </div>
-                        </div>
+            <div class="card-header">
+                <div><i class="fas fa-user-alt me-2"></i> Doctors</div>
+                <div class="filter-bar">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="doctorSearch" class="search-input" placeholder="Search by name, specialty..." onkeyup="searchDoctors()">
                     </div>
-                    
-                    <!-- Specialty filter dropdown - optional enhancement -->
-                    <div class="col-md-4">
-                        <div class="filter-item">
-                            <div class="filter-label">
-                                <i class="fas fa-filter me-1"></i> Filter by Specialty
-                            </div>
-                            <select id="specialtyFilter" class="form-select" onchange="searchDoctors()">
-                                <option value="">All Specialties</option>
-                                <!-- Could be populated dynamically with available specialties -->
-                                <option value="Cardiology">Cardiology</option>
-                                <option value="Dermatology">Dermatology</option>
-                                <option value="Neurology">Neurology</option>
-                                <option value="Orthopedics">Orthopedics</option>
-                                <option value="Pediatrics">Pediatrics</option>
-                                <option value="Psychiatry">Psychiatry</option>
-                                <option value="Gynecology">Gynecology</option>
-                                <option value="Dentistry">Dentistry</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Reset Filters Button -->
-                    <div class="col-md-2">
-                        <div class="filter-item">
-                            <button class="btn btn-outline-secondary w-20" onclick="resetFilters()">
-                                <i class="fas fa-redo-alt me-1"></i> 
-                            </button>
-                        </div>
-                    </div>
+
+                    <select id="specialtyFilter" class="filter-dropdown" onchange="searchDoctors()">
+                        <option value="">All Specialties</option>--%>
+                                                        <!-- Could be populated dynamically with available specialties -->
+                                                        <option value="Cardiology">Cardiology</option>
+                                                        <option value="Dermatology">Dermatology</option>
+                                                        <option value="Neurology">Neurology</option>
+                                                        <option value="Orthopedics">Orthopedics</option>
+                                                        <option value="Pediatrics">Pediatrics</option>
+                                                        <option value="Psychiatry">Psychiatry</option>
+                                                        <option value="Gynecology">Gynecology</option>
+                                                        <option value="Dentistry">Dentistry</option>
+                    </select>
+
+                    <button class="filter-button" onclick="resetFilters()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
+
+        <%--                <div class="row align-items-end">--%>
+<%--                    <!-- Text filter for doctor name or specialty -->--%>
+<%--                    <div class="col-md-6">--%>
+<%--                        <div class="filter-item">--%>
+<%--                            <div class="filter-label">--%>
+<%--                                <i class="fas fa-search me-1"></i> Search Doctors--%>
+<%--                            </div>--%>
+<%--                            <div class="search-box">--%>
+<%--                                <i class="fas fa-search search-icon"></i>--%>
+<%--                                <input type="text" id="doctorSearch" class="form-control" --%>
+<%--                                       placeholder="Search by name, specialty or qualifications..." --%>
+<%--                                       onkeyup="searchDoctors()">--%>
+<%--                            </div>--%>
+<%--                        </div>--%>
+<%--                    </div>--%>
+<%--                    --%>
+<%--                    <!-- Specialty filter dropdown - optional enhancement -->--%>
+<%--                    <div class="col-md-4">--%>
+<%--                        <div class="filter-item">--%>
+<%--                            <div class="filter-label">--%>
+<%--                                <i class="fas fa-filter me-1"></i> Filter by Specialty--%>
+<%--                            </div>--%>
+<%--                            <select id="specialtyFilter" class="form-select" onchange="searchDoctors()">--%>
+<%--                                <option value="">All Specialties</option>--%>
+<%--                                <!-- Could be populated dynamically with available specialties -->--%>
+<%--                                <option value="Cardiology">Cardiology</option>--%>
+<%--                                <option value="Dermatology">Dermatology</option>--%>
+<%--                                <option value="Neurology">Neurology</option>--%>
+<%--                                <option value="Orthopedics">Orthopedics</option>--%>
+<%--                                <option value="Pediatrics">Pediatrics</option>--%>
+<%--                                <option value="Psychiatry">Psychiatry</option>--%>
+<%--                                <option value="Gynecology">Gynecology</option>--%>
+<%--                                <option value="Dentistry">Dentistry</option>--%>
+<%--                            </select>--%>
+<%--                        </div>--%>
+<%--                    </div>--%>
+<%--                    --%>
+<%--                    <!-- Reset Filters Button -->--%>
+<%--                    <div class="col-md-2">--%>
+<%--                        <div class="filter-item">--%>
+<%--                            <button class="btn btn-outline-secondary w-20" onclick="resetFilters()">--%>
+<%--                                <i class="fas fa-redo-alt me-1"></i> --%>
+<%--                            </button>--%>
+<%--                        </div>--%>
+<%--                    </div>--%>
+<%--                </div>--%>
+
             
             <!-- Doctors Table -->
             <div class="table-responsive">
@@ -597,8 +665,8 @@
                                 data-specialty="${specialty}" 
                                 data-qualifications="${degree}">
                                 <td>
-                                    <div class="doctor-info">
-                                        <div class="doctor-avatar" style="background-color: hsl(${(status.index * 40) % 360}, 70%, 60%)">
+                                    <div class="dodoctor-infoctor-info">
+                                        <div class="doctor-avatar">
                                             ${fn:substring(doctorName, 0, 1)}
                                         </div>
                                         ${doctorName}
@@ -622,7 +690,7 @@
                                 </td>
                                 <td>${contact}</td>
                                 <td>
-                                    <button class="btn btn-success btn-sm" onclick="bookAppointment(${doctorId})">
+                                    <button class="btn btn-primary" onclick="bookAppointment(${doctorId})">
                                         <i class="fas fa-calendar-plus me-1"></i> Book Appointment
                                     </button>
                                 </td>
