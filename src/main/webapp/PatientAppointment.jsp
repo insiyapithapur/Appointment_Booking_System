@@ -212,139 +212,133 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        /* Statistics Cards */
-        .statistics-row {
-            display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 0;
-            padding: 15px;
-        }
-        
-        .stat-card {
-            flex: 1;
-            min-width: 240px;
-            background-color: var(--bg-color);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 6px rgba(77, 171, 247, 0.04);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .stat-info h3 {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-        }
-        
-        .stat-info p {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-color);
-            font-size: 18px;
+            gap: 15px;
         }
         
         /* Filter section */
-        .filter-container {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: var(--bg-secondary);
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
         }
         
-        .filter-item {
-            margin-bottom: 0;
-        }
-        
-        .filter-label {
-            font-weight: 500;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-            font-size: 13px;
-        }
-        
-        .search-box {
+        .search-container {
             position: relative;
+            flex-grow: 1;
+            max-width: 300px;
         }
         
-        .search-box .search-icon {
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 35px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-primary);
+            background-color: white;
+        }
+        
+        .search-icon {
             position: absolute;
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-secondary);
-            z-index: 2;
         }
         
-        .search-box input {
-            padding-left: 35px;
+        .date-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .date-input {
+            padding: 8px 12px 8px 35px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
             font-size: 13px;
-            height: 38px;
+            color: var(--text-primary);
+            background-color: white;
+            width: 180px;
         }
         
-        .form-control, .form-select {
-            border: 1px solid var(--border-color);
+        .date-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        
+        .filter-dropdown {
+            padding: 8px 12px;
             border-radius: 6px;
+            border: 1px solid var(--border-color);
             font-size: 13px;
-            height: 38px;
+            color: var(--text-primary);
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .filter-button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .filter-button:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
         }
         
         /* Table styles */
         .appointments-table {
             width: 100%;
-            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
         }
         
         .appointments-table th {
-            padding: 12px 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            background-color: var(--bg-secondary);
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-secondary);
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
+            background-color: var(--bg-secondary);
             cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .appointments-table th:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
         }
         
         .appointments-table th i {
             margin-left: 5px;
-            font-size: 12px;
         }
         
         .appointments-table td {
-            padding: 12px 16px;
-            vertical-align: middle;
+            padding: 12px 15px;
             border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
         }
         
-        .appointments-table tr:last-child td {
+        .appointments-table tbody tr:last-child td {
             border-bottom: none;
-        }
-        
-        .appointments-table tbody tr {
-            transition: all 0.2s;
-        }
-        
-        .appointments-table tbody tr:hover {
-            background-color: var(--primary-light);
         }
         
         /* Doctor Info */
@@ -747,79 +741,51 @@
             </c:if>
         </div>
         
-        <!-- Appointments Table Card -->
-        <div class="card mb-4">
-           
-            
-            <!-- Filter Controls -->
-            <div class="filter-container">
-                <div class="row align-items-end">
-                    <!-- Text filter for doctor name or reason -->
-                    <div class="col-md-3">
-                        <div class="filter-item">
-                            <div class="filter-label">
-                                <i class="fas fa-search me-1"></i> Search
-                            </div>
-                            <div class="search-box">
-                                <i class="fas fa-search search-icon"></i>
-                                <input type="text" id="textFilter" class="form-control" 
-                                       placeholder="Doctor name or reason..." 
-                                       onkeyup="applyFilters()">
-                            </div>
-                        </div>
+        <!-- Appointments Table and Filter -->
+        <div class="card">
+           <div class="card-header">
+                <div><i class="fas fa-calendar-alt me-2"></i>Appointments</div>
+                
+                <!-- Appointment Filters -->
+                <div class="filter-bar">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="textFilter" class="search-input" placeholder="Doctor name or reason..." onkeyup="applyFilters()">
                     </div>
                     
-                    <!-- Date filter -->
-                    <div class="col-md-3">
-                        <div class="filter-item">
-                            <div class="filter-label">
-                                <i class="far fa-calendar-alt me-1"></i> Date
-                            </div>
-                            <input type="date" id="dateFilter" class="form-control" 
-                                   onchange="applyFilters()">
-                        </div>
+                    <!-- Date input field instead of dropdown -->
+                    <div class="date-container">
+                        <i class="fas fa-calendar-day date-icon"></i>
+                        <input type="date" id="dateFilter" class="date-input" onchange="applyFilters()">
                     </div>
-                    
-                    <!-- Status filter dropdown -->
-                    <div class="col-md-3">
-                        <div class="filter-item">
-                            <div class="filter-label">
-                                <i class="fas fa-tasks me-1"></i> Status
-                            </div>
-                            <select id="statusFilter" class="form-select" onchange="applyFilters()">
-                                <option value="all">All</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Reset Filters Button -->
-                    <div class="col-md-3">
-                        <div class="filter-item">
-                            <button class="btn btn-outline-secondary w-20" onclick="resetFilters()">
-                                <i class="fas fa-redo-alt me-1"></i>
-                            </button>
-                        </div>
-                    </div>
+                            
+                    <select id="statusFilter" class="filter-dropdown" onchange="applyFilters()">
+                        <option value="all">All</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                            
+                    <button class="filter-button" onclick="resetFilters()">
+                        <i class="fas fa-sync-alt"></i> 
+                    </button>
                 </div>
             </div>
             
             <!-- Appointments Table -->
             <div class="table-responsive">
-                <table class="appointments-table" id="appointmentsTable">
-                    <thead>
-                        <tr>
-                            <th onclick="sortTable(0)">Doctor</th>
-                            <th onclick="sortTable(1)">Date</th>
-                            <th onclick="sortTable(2)">Token</th>
-                            <th onclick="sortTable(3)">Reason</th>
-                            <th onclick="sortTable(4)">Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            	<table class="appointments-table" id="appointmentsTable">
+            		<thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Doctor</th>
+                                <th onclick="sortTable(1)">Date</th>
+                                <th onclick="sortTable(2)">Token</th>
+                                <th onclick="sortTable(3)">Reason</th>
+                                <th onclick="sortTable(4)">Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         <c:forEach items="${appointments}" var="appointmentInfo" varStatus="status">
                             <c:set var="appointmentParts" value="${fn:split(appointmentInfo, '|')}" />
                             <c:set var="appointmentId" value="${fn:trim(fn:substringAfter(appointmentParts[0], 'ID:'))}" />
@@ -839,7 +805,7 @@
                                 data-reason="${reason}">
                                 <td>
                                     <div class="doctor-info">
-                                        <div class="doctor-avatar" style="background-color: ${avatarColor}">
+                                        <div class="doctor-avatar">
                                             ${fn:substring(doctorName, 0, 1)}
                                         </div>
                                         ${doctorName}
@@ -903,8 +869,9 @@
                             </td>
                         </tr>
                     </tbody>
-                </table>
+            	</table>
             </div>
+            
         </div>
         
         <!-- Action buttons -->

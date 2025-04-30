@@ -803,6 +803,11 @@
     </div>
     
     <div class="content">
+    	<!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Dashboard</h1>
+        </div>
+        
         <!-- Alert Container -->
         <div class="alert-container">
             <c:if test="${not empty errorMessage}">
@@ -821,107 +826,7 @@
             </c:if>
         </div>
         
-        <!-- Upcoming Statistics Cards -->
-        <div class="card">
-            <div class="card-header">
-                <div><i class="fas fa-chart-line me-2"></i>Upcoming Appointment Overview</div>
-                <div class="total-appointments">
-                	<c:out value="2" default="0" /> TOTAL
-                    <!--<c:out value="${activeDoctorCount}" default="0" /> TOTAL-->
-                </div>
-            </div>
-            <div class="p-3">
-            	<div class="statistics-row">
-
-		            <div class="stat-card">
-		                <div class="stat-info">
-		                    <h3>Pending Appointment</h3>
-		                    <p>
-		                        <c:out value="${totalPatients}" default="2" />
-		                    </p>
-		                </div>
-		                <div class="stat-icon">
-		                    <i class="fas fa-user-injured"></i>
-		                </div>
-		            </div>
-		            
-		            <div class="stat-card">
-		                <div class="stat-info">
-		                    <h3>Completed Appointment</h3>
-		                    <p>
-		                        <c:out value="${doctorCount}" default="0" />
-		                    </p>
-		                </div>
-		                <div class="stat-icon">
-		                    <i class="fas fa-user-md"></i>
-		                </div>
-		            </div>
-		            
-		            <div class="stat-card">
-		                <div class="stat-info">
-		                    <h3>Cancelled Appointment</h3>
-		                    <p>
-		                        <c:out value="${totalAppointments}" default="0" />
-		                    </p>
-		                </div>
-		                <div class="stat-icon">
-		                    <i class="fas fa-calendar-check"></i>
-		                </div>
-		            </div>
-		        </div>
-            </div>
-         </div>
-         
-         <!-- Today Statistics Cards -->
-         <div class="card">
-            <div class="card-header">
-                <div><i class="fas fa-chart-line me-2"></i>Today's Appointment Overview</div>
-                <div class="total-appointments">
-                	<c:out value="0" default="0" /> TOTAL
-                    <!--<c:out value="${activeDoctorCount}" default="0" /> TOTAL-->
-                </div>
-            </div>
-            <div class="p-3">
-            	<div class="statistics-row">
-
-		            <div class="stat-card">
-		                <div class="stat-info">
-		                    <h3>Pending Appointment</h3>
-		                    <p>
-		                        <c:out value="${totalPatients}" default="0" />
-		                    </p>
-		                </div>
-		                <div class="stat-icon">
-		                    <i class="fas fa-user-injured"></i>
-		                </div>
-		            </div>
-		            
-		            <div class="stat-card">
-		                <div class="stat-info">
-		                    <h3>Completed Appointment</h3>
-		                    <p>
-		                        <c:out value="${doctorCount}" default="0" />
-		                    </p>
-		                </div>
-		                <div class="stat-icon">
-		                    <i class="fas fa-user-md"></i>
-		                </div>
-		            </div>
-		            
-		            <div class="stat-card">
-		                <div class="stat-info">
-		                    <h3>Cancelled Appointment</h3>
-		                    <p>
-		                        <c:out value="${totalAppointments}" default="0" />
-		                    </p>
-		                </div>
-		                <div class="stat-icon">
-		                    <i class="fas fa-calendar-check"></i>
-		                </div>
-		            </div>
-		        </div>
-            </div>
-         </div>
+        
         
         <!-- Appointments Card with Search and Filters -->
         <div class="card">

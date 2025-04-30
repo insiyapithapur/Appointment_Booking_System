@@ -26,8 +26,6 @@ Admin
 	
 
 Patient
-	Side bar --> All procedures integrate
-	Dashboard --> All procedure integrate, instead of Upcoming have total with past also
 	Confiemed Appointment --> Show only those days which has selected
 	Profile --> Edit and Change password
 	
