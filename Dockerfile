@@ -1,5 +1,5 @@
 # Stage 1: Maven Build
-FROM maven:3.9.3-eclipse-temurin-21 as builder
+FROM maven:3.9-eclipse-temurin-21 as builder
 WORKDIR /app
 COPY . .
 RUN mvn clean install
