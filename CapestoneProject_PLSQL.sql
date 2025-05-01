@@ -398,4 +398,335 @@ BEGIN
 END;
 /
 
+-- Doctor Dashboard Analytics Package Specification
+CREATE OR REPLACE PACKAGE doctor_dashboard_analytics AS
+    -- Doctor's patient analytics procedure
+    PROCEDURE get_doctor_patient_analytics(
+        p_doctor_id IN NUMBER,
+        p_total_patients OUT NUMBER,
+        p_new_patients_this_month OUT NUMBER,
+        p_today_patients OUT NUMBER
+    );
+    
+    -- Doctor's appointment analytics procedure
+    PROCEDURE get_doctor_today_appointment_analytics(
+        p_doctor_id IN NUMBER,
+        p_pending_count OUT NUMBER,
+        p_completed_count OUT NUMBER,
+        p_cancelled_count OUT NUMBER,
+        p_total_count OUT NUMBER
+    );
+    
+    -- Doctor's overall appointment analytics procedure
+    PROCEDURE get_doctor_overall_appointment_analytics(
+        p_doctor_id IN NUMBER,
+        p_pending_count OUT NUMBER,
+        p_completed_count OUT NUMBER,
+        p_cancelled_count OUT NUMBER,
+        p_total_count OUT NUMBER
+    );
+END doctor_dashboard_analytics;
+/
+
+-- Doctor Dashboard Analytics Package Body
+CREATE OR REPLACE PACKAGE BODY doctor_dashboard_analytics AS
+    -- Doctor's patient analytics procedure implementation
+    PROCEDURE get_doctor_patient_analytics(
+        p_doctor_id IN NUMBER,
+        p_total_patients OUT NUMBER,
+        p_new_patients_this_month OUT NUMBER,
+        p_today_patients OUT NUMBER
+    ) IS
+    BEGIN
+        -- Get total unique patients the doctor has handled till now
+        SELECT COUNT(DISTINCT p.patient_id) INTO p_total_patients
+        FROM patients p
+        JOIN appointments a ON p.patient_id = a.patient_id
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        WHERE s.doctor_id = p_doctor_id;
+        
+        -- Get new patients this month
+        SELECT COUNT(DISTINCT p.patient_id) INTO p_new_patients_this_month
+        FROM patients p
+        JOIN appointments a ON p.patient_id = a.patient_id
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        WHERE s.doctor_id = p_doctor_id
+        AND TRUNC(a.created_at, 'MM') = TRUNC(SYSDATE, 'MM')
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM appointments a2
+            JOIN schedules s2 ON a2.schedule_id = s2.schedule_id
+            WHERE a2.patient_id = p.patient_id
+            AND s2.doctor_id = p_doctor_id
+            AND a2.created_at < TRUNC(SYSDATE, 'MM')
+        );
+        
+        -- Get today's patients with appointments for this doctor
+        SELECT COUNT(DISTINCT p.patient_id) INTO p_today_patients
+        FROM patients p
+        JOIN appointments a ON p.patient_id = a.patient_id
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        WHERE s.doctor_id = p_doctor_id
+        AND TRUNC(a.appointment_date) = TRUNC(SYSDATE);
+    END get_doctor_patient_analytics;
+    
+    -- Doctor's today appointment analytics procedure implementation
+    PROCEDURE get_doctor_today_appointment_analytics(
+        p_doctor_id IN NUMBER,
+        p_pending_count OUT NUMBER,
+        p_completed_count OUT NUMBER,
+        p_cancelled_count OUT NUMBER,
+        p_total_count OUT NUMBER
+    ) IS
+    BEGIN
+        -- Get total appointments for today for this doctor
+        SELECT COUNT(*) INTO p_total_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        WHERE s.doctor_id = p_doctor_id
+        AND TRUNC(a.appointment_date) = TRUNC(SYSDATE);
+        
+        -- Get pending appointments count
+        SELECT COUNT(*) INTO p_pending_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        JOIN appointments_status ast ON a.status_id = ast.status_id
+        WHERE s.doctor_id = p_doctor_id
+        AND TRUNC(a.appointment_date) = TRUNC(SYSDATE)
+        AND ast.status_name = 'Pending';
+        
+        -- Get completed appointments count
+        SELECT COUNT(*) INTO p_completed_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        JOIN appointments_status ast ON a.status_id = ast.status_id
+        WHERE s.doctor_id = p_doctor_id
+        AND TRUNC(a.appointment_date) = TRUNC(SYSDATE)
+        AND ast.status_name = 'Completed';
+        
+        -- Get cancelled appointments count
+        SELECT COUNT(*) INTO p_cancelled_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        JOIN appointments_status ast ON a.status_id = ast.status_id
+        WHERE s.doctor_id = p_doctor_id
+        AND TRUNC(a.appointment_date) = TRUNC(SYSDATE)
+        AND ast.status_name = 'Cancelled';
+    END get_doctor_today_appointment_analytics;
+    
+    -- Doctor's overall appointment analytics procedure implementation
+    PROCEDURE get_doctor_overall_appointment_analytics(
+        p_doctor_id IN NUMBER,
+        p_pending_count OUT NUMBER,
+        p_completed_count OUT NUMBER,
+        p_cancelled_count OUT NUMBER,
+        p_total_count OUT NUMBER
+    ) IS
+    BEGIN
+        -- Get total appointments for this doctor
+        SELECT COUNT(*) INTO p_total_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        WHERE s.doctor_id = p_doctor_id;
+        
+        -- Get pending appointments count
+        SELECT COUNT(*) INTO p_pending_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        JOIN appointments_status ast ON a.status_id = ast.status_id
+        WHERE s.doctor_id = p_doctor_id
+        AND ast.status_name = 'Pending';
+        
+        -- Get completed appointments count
+        SELECT COUNT(*) INTO p_completed_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        JOIN appointments_status ast ON a.status_id = ast.status_id
+        WHERE s.doctor_id = p_doctor_id
+        AND ast.status_name = 'Completed';
+        
+        -- Get cancelled appointments count
+        SELECT COUNT(*) INTO p_cancelled_count
+        FROM appointments a
+        JOIN schedules s ON a.schedule_id = s.schedule_id
+        JOIN appointments_status ast ON a.status_id = ast.status_id
+        WHERE s.doctor_id = p_doctor_id
+        AND ast.status_name = 'Cancelled';
+    END get_doctor_overall_appointment_analytics;
+END doctor_dashboard_analytics;
+/
+
+-- Test Doctor Patient Analytics
+DECLARE
+    v_doctor_id NUMBER := 1; -- Replace with actual doctor_id
+    v_total_patients NUMBER;
+    v_new_patients_this_month NUMBER;
+    v_today_patients NUMBER;
+BEGIN
+    -- Call the package procedure
+    doctor_dashboard_analytics.get_doctor_patient_analytics(
+        p_doctor_id => v_doctor_id,
+        p_total_patients => v_total_patients,
+        p_new_patients_this_month => v_new_patients_this_month,
+        p_today_patients => v_today_patients
+    );
+    
+    -- Display the results
+    DBMS_OUTPUT.PUT_LINE('Doctor Patient Analytics for Doctor ID: ' || v_doctor_id);
+    DBMS_OUTPUT.PUT_LINE('Total Patients Handled: ' || v_total_patients);
+    DBMS_OUTPUT.PUT_LINE('New Patients This Month: ' || v_new_patients_this_month);
+    DBMS_OUTPUT.PUT_LINE('Patients with Appointments Today: ' || v_today_patients);
+END;
+/
+
+-- Test Doctor Today's Appointment Analytics
+DECLARE
+    v_doctor_id NUMBER := 1; -- Replace with actual doctor_id
+    v_pending_count NUMBER;
+    v_completed_count NUMBER;
+    v_cancelled_count NUMBER;
+    v_total_count NUMBER;
+BEGIN
+    -- Call the package procedure
+    doctor_dashboard_analytics.get_doctor_today_appointment_analytics(
+        p_doctor_id => v_doctor_id,
+        p_pending_count => v_pending_count,
+        p_completed_count => v_completed_count,
+        p_cancelled_count => v_cancelled_count,
+        p_total_count => v_total_count
+    );
+    
+    -- Display the results
+    DBMS_OUTPUT.PUT_LINE('Today''s Appointment Analytics for Doctor ID: ' || v_doctor_id);
+    DBMS_OUTPUT.PUT_LINE('Pending Appointments: ' || v_pending_count);
+    DBMS_OUTPUT.PUT_LINE('Completed Appointments: ' || v_completed_count);
+    DBMS_OUTPUT.PUT_LINE('Cancelled Appointments: ' || v_cancelled_count);
+    DBMS_OUTPUT.PUT_LINE('Total Appointments: ' || v_total_count);
+END;
+/
+
+-- Test Doctor Overall Appointment Analytics
+DECLARE
+    v_doctor_id NUMBER := 1; -- Replace with actual doctor_id
+    v_pending_count NUMBER;
+    v_completed_count NUMBER;
+    v_cancelled_count NUMBER;
+    v_total_count NUMBER;
+BEGIN
+    -- Call the package procedure
+    doctor_dashboard_analytics.get_doctor_overall_appointment_analytics(
+        p_doctor_id => v_doctor_id,
+        p_pending_count => v_pending_count,
+        p_completed_count => v_completed_count,
+        p_cancelled_count => v_cancelled_count,
+        p_total_count => v_total_count
+    );
+    
+    -- Display the results
+    DBMS_OUTPUT.PUT_LINE('Overall Appointment Analytics for Doctor ID: ' || v_doctor_id);
+    DBMS_OUTPUT.PUT_LINE('Pending Appointments: ' || v_pending_count);
+    DBMS_OUTPUT.PUT_LINE('Completed Appointments: ' || v_completed_count);
+    DBMS_OUTPUT.PUT_LINE('Cancelled Appointments: ' || v_cancelled_count);
+    DBMS_OUTPUT.PUT_LINE('Total Appointments: ' || v_total_count);
+END;
+/
+
+-- Combined Doctor Dashboard Analytics (All in one block)
+CREATE OR REPLACE PROCEDURE get_doctor_dashboard_analytics(
+    p_doctor_id IN NUMBER
+) AS
+    -- Patient analytics variables
+    v_total_patients NUMBER;
+    v_new_patients_this_month NUMBER;
+    v_today_patients NUMBER;
+    
+    -- Today's appointment analytics variables
+    v_today_pending_count NUMBER;
+    v_today_completed_count NUMBER;
+    v_today_cancelled_count NUMBER;
+    v_today_total_count NUMBER;
+    
+    -- Overall appointment analytics variables
+    v_overall_pending_count NUMBER;
+    v_overall_completed_count NUMBER;
+    v_overall_cancelled_count NUMBER;
+    v_overall_total_count NUMBER;
+    
+    -- Doctor information variables
+    v_doctor_name VARCHAR2(100);
+    v_specialization VARCHAR2(100);
+BEGIN
+    -- Get doctor information
+    SELECT ud.first_name || ' ' || ud.last_name, d.specialization
+    INTO v_doctor_name, v_specialization
+    FROM doctors d
+    JOIN user_details ud ON d.user_id = ud.user_id
+    WHERE d.doctor_id = p_doctor_id;
+    
+    -- Get patient analytics
+    doctor_dashboard_analytics.get_doctor_patient_analytics(
+        p_doctor_id => p_doctor_id,
+        p_total_patients => v_total_patients,
+        p_new_patients_this_month => v_new_patients_this_month,
+        p_today_patients => v_today_patients
+    );
+    
+    -- Get today's appointment analytics
+    doctor_dashboard_analytics.get_doctor_today_appointment_analytics(
+        p_doctor_id => p_doctor_id,
+        p_pending_count => v_today_pending_count,
+        p_completed_count => v_today_completed_count,
+        p_cancelled_count => v_today_cancelled_count,
+        p_total_count => v_today_total_count
+    );
+    
+    -- Get overall appointment analytics
+    doctor_dashboard_analytics.get_doctor_overall_appointment_analytics(
+        p_doctor_id => p_doctor_id,
+        p_pending_count => v_overall_pending_count,
+        p_completed_count => v_overall_completed_count,
+        p_cancelled_count => v_overall_cancelled_count,
+        p_total_count => v_overall_total_count
+    );
+    
+    -- Display the results
+    DBMS_OUTPUT.PUT_LINE('=================================================');
+    DBMS_OUTPUT.PUT_LINE('Dashboard Analytics for Doctor: ' || v_doctor_name);
+    DBMS_OUTPUT.PUT_LINE('Specialization: ' || v_specialization);
+    DBMS_OUTPUT.PUT_LINE('=================================================');
+    DBMS_OUTPUT.PUT_LINE('');
+    
+    DBMS_OUTPUT.PUT_LINE('PATIENT ANALYTICS');
+    DBMS_OUTPUT.PUT_LINE('-----------------');
+    DBMS_OUTPUT.PUT_LINE('Total Patients Handled: ' || v_total_patients);
+    DBMS_OUTPUT.PUT_LINE('New Patients This Month: ' || v_new_patients_this_month);
+    DBMS_OUTPUT.PUT_LINE('Patients with Appointments Today: ' || v_today_patients);
+    DBMS_OUTPUT.PUT_LINE('');
+    
+    DBMS_OUTPUT.PUT_LINE('TODAY''S APPOINTMENT ANALYTICS');
+    DBMS_OUTPUT.PUT_LINE('----------------------------');
+    DBMS_OUTPUT.PUT_LINE('Pending Appointments: ' || v_today_pending_count);
+    DBMS_OUTPUT.PUT_LINE('Completed Appointments: ' || v_today_completed_count);
+    DBMS_OUTPUT.PUT_LINE('Cancelled Appointments: ' || v_today_cancelled_count);
+    DBMS_OUTPUT.PUT_LINE('Total Appointments: ' || v_today_total_count);
+    DBMS_OUTPUT.PUT_LINE('');
+    
+    DBMS_OUTPUT.PUT_LINE('OVERALL APPOINTMENT ANALYTICS');
+    DBMS_OUTPUT.PUT_LINE('----------------------------');
+    DBMS_OUTPUT.PUT_LINE('Pending Appointments: ' || v_overall_pending_count);
+    DBMS_OUTPUT.PUT_LINE('Completed Appointments: ' || v_overall_completed_count);
+    DBMS_OUTPUT.PUT_LINE('Cancelled Appointments: ' || v_overall_cancelled_count);
+    DBMS_OUTPUT.PUT_LINE('Total Appointments: ' || v_overall_total_count);
+    DBMS_OUTPUT.PUT_LINE('=================================================');
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Doctor with ID ' || p_doctor_id || ' not found.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+END get_doctor_dashboard_analytics;
+/
+
+-- Test the combined doctor dashboard analytics procedure
+EXECUTE get_doctor_dashboard_analytics(1); -- Replace with actual doctor_id
+
 Commit;
