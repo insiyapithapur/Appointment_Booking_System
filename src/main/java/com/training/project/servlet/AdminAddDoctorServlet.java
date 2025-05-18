@@ -176,6 +176,6 @@ public class AdminAddDoctorServlet extends HttpServlet {
     
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Redirect GET requests to the add doctor form page
-        response.sendRedirect("/AdminAddDoctor.jsp");
+        response.sendRedirect("AdminAddDoctor.jsp");
     }
 }
